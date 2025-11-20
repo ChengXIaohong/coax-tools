@@ -1,73 +1,74 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!-- 注意：请将下面所有的 https://YOUR-DOMAIN.COM 替换为您实际部署的域名 -->
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://www.tools.coax.uno/</loc>
+    <loc>https://YOUR-DOMAIN.COM/</loc>
     <lastmod>2025-11-20</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://www.tools.coax.uno/pages/converter.html</loc>
+    <loc>https://YOUR-DOMAIN.COM/pages/converter.html</loc>
     <lastmod>2025-11-20</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.tools.coax.uno/pages/data-generator.html</loc>
+    <loc>https://YOUR-DOMAIN.COM/pages/data-generator.html</loc>
     <lastmod>2025-11-20</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.tools.coax.uno/pages/docx-converter.html</loc>
+    <loc>https://YOUR-DOMAIN.COM/pages/docx-converter.html</loc>
     <lastmod>2025-11-20</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.tools.coax.uno/pages/id-generator.html</loc>
+    <loc>https://YOUR-DOMAIN.COM/pages/id-generator.html</loc>
     <lastmod>2025-11-20</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.tools.coax.uno/pages/image-compressor.html</loc>
+    <loc>https://YOUR-DOMAIN.COM/pages/image-compressor.html</loc>
     <lastmod>2025-11-20</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.tools.coax.uno/pages/json-formatter.html</loc>
+    <loc>https://YOUR-DOMAIN.COM/pages/json-formatter.html</loc>
     <lastmod>2025-11-20</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.tools.coax.uno/pages/password-generator.html</loc>
+    <loc>https://YOUR-DOMAIN.COM/pages/password-generator.html</loc>
     <lastmod>2025-11-20</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.tools.coax.uno/pages/text-converter.html</loc>
+    <loc>https://YOUR-DOMAIN.COM/pages/text-converter.html</loc>
     <lastmod>2025-11-20</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.tools.coax.uno/pages/text-reader.html</loc>
+    <loc>https://YOUR-DOMAIN.COM/pages/text-reader.html</loc>
     <lastmod>2025-11-20</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.tools.coax.uno/pages/text-slicer.html</loc>
+    <loc>https://YOUR-DOMAIN.COM/pages/text-slicer.html</loc>
     <lastmod>2025-11-20</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.tools.coax.uno/pages/timestamp-converter.html</loc>
+    <loc>https://YOUR-DOMAIN.COM/pages/timestamp-converter.html</loc>
     <lastmod>2025-11-20</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>

@@ -4,7 +4,7 @@ Disallow: /node_modules/
 Disallow: /.venv/
 Disallow: /.idea/
 
-Sitemap: https://www.tools.coax.uno/sitemap.xml
+Sitemap: https://YOUR-DOMAIN.COM/sitemap.xml
 
 # 允许访问所有其他内容
 Allow: /
@@ -13,3 +13,6 @@ Allow: /
 # 1. 禁止访问测试目录
 # 2. 禁止访问依赖和配置目录
 # 3. 允许搜索引擎索引主要工具页面
+#
+# 注意：请将上面的 YOUR-DOMAIN.COM 替换为您实际部署的域名
+# 此文件主要用于帮助搜索引擎更好地抓取和索引网站内容
