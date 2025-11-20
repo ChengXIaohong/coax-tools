@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>前端页面测试套件</title>
+    <link rel="stylesheet" href="assets/test-styles.css">
+</head>
+<body>
+    <header class="test-header">
+        <h1>前端页面测试套件</h1>
+        <p>请选择要测试的页面组件</p>
+    </header>
+
+    <main class="test-container">
+        <aside class="test-sidebar">
+            <h3>测试项目</h3>
+            <ul id="testList">
+                <li><label><input type="checkbox" data-page="converter.html"> 单位换算器</label></li>
+                <li><label><input type="checkbox" data-page="data-generator.html"> 模拟数据生成器</label></li>
+                <li><label><input type="checkbox" data-page="docx-converter.html"> Docx转文本工具</label></li>
+                <li><label><input type="checkbox" data-page="id-generator.html"> 身份证信息生成器</label></li>
+                <li><label><input type="checkbox" data-page="image-compressor.html"> 图片压缩工具</label></li>
+                <li><label><input type="checkbox" data-page="json-formatter.html"> JSON格式化工具</label></li>
+                <li><label><input type="checkbox" data-page="password-generator.html"> 密码生成器</label></li>
+                <li><label><input type="checkbox" data-page="text-converter.html"> 文本转换工具</label></li>
+                <li><label><input type="checkbox" data-page="text-reader.html"> 大文本文件阅读器</label></li>
+                <li><label><input type="checkbox" data-page="text-slicer.html"> 文本文件切片工具</label></li>
+                <li><label><input type="checkbox" data-page="timestamp-converter.html"> 时间戳转换工具</label></li>
+            </ul>
+            <button id="runSelectedTests" class="run-btn">运行选中测试</button>
+            <button id="runAllTests" class="run-btn run-all">运行所有测试</button>
+        </aside>
+
+        <section class="test-content">
+            <div id="testFrameContainer"></div>
+            <div id="testResults"></div>
+        </section>
+    </main>
+
+    <script src="assets/test-data.js"></script>
+    <script src="utils/test-runner.js"></script>
+</body>
+</html>

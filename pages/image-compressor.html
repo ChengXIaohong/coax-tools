@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="在线图片压缩工具支持JPG、PNG、WEBP等格式图片压缩，可自定义压缩质量和最大宽度，帮助减小图片文件大小。">
+    <meta name="keywords" content="图片压缩, 图片优化, JPG压缩, PNG压缩, WEBP压缩, 在线压缩">
+    <meta name="author" content="coax">
+    <title>图片压缩工具 - coax的小工具</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/image-compressor.css">
+</head>
+<body>
+    <div class="container">
+        <main>
+            <div class="compressor-container">
+                <div class="compressor-header">
+                    <h1>图片压缩工具</h1>
+                    <p>支持JPG、PNG、WEBP等格式的图片压缩</p>
+                </div>
+                
+                <div class="message" id="message"></div>
+                
+                <div class="upload-area" id="uploadArea">
+                    <i>📁</i>
+                    <h3>拖拽图片到此处或点击上传</h3>
+                    <p>支持 JPG, PNG, WEBP 格式</p>
+                    <div class="file-input-wrapper">
+                        <button class="file-input-button">选择图片</button>
+                        <input type="file" id="imageInput" accept=".jpg,.jpeg,.png,.webp">
+                    </div>
+                    <p id="fileInfo"></p>
+                </div>
+                
+                <div class="preview-container">
+                    <div class="preview-panel">
+                        <h3>原始图片</h3>
+                        <img id="originalPreview" class="image-preview" alt="原始图片预览">
+                        <div class="image-info" id="originalInfo">
+                            <p>请先上传图片</p>
+                        </div>
+                    </div>
+                    
+                    <div class="preview-panel">
+                        <h3>压缩后图片</h3>
+                        <img id="compressedPreview" class="image-preview" alt="压缩后图片预览">
+                        <div class="image-info" id="compressedInfo">
+                            <p>请先压缩图片</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="controls">
+                    <div class="control-group">
+                        <div class="control-header">
+                            <label for="quality">压缩质量:</label>
+                            <span id="qualityValue" class="slider-value">80%</span>
+                        </div>
+                        <div class="slider-container">
+                            <input type="range" id="quality" min="10" max="100" value="80">
+                        </div>
+                    </div>
+                    
+                    <div class="control-group">
+                        <div class="control-header">
+                            <label for="maxWidth">最大宽度:</label>
+                            <span id="widthValue" class="slider-value">1920px</span>
+                        </div>
+                        <div class="slider-container">
+                            <input type="range" id="maxWidth" min="100" max="4000" step="100" value="1920">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="progress-container" id="progressContainer">
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill"></div>
+                    </div>
+                </div>
+                
+                <div class="action-buttons">
+                    <button id="compressBtn" class="btn compress-btn">压缩图片</button>
+                    <a id="downloadBtn" class="btn download-btn" download="compressed-image.jpg">下载压缩图片</a>
+                    <button id="resetBtn" class="btn reset-btn">重置</button>
+                </div>
+            </div>
+        </main>
+
+        <footer id="pageFooter">
+            <div class="footer-content">
+                <p>&copy; <span id="currentYear"></span> coax的小工具. 保留所有权利。</p>
+                <p>渝ICP备2025071398号</p>
+            </div>
+        </footer>
+    </div>
+
+    <script src="../js/image-compressor.js"></script>
+    <script src="../js/common.js"></script>
+</body>
+</html>

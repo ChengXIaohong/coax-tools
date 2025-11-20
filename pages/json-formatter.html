@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="JSON格式化工具可验证并格式化JSON数据，使其更易读和调试，支持自定义缩进空格数，适用于Web开发和API测试场景。">
+    <meta name="keywords" content="JSON格式化, JSON验证, JSON工具, JSON美化, Web开发">
+    <meta name="author" content="coax">
+    <title>JSON格式化工具 - coax的小工具</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/json-formatter.css">
+</head>
+<body>
+    <div class="container">
+        <main>
+            <div class="formatter-container">
+                <div class="formatter-header">
+                    <h1>JSON格式化工具</h1>
+                    <p>粘贴您的JSON数据，点击格式化按钮即可美化和验证JSON</p>
+                </div>
+                
+                <div class="message" id="message"></div>
+                
+                <div class="input-output-container">
+                    <div class="panel">
+                        <div class="panel-header">
+                            <h2>输入原始JSON</h2>
+                            <div class="panel-actions">
+                                <button class="btn-small" id="clearInput">清空</button>
+                            </div>
+                        </div>
+                        <textarea id="inputJson" placeholder='粘贴您的原始JSON数据在这里，例如:
+{
+  "name": "张三",
+  "age": 30,
+  "city": "北京"
+}'></textarea>
+                    </div>
+                    
+                    <div class="panel">
+                        <div class="panel-header">
+                            <h2>格式化结果</h2>
+                            <div class="panel-actions">
+                                <button class="btn-small" id="yamlConvert">转YAML</button>
+                                <button class="btn-small" id="toonConvert">转TOON</button>
+                                <button class="btn-small" id="extractStructure">提取结构</button>
+                                <button class="btn-small" id="copyOutput">复制</button>
+                            </div>
+                        </div>
+                        <textarea id="outputJson" placeholder="格式化后的JSON将显示在这里" readonly></textarea>
+                    </div>
+                </div>
+                
+                <div class="controls">
+                    <div class="control-group">
+                        <label for="indentSize">缩进空格数:</label>
+                        <select id="indentSize">
+                            <option value="2">2</option>
+                            <option value="4" selected>4</option>
+                            <option value="8">8</option>
+                        </select>
+                    </div>
+                    
+                    <button id="formatBtn" class="btn-large format-btn">格式化JSON</button>
+                    <button id="structureBtn" class="btn-large format-btn">提取结构</button>
+                    <button id="toonBtn" class="btn-large format-btn">转TOON格式</button>
+                    <button id="yamlBtn" class="btn-large format-btn">转YAML格式</button>
+                    <button id="clearBtn" class="btn-large clear-btn">清空所有</button>
+                </div>
+                
+                <div class="sample-data">
+                    <p>没有JSON数据？<span class="sample-link" id="loadSample">加载示例数据</span></p>
+                </div>
+            </div>
+        </main>
+
+        <footer id="pageFooter">
+            <div class="footer-content">
+                <p>&copy; <span id="currentYear"></span> coax的小工具. 保留所有权利。</p>
+                <p>渝ICP备2025071398号</p>
+            </div>
+        </footer>
+    </div>
+
+    <script src="../js/json-formatter.js"></script>
+    <script src="../js/common.js"></script>
+</body>
+</html>

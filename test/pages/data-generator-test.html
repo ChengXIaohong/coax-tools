@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>模拟数据生成器测试</title>
+    <link rel="stylesheet" href="../../css/data-generator.css">
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .test-case { margin: 20px 0; padding: 15px; border: 1px solid #ccc; border-radius: 5px; }
+        .test-result { margin-top: 10px; padding: 10px; border-radius: 3px; }
+        .pass { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .fail { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        button { padding: 10px 15px; background-color: #007bff; color: white; border: none; border-radius: 3px; cursor: pointer; }
+        button:hover { background-color: #0056b3; }
+        #preview { min-height: 100px; border: 1px solid #eee; padding: 10px; margin-top: 10px; }
+    </style>
+</head>
+<body>
+    <h1>模拟数据生成器测试</h1>
+    
+    <div class="test-case">
+        <h3>测试用例 1: 生成默认选项的模拟数据</h3>
+        <p>生成行数: 10行</p>
+        <p>选项: 序号、IP地址、电话号码、车牌号、访问时间、客户姓名(中间脱敏)</p>
+        <button onclick="testDefaultDataGeneration()">运行测试</button>
+        <div id="defaultTestResult" class="test-result" style="display:none;"></div>
+        <div id="preview"></div>
+    </div>
+    
+    <div class="test-case">
+        <h3>测试用例 2: 生成自定义选项的模拟数据</h3>
+        <p>生成行数: 5行</p>
+        <p>选项: IP地址、电话号码、姓名(第一位之后全部脱敏)</p>
+        <button onclick="testCustomDataGeneration()">运行测试</button>
+        <div id="customTestResult" class="test-result" style="display:none;"></div>
+    </div>
+
+    <!-- 引入必要的脚本 -->
+    <script src="../../js/id-data.js"></script>
+    <script>
+        // 模拟原始页面的部分功能
+        function generateRandomIP() {
+            return Math.floor(Math.random() * 255) + '.' + 
+                   Math.floor(Math.random() * 255) + '.' + 
+                   Math.floor(Math.random() * 255) + '.' + 
+                   Math.floor(Math.random() * 255);
+        }
+
+        function generateRandomPhone() {
+            return '1' + Math.floor(Math.random() * 10) + 
+                   Math.floor(Math.random() * 10) + 
+                   Math.floor(Math.random() * 10) + 
+                   Math.floor(Math.random() * 10) + 
+                   Math.floor(Math.random() * 10) + 
+                   Math.floor(Math.random() * 10) + 
+                   Math.floor(Math.random() * 10) + 
+                   Math.floor(Math.random() * 10) + 
+                   Math.floor(Math.random() * 10) + 
+                   Math.floor(Math.random() * 10) + 
+                   Math.floor(Math.random() * 10);
+        }
+
+        function generateRandomPlate() {
+            const provinces = ['京', '沪', '粤', '苏', '浙', '鲁', '川', '豫'];
+            const province = provinces[Math.floor(Math.random() * provinces.length)];
+            let plate = province;
+            for (let i = 0; i < 6; i++) {
+                plate += Math.random() > 0.5 ? 
+                    String.fromCharCode(65 + Math.floor(Math.random() * 26)) : 
+                    Math.floor(Math.random() * 10);
+            }
+            return plate;
+        }
+
+        function generateRandomTime() {
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            const hours = String(Math.floor(Math.random() * 24)).padStart(2, '0');
+            const minutes = String(Math.floor(Math.random() * 60)).padStart(2, '0');
+            const seconds = String(Math.floor(Math.random() * 60)).padStart(2, '0');
+            return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+        }
+
+        function generateRandomName() {
+            const surnames = ['张', '李', '王', '刘', '陈', '杨', '赵', '黄', '周', '吴'];
+            const names = ['伟', '芳', '娜', '敏', '静', '丽', '强', '磊', '军', '洋',
+                          '勇', '艳', '杰', '娟', '涛', '明', '超', '秀英', '霞', '平'];
+            const surname = surnames[Math.floor(Math.random() * surnames.length)];
+            const name1 = names[Math.floor(Math.random() * names.length)];
+            const name2 = names[Math.floor(Math.random() * names.length)];
+            return surname + name1 + name2;
+        }
+
+        function maskName(name, type) {
+            if (type === 'middle') {
+                if (name.length === 2) {
+                    return name.charAt(0) + '*';
+                } else if (name.length >= 3) {
+                    return name.charAt(0) + '*'.repeat(name.length - 2) + name.charAt(name.length - 1);
+                }
+            } else if (type === 'afterFirst') {
+                return name.charAt(0) + '*'.repeat(name.length - 1);
+            }
+            return name;
+        }
+
+        // 测试默认数据生成
+        function testDefaultDataGeneration() {
+            const rowCount = 10;
+            const data = [];
+            
+            for (let i = 1; i <= rowCount; i++) {
+                const row = {};
+                row.index = i;
+                row.ip = generateRandomIP();
+                row.phone = generateRandomPhone();
+                row.plate = generateRandomPlate();
+                row.time = generateRandomTime();
+                row.name = maskName(generateRandomName(), 'middle');
+                data.push(row);
+            }
+            
+            const passed = data.length === rowCount;
+            
+            const resultDiv = document.getElementById('defaultTestResult');
+            resultDiv.style.display = 'block';
+            resultDiv.className = 'test-result ' + (passed ? 'pass' : 'fail');
+            resultDiv.innerHTML = passed 
+                ? `测试通过: 成功生成 ${data.length} 行数据` 
+                : `测试失败: 期望生成 ${rowCount} 行，实际生成 ${data.length} 行`;
+            
+            // 显示预览
+            const previewDiv = document.getElementById('preview');
+            previewDiv.innerHTML = '<h4>数据预览:</h4>';
+            const table = document.createElement('table');
+            table.border = '1';
+            table.innerHTML = `
+                <tr>
+                    <th>序号</th>
+                    <th>IP地址</th>
+                    <th>客户电话</th>
+                    <th>车牌号</th>
+                    <th>访问时间</th>
+                    <th>客户姓名</th>
+                </tr>
+            `;
+            
+            for (let i = 0; i < Math.min(3, data.length); i++) {
+                const row = data[i];
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${row.index}</td>
+                    <td>${row.ip}</td>
+                    <td>${row.phone}</td>
+                    <td>${row.plate}</td>
+                    <td>${row.time}</td>
+                    <td>${row.name}</td>
+                `;
+                table.appendChild(tr);
+            }
+            
+            previewDiv.appendChild(table);
+        }
+        
+        // 测试自定义数据生成
+        function testCustomDataGeneration() {
+            const rowCount = 5;
+            const data = [];
+            
+            for (let i = 1; i <= rowCount; i++) {
+                const row = {};
+                row.ip = generateRandomIP();
+                row.phone = generateRandomPhone();
+                row.name = maskName(generateRandomName(), 'afterFirst');
+                data.push(row);
+            }
+            
+            const passed = data.length === rowCount;
+            
+            const resultDiv = document.getElementById('customTestResult');
+            resultDiv.style.display = 'block';
+            resultDiv.className = 'test-result ' + (passed ? 'pass' : 'fail');
+            resultDiv.innerHTML = passed 
+                ? `测试通过: 成功生成 ${data.length} 行数据` 
+                : `测试失败: 期望生成 ${rowCount} 行，实际生成 ${data.length} 行`;
+        }
+    </script>
+</body>
+</html>

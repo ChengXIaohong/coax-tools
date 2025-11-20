@@ -1,0 +1,202 @@
+<!--
+  coax的小工具 - 一套实用的前端工具集合
+  
+  MIT License
+  
+  Copyright (c) 2025 coax
+  
+   Permission is hereby granted, free of charge, to any person obtaining a copy
+   of this software and associated documentation files (the "Software"), to deal
+   in the Software without restriction, including without limitation the rights
+   to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+   copies of the Software, and to permit persons to whom the Software is
+   furnished to do so, subject to the following conditions:
+   
+   The above copyright notice and this permission notice shall be included in all
+   copies or substantial portions of the Software.
+   
+   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+   IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+   FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+   AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+   LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+   OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+   SOFTWARE.
+  
+   一套实用的前端工具集合，包括文本处理、数据转换、文件操作等多种实用工具。
+   源码可得，快乐加倍！记得给个Star哦~ 🌟
+-->
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="单位换算器支持长度、重量、温度、面积、体积、速度等多种单位之间的换算，适用于工程、制造、化学、建筑等领域的专业计算需求。">
+    <meta name="keywords" content="单位换算, 长度换算, 重量换算, 温度换算, 面积换算, 体积换算, 速度换算, 工程计算">
+    <meta name="author" content="coax">
+    <title>单位换算器 - coax的小工具</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/converter.css">
+    <!-- 添加favicon图标 -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔧</text></svg>">
+    <script src="../js/unit-data.js"></script>
+</head>
+<body>
+    <div class="container">
+        <main>
+            <div class="converter-container">
+                <div class="converter-header">
+                    <h1>单位换算器</h1>
+                    <p>支持多种单位之间的换算</p>
+                </div>
+                
+                <div class="help-icon" id="helpIcon">?</div>
+                
+                <div class="help-modal" id="helpModal">
+                    <div class="help-content">
+                        <span class="close" id="closeHelp">&times;</span>
+                        <h2>单位换算器说明</h2>
+                        
+                        <div class="help-section">
+                            <h3>长度单位</h3>
+                            <p>支持毫米(mm)、厘米(cm)、米(m)、千米(km)、英寸(in)、英尺(ft)、码(yd)、英里(mi)之间的相互转换。</p>
+                        </div>
+                        
+                        <div class="help-section">
+                            <h3>重量单位</h3>
+                            <p>支持毫克(mg)、克(g)、千克(kg)、吨(t)、盎司(oz)、磅(lb)之间的相互转换。</p>
+                        </div>
+                        
+                        <div class="help-section">
+                            <h3>温度单位</h3>
+                            <p>支持摄氏度(℃)、华氏度(℉)、开尔文(K)之间的相互转换。温度转换使用专用算法而非简单的比例因子。</p>
+                        </div>
+                        
+                        <div class="help-section">
+                            <h3>面积单位</h3>
+                            <p>支持平方毫米(sqmm)、平方厘米(sqcm)、平方米(sqm)、公顷(ha)、平方千米(sqkm)、平方英寸(sqin)、平方英尺(sqft)、平方码(sqyd)、英亩(acre)、平方英里(sqmi)之间的相互转换。</p>
+                        </div>
+                        
+                        <div class="help-section">
+                            <h3>体积单位</h3>
+                            <p>支持毫升(ml)、升(l)、立方米(cum)、茶匙(tsp)、汤匙(tbsp)、液盎司(floz)、杯(cup)、品脱(pt)、夸脱(qt)、加仑(gal)之间的相互转换。</p>
+                        </div>
+                        
+                        <div class="help-section">
+                            <h3>速度单位</h3>
+                            <p>支持米/秒(mps)、千米/小时(kph)、英里/小时(mph)、英尺/秒(fps)、节(knot)、光速(c)之间的相互转换。</p>
+                            <p>光速是物理学中的基本常数，约等于 299,792,458 米/秒。现在用户可以在单位换算器中使用光速作为参考速度单位进行各种转换。</p>
+                        </div>
+                        
+                        <div class="help-section">
+                            <h3>角度单位</h3>
+                            <p>支持度(°)、弧度(rad)、百分度(grad)等单位间的转换。</p>
+                        </div>
+                        
+                        <div class="help-section">
+                            <h3>力</h3>
+                            <p>支持牛顿(N)、千牛(kN)、磅力(lbf)等单位间的转换。</p>
+                        </div>
+                        
+                        <div class="help-section">
+                            <h3>压力</h3>
+                            <p>支持帕斯卡(Pa)、兆帕(MPa)、巴(bar)、百帕(hPa)、毫米汞柱(mmHg)等单位间的转换。</p>
+                        </div>
+                        
+                        <div class="help-section">
+                            <h3>功率</h3>
+                            <p>支持瓦特(W)、千瓦(kW)、兆瓦(MW)、马力(hp)等单位间的转换。</p>
+                        </div>
+                        
+                        <div class="help-section">
+                            <h3>能量</h3>
+                            <p>支持焦耳(J)、千瓦时(kWh)等单位间的转换。</p>
+                        </div>
+                        
+                        <div class="help-section">
+                            <h3>体积与容量</h3>
+                            <p>支持立方米(m³)、升(L)、加仑(gal)、桶(bbl)等单位间的转换。</p>
+                        </div>
+                        
+                        <div class="help-section">
+                            <h3>质量单位</h3>
+                            <p>支持毫克(mg)、微克(μg)等单位间的转换。</p>
+                            <p class="note">注意：国际单位(IU)与质量单位(如mg、μg)的换算关系因物质而异，无法通过固定因子换算。</p>
+                        </div>
+                        
+                        <div class="help-section">
+                            <h3>浓度</h3>
+                            <p>支持摩尔浓度(mol/L)、质量浓度(g/L)、百分比浓度(%)等单位间的转换。</p>
+                            <p class="note">注意：摩尔浓度与质量浓度之间的换算需要知道具体物质的摩尔质量（分子量），不同物质的换算因子不同。</p>
+                        </div>
+                        
+                        <div class="help-section">
+                            <h3>反应速率</h3>
+                            <p>支持mol/(L·s)、kmol/(m³·h)等单位间的转换。</p>
+                        </div>
+                        
+                        <div class="help-section">
+                            <h3>流量</h3>
+                            <p>支持标准立方米/小时(Nm³/h)、升/分钟(L/min)等单位间的转换。</p>
+                            <p class="note">注意：Nm³/h表示在标准状态下（温度0°C，压力101.325kPa）的气体体积流量。</p>
+                        </div>
+                        
+                        <div class="help-section">
+                            <h3>频率</h3>
+                            <p>支持赫兹(Hz)、千赫兹(kHz)、兆赫兹(MHz)等单位间的转换。</p>
+                        </div>
+
+                    </div>
+                </div>
+                
+                <form class="converter-form" id="converterForm">
+                    <div class="input-group">
+                        <label for="category">类别:</label>
+                        <select id="category"></select>
+                    </div>
+                    
+                    <div class="conversion-row">
+                        <div class="input-group">
+                            <label for="fromValue">数值:</label>
+                            <input type="number" id="fromValue" placeholder="请输入数值" step="any">
+                        </div>
+                        
+                        <div class="input-group">
+                            <label for="fromUnit">源单位:</label>
+                            <select id="fromUnit"></select>
+                        </div>
+                        
+                        <div class="swap-btn-container">
+                            <button type="button" class="swap-btn" id="swapBtn" title="交换单位">⇄</button>
+                        </div>
+                        
+                        <div class="input-group">
+                            <label for="toUnit">目标单位:</label>
+                            <select id="toUnit"></select>
+                        </div>
+                        
+                        <div class="input-group">
+                            <label for="toValue">结果:</label>
+                            <input type="text" id="toValue" placeholder="转换结果" readonly>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="convert-btn">转换</button>
+                </form>
+                
+                <div class="result" id="result"></div>
+            </div>
+        </main>
+
+        <footer id="pageFooter">
+            <div class="footer-content">
+                <p>&copy; <span id="currentYear"></span> coax的小工具. 保留所有权利。</p>
+                <p>渝ICP备2025071398号</p>
+            </div>
+        </footer>
+    </div>
+
+    <script src="../js/converter.js"></script>
+    <script src="../js/common.js"></script>
+</body>
+</html>

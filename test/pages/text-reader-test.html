@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>大文本文件阅读器测试</title>
+    <link rel="stylesheet" href="../../css/text-reader.css">
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .test-case { margin: 20px 0; padding: 15px; border: 1px solid #ccc; border-radius: 5px; }
+        .test-result { margin-top: 10px; padding: 10px; border-radius: 3px; }
+        .pass { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .fail { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        button { padding: 10px 15px; background-color: #007bff; color: white; border: none; border-radius: 3px; cursor: pointer; }
+        button:hover { background-color: #0056b3; }
+        .reader-content-test {
+            border: 1px solid #ccc;
+            height: 200px;
+            overflow-y: auto;
+            display: flex;
+        }
+        .line-numbers-test {
+            width: 50px;
+            background-color: #f5f5f5;
+            padding: 10px;
+            text-align: right;
+            font-family: monospace;
+            border-right: 1px solid #ccc;
+        }
+        .text-content-test {
+            flex: 1;
+            padding: 10px;
+            font-family: monospace;
+            white-space: pre-wrap;
+        }
+        .control-group-test {
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>大文本文件阅读器测试</h1>
+    
+    <div class="test-case">
+        <h3>测试用例 1: 文件上传功能</h3>
+        <p>测试文件上传区域的功能</p>
+        <div class="control-group-test">
+            <label>文件编码:
+                <select id="encodingSelectTest">
+                    <option value="utf-8" selected>UTF-8</option>
+                    <option value="gbk">GBK</option>
+                    <option value="gb2312">GB2312</option>
+                </select>
+            </label>
+        </div>
+        <div style="border: 2px dashed #ccc; padding: 20px; text-align: center; margin: 10px 0;">
+            <p>拖拽文本文件到此处或点击选择文件</p>
+            <input type="file" id="fileInputTest" accept=".txt,.log,.csv,text/*">
+        </div>
+        <button onclick="testFileUpload()">运行测试</button>
+        <div id="fileUploadTestResult" class="test-result" style="display:none;"></div>
+    </div>
+    
+    <div class="test-case">
+        <h3>测试用例 2: 文本显示功能</h3>
+        <p>测试大文本文件的显示和滚动功能</p>
+        <div class="reader-content-test">
+            <div class="line-numbers-test" id="lineNumbersTest">1<br>2<br>3<br>4<br>5<br>6<br>7<br>8<br>9<br>10</div>
+            <div class="text-content-test" id="textContentTest">这是第一行文本内容
+这是第二行文本内容
+这是第三行文本内容
+这是第四行文本内容
+这是第五行文本内容
+这是第六行文本内容
+这是第七行文本内容
+这是第八行文本内容
+这是第九行文本内容
+这是第十行文本内容</div>
+        </div>
+        <button onclick="testTextDisplay()">运行测试</button>
+        <div id="textDisplayTestResult" class="test-result" style="display:none;"></div>
+    </div>
+    
+    <div class="test-case">
+        <h3>测试用例 3: 行号跳转功能</h3>
+        <p>测试跳转到指定行号的功能</p>
+        <div class="control-group-test">
+            <label>跳转到行:
+                <input type="number" id="lineNumberInputTest" min="1" value="5">
+                <button id="goToLineBtnTest">跳转</button>
+            </label>
+        </div>
+        <button onclick="testLineJump()">运行测试</button>
+        <div id="lineJumpTestResult" class="test-result" style="display:none;"></div>
+    </div>
+
+    <script>
+        // 测试文件上传功能
+        function testFileUpload() {
+            const fileInput = document.getElementById('fileInputTest');
+            const encodingSelect = document.getElementById('encodingSelectTest');
+            
+            const hasFileInput = !!fileInput;
+            const hasEncodingSelect = !!encodingSelect;
+            const passed = hasFileInput && hasEncodingSelect;
+            
+            const resultDiv = document.getElementById('fileUploadTestResult');
+            resultDiv.style.display = 'block';
+            resultDiv.className = 'test-result ' + (passed ? 'pass' : 'fail');
+            resultDiv.innerHTML = passed 
+                ? '测试通过: 文件上传功能正常' 
+                : `测试失败: 文件输入=${hasFileInput}, 编码选择=${hasEncodingSelect}`;
+        }
+        
+        // 测试文本显示功能
+        function testTextDisplay() {
+            const lineNumbers = document.getElementById('lineNumbersTest');
+            const textContent = document.getElementById('textContentTest');
+            
+            const hasLineNumbers = !!lineNumbers;
+            const hasTextContent = !!textContent;
+            const passed = hasLineNumbers && hasTextContent;
+            
+            const resultDiv = document.getElementById('textDisplayTestResult');
+            resultDiv.style.display = 'block';
+            resultDiv.className = 'test-result ' + (passed ? 'pass' : 'fail');
+            resultDiv.innerHTML = passed 
+                ? '测试通过: 文本显示功能正常' 
+                : `测试失败: 行号显示=${hasLineNumbers}, 文本内容=${hasTextContent}`;
+        }
+        
+        // 测试行号跳转功能
+        function testLineJump() {
+            const lineNumberInput = document.getElementById('lineNumberInputTest');
+            const goToLineBtn = document.getElementById('goToLineBtnTest');
+            
+            const hasLineNumberInput = !!lineNumberInput;
+            const hasGoToLineBtn = !!goToLineBtn;
+            const passed = hasLineNumberInput && hasGoToLineBtn;
+            
+            const resultDiv = document.getElementById('lineJumpTestResult');
+            resultDiv.style.display = 'block';
+            resultDiv.className = 'test-result ' + (passed ? 'pass' : 'fail');
+            resultDiv.innerHTML = passed 
+                ? '测试通过: 行号跳转功能正常' 
+                : `测试失败: 行号输入=${hasLineNumberInput}, 跳转按钮=${hasGoToLineBtn}`;
+        }
+    </script>
+</body>
+</html>

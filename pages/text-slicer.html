@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="文本文件切片工具可以将大文本文件按行数或文件大小进行分割，支持多种分割方式和自定义参数设置。">
+    <meta name="keywords" content="文本分割, 文件切片, 文本处理, 文件分割, 大文件处理">
+    <meta name="author" content="coax">
+    <title>文本文件切片工具 - coax的小工具</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/text-slicer.css">
+</head>
+<body>
+    <div class="container">
+        <main>
+            <div class="slicer-container">
+                <div class="slicer-header">
+                    <h1>文本文件切片工具</h1>
+                    <p>将大文本文件按行数或文件大小进行分割</p>
+                </div>
+                
+                <div class="message" id="message"></div>
+                
+                <div class="upload-area" id="uploadArea">
+                    <i>📄</i>
+                    <h3>拖拽文本文件到此处或点击上传</h3>
+                    <p>支持 TXT, LOG, CSV 等文本格式</p>
+                    <div class="file-input-wrapper">
+                        <button class="file-input-button">选择文件</button>
+                        <input type="file" id="fileInput" accept=".txt,.log,.csv,text/*">
+                    </div>
+                    <p id="fileInfo"></p>
+                </div>
+                
+                <div class="options-container">
+                    <h3>切片选项</h3>
+                    <div class="options-grid">
+                        <div class="option-item">
+                            <input type="radio" id="sliceByLines" name="sliceMethod" value="lines" checked>
+                            <label for="sliceByLines">按行数分割</label>
+                        </div>
+                        <div class="option-item">
+                            <input type="radio" id="sliceBySize" name="sliceMethod" value="size">
+                            <label for="sliceBySize">按文件大小分割</label>
+                        </div>
+                    </div>
+                    
+                    <div class="slice-options active" id="linesOptions">
+                        <div class="input-group">
+                            <label for="linesPerFile">每文件行数:</label>
+                            <input type="number" id="linesPerFile" min="1" max="100000" value="1000">
+                        </div>
+                    </div>
+                    
+                    <div class="slice-options" id="sizeOptions">
+                        <div class="input-group">
+                            <label for="maxFileSize">最大文件大小 (KB):</label>
+                            <input type="number" id="maxFileSize" min="1" max="102400" value="1024">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="controls">
+                    <button id="sliceBtn" class="btn slice-btn">开始切片</button>
+                    <button id="resetBtn" class="btn reset-btn">重置</button>
+                </div>
+                
+                <div class="progress-container" id="progressContainer">
+                    <h3>处理进度</h3>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill"></div>
+                    </div>
+                </div>
+                
+                <div class="result-container">
+                    <h3>切片结果</h3>
+                    <div class="file-list" id="fileList">
+                        <p>切片完成后，文件列表将显示在此处</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <footer id="pageFooter">
+            <div class="footer-content">
+                <p>&copy; <span id="currentYear"></span> coax的小工具. 保留所有权利。</p>
+                <p>渝ICP备2025071398号</p>
+            </div>
+        </footer>
+    </div>
+
+    <script src="../js/text-slicer.js"></script>
+    <script src="../js/common.js"></script>
+</body>
+</html>

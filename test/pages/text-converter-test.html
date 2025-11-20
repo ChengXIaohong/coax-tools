@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>文本转换工具测试</title>
+    <link rel="stylesheet" href="../../css/text-converter.css">
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .test-case { margin: 20px 0; padding: 15px; border: 1px solid #ccc; border-radius: 5px; }
+        .test-result { margin-top: 10px; padding: 10px; border-radius: 3px; }
+        .pass { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .fail { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        button { padding: 10px 15px; background-color: #007bff; color: white; border: none; border-radius: 3px; cursor: pointer; }
+        button:hover { background-color: #0056b3; }
+        textarea {
+            width: 100%;
+            min-height: 80px;
+            margin: 10px 0;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-family: monospace;
+        }
+        .conversion-type {
+            margin: 10px 0;
+            padding: 5px;
+            background-color: #f0f0f0;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body>
+    <h1>文本转换工具测试</h1>
+    
+    <div class="test-case">
+        <h3>测试用例 1: 大小写转换</h3>
+        <p>测试文本的大小写转换功能</p>
+        <textarea id="inputText1">Hello World</textarea>
+        <div class="conversion-type">转为大写</div>
+        <button onclick="testUppercaseConversion()">运行测试</button>
+        <div id="uppercaseTestResult" class="test-result" style="display:none;"></div>
+        <textarea id="outputText1" readonly></textarea>
+        
+        <div class="conversion-type">转为小写</div>
+        <button onclick="testLowercaseConversion()">运行测试</button>
+        <div id="lowercaseTestResult" class="test-result" style="display:none;"></div>
+        <textarea id="outputText2" readonly></textarea>
+    </div>
+    
+    <div class="test-case">
+        <h3>测试用例 2: 命名格式转换</h3>
+        <p>测试不同命名格式之间的转换</p>
+        <textarea id="inputText2">hello world</textarea>
+        <div class="conversion-type">首字母大写</div>
+        <button onclick="testCapitalizeConversion()">运行测试</button>
+        <div id="capitalizeTestResult" class="test-result" style="display:none;"></div>
+        <textarea id="outputText3" readonly></textarea>
+        
+        <div class="conversion-type">驼峰命名</div>
+        <button onclick="testCamelCaseConversion()">运行测试</button>
+        <div id="camelCaseTestResult" class="test-result" style="display:none;"></div>
+        <textarea id="outputText4" readonly></textarea>
+        
+        <div class="conversion-type">蛇形命名</div>
+        <button onclick="testSnakeCaseConversion()">运行测试</button>
+        <div id="snakeCaseTestResult" class="test-result" style="display:none;"></div>
+        <textarea id="outputText5" readonly></textarea>
+        
+        <div class="conversion-type">串式命名</div>
+        <button onclick="testKebabCaseConversion()">运行测试</button>
+        <div id="kebabCaseTestResult" class="test-result" style="display:none;"></div>
+        <textarea id="outputText6" readonly></textarea>
+    </div>
+    
+    <div class="test-case">
+        <h3>测试用例 3: 复杂文本转换</h3>
+        <p>测试复杂文本的转换功能</p>
+        <textarea id="inputText3">This is a Sample Text for Testing</textarea>
+        <button onclick="testComplexConversion()">运行测试</button>
+        <div id="complexTestResult" class="test-result" style="display:none;"></div>
+        <textarea id="outputText7" readonly></textarea>
+    </div>
+
+    <script>
+        // 文本转换函数
+        function convertText(text, type) {
+            switch (type) {
+                case 'toUpperCase':
+                    return text.toUpperCase();
+                case 'toLowerCase':
+                    return text.toLowerCase();
+                case 'capitalize':
+                    return text.toLowerCase().replace(/\b\w/g, function(char) {
+                        return char.toUpperCase();
+                    });
+                case 'camelCase':
+                    return text.toLowerCase().replace(/[^a-zA-Z0-9]+(.)/g, function(match, char) {
+                        return char.toUpperCase();
+                    });
+                case 'snakeCase':
+                    return text.toLowerCase().replace(/[^a-zA-Z0-9]+/g, '_');
+                case 'kebabCase':
+                    return text.toLowerCase().replace(/[^a-zA-Z0-9]+/g, '-');
+                default:
+                    return text;
+            }
+        }
+        
+        // 测试转为大写
+        function testUppercaseConversion() {
+            const input = document.getElementById('inputText1').value;
+            const output = convertText(input, 'toUpperCase');
+            document.getElementById('outputText1').value = output;
+            
+            const expected = 'HELLO WORLD';
+            const passed = output === expected;
+            
+            const resultDiv = document.getElementById('uppercaseTestResult');
+            resultDiv.style.display = 'block';
+            resultDiv.className = 'test-result ' + (passed ? 'pass' : 'fail');
+            resultDiv.innerHTML = passed 
+                ? '测试通过: 转为大写功能正常' 
+                : `测试失败: 期望"${expected}", 实际"${output}"`;
+        }
+        
+        // 测试转为小写
+        function testLowercaseConversion() {
+            const input = document.getElementById('inputText1').value;
+            const output = convertText(input, 'toLowerCase');
+            document.getElementById('outputText2').value = output;
+            
+            const expected = 'hello world';
+            const passed = output === expected;
+            
+            const resultDiv = document.getElementById('lowercaseTestResult');
+            resultDiv.style.display = 'block';
+            resultDiv.className = 'test-result ' + (passed ? 'pass' : 'fail');
+            resultDiv.innerHTML = passed 
+                ? '测试通过: 转为小写功能正常' 
+                : `测试失败: 期望"${expected}", 实际"${output}"`;
+        }
+        
+        // 测试首字母大写
+        function testCapitalizeConversion() {
+            const input = document.getElementById('inputText2').value;
+            const output = convertText(input, 'capitalize');
+            document.getElementById('outputText3').value = output;
+            
+            const expected = 'Hello World';
+            const passed = output === expected;
+            
+            const resultDiv = document.getElementById('capitalizeTestResult');
+            resultDiv.style.display = 'block';
+            resultDiv.className = 'test-result ' + (passed ? 'pass' : 'fail');
+            resultDiv.innerHTML = passed 
+                ? '测试通过: 首字母大写功能正常' 
+                : `测试失败: 期望"${expected}", 实际"${output}"`;
+        }
+        
+        // 测试驼峰命名
+        function testCamelCaseConversion() {
+            const input = document.getElementById('inputText2').value;
+            const output = convertText(input, 'camelCase');
+            document.getElementById('outputText4').value = output;
+            
+            const expected = 'helloWorld';
+            const passed = output === expected;
+            
+            const resultDiv = document.getElementById('camelCaseTestResult');
+            resultDiv.style.display = 'block';
+            resultDiv.className = 'test-result ' + (passed ? 'pass' : 'fail');
+            resultDiv.innerHTML = passed 
+                ? '测试通过: 驼峰命名功能正常' 
+                : `测试失败: 期望"${expected}", 实际"${output}"`;
+        }
+        
+        // 测试蛇形命名
+        function testSnakeCaseConversion() {
+            const input = document.getElementById('inputText2').value;
+            const output = convertText(input, 'snakeCase');
+            document.getElementById('outputText5').value = output;
+            
+            const expected = 'hello_world';
+            const passed = output === expected;
+            
+            const resultDiv = document.getElementById('snakeCaseTestResult');
+            resultDiv.style.display = 'block';
+            resultDiv.className = 'test-result ' + (passed ? 'pass' : 'fail');
+            resultDiv.innerHTML = passed 
+                ? '测试通过: 蛇形命名功能正常' 
+                : `测试失败: 期望"${expected}", 实际"${output}"`;
+        }
+        
+        // 测试串式命名
+        function testKebabCaseConversion() {
+            const input = document.getElementById('inputText2').value;
+            const output = convertText(input, 'kebabCase');
+            document.getElementById('outputText6').value = output;
+            
+            const expected = 'hello-world';
+            const passed = output === expected;
+            
+            const resultDiv = document.getElementById('kebabCaseTestResult');
+            resultDiv.style.display = 'block';
+            resultDiv.className = 'test-result ' + (passed ? 'pass' : 'fail');
+            resultDiv.innerHTML = passed 
+                ? '测试通过: 串式命名功能正常' 
+                : `测试失败: 期望"${expected}", 实际"${output}"`;
+        }
+        
+        // 测试复杂文本转换
+        function testComplexConversion() {
+            const input = document.getElementById('inputText3').value;
+            const output = convertText(input, 'camelCase');
+            document.getElementById('outputText7').value = output;
+            
+            const expected = 'thisIsASampleTextForTesting';
+            const passed = output === expected;
+            
+            const resultDiv = document.getElementById('complexTestResult');
+            resultDiv.style.display = 'block';
+            resultDiv.className = 'test-result ' + (passed ? 'pass' : 'fail');
+            resultDiv.innerHTML = passed 
+                ? '测试通过: 复杂文本转换功能正常' 
+                : `测试失败: 期望"${expected}", 实际"${output}"`;
+        }
+    </script>
+</body>
+</html>

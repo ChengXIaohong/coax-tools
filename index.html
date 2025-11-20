@@ -1,0 +1,73 @@
+<!--
+  coax的小工具 - 一套实用的前端工具集合
+  
+  MIT License
+  
+  Copyright (c) 2025 coax
+  
+   Permission is hereby granted, free of charge, to any person obtaining a copy
+   of this software and associated documentation files (the "Software"), to deal
+   in the Software without restriction, including without limitation the rights
+   to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+   copies of the Software, and to permit persons to whom the Software is
+   furnished to do so, subject to the following conditions:
+   
+   The above copyright notice and this permission notice shall be included in all
+   copies or substantial portions of the Software.
+   
+   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+   IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+   FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+   AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+   LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+   OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+   SOFTWARE.
+  
+   一套实用的前端工具集合，包括文本处理、数据转换、文件操作等多种实用工具。
+   源码可得，快乐加倍！记得给个Star哦~ 🌟
+-->
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="coax的小工具是一个集合了多种实用在线工具的网站，包括文本转换、图片压缩、密码生成、单位换算等工具，所有工具均可免费使用。">
+    <meta name="keywords" content="在线工具, 文本转换, 图片压缩, 密码生成, 单位换算, 时间戳转换, JSON格式化, 身份证生成">
+    <meta name="author" content="coax">
+    <title>coax的小工具</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/header-footer.css">
+    <!-- 添加favicon图标 -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔧</text></svg>">
+</head>
+<body>
+    <header id="mainHeader">
+        <div class="header-content">
+            <h1>coax的小工具</h1>
+            <button class="theme-switcher" id="themeSwitcher" title="切换主题">🌓</button>
+        </div>
+    </header>
+    
+    <div class="container">
+        <main>
+            <section class="tools-intro">
+                <h2>为您提供各种在线实用工具</h2>
+                <p>包括文本处理、数据转换、文件操作等多种实用工具，完全免费使用</p>
+            </section>
+
+            <section class="tools-grid" id="toolsGrid">
+                <!-- 工具将通过 JavaScript 动态加载 -->
+            </section>
+        </main>
+
+        <footer id="mainFooter">
+            <div class="footer-content">
+                <p>&copy; <span id="currentYear"></span> coax的小工具. 保留所有权利。 | <i class="public-security-icon"></i> 渝ICP备2025071398号</p>
+            </div>
+        </footer>
+    </div>
+
+    <script src="js/main.js"></script>
+    <script src="js/header-footer.js"></script>
+</body>
+</html>
