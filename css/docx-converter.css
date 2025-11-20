@@ -1,0 +1,267 @@
+.converter-container {
+    max-width: 800px;
+    margin: 2rem auto;
+    padding: 2rem;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+.converter-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.converter-header h1 {
+    color: #4a4a4a;
+    margin-bottom: 0.5rem;
+}
+
+.upload-area {
+    border: 2px dashed #ccc;
+    border-radius: 8px;
+    padding: 40px;
+    text-align: center;
+    margin: 20px 0;
+    transition: border-color 0.3s;
+    cursor: pointer;
+    background-color: #f8f9fa;
+}
+
+.upload-area:hover, .upload-area.dragover {
+    border-color: #667eea;
+    background-color: #f0f2ff;
+}
+
+.upload-icon {
+    font-size: 48px;
+    color: #667eea;
+    margin-bottom: 10px;
+}
+
+.file-input {
+    display: none;
+}
+
+.file-label {
+    display: inline-block;
+    padding: 10px 20px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: opacity 0.3s;
+}
+
+.file-label:hover {
+    opacity: 0.9;
+}
+
+.file-info {
+    margin: 15px 0;
+    padding: 10px;
+    background-color: #e9ecef;
+    border-radius: 4px;
+    display: none;
+}
+
+.preview-container {
+    margin-top: 30px;
+    display: none;
+}
+
+.preview-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.preview-title {
+    font-size: 18px;
+    font-weight: bold;
+    color: #4a4a4a;
+}
+
+.preview-content {
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 15px;
+    min-height: 200px;
+    max-height: 500px;
+    overflow-y: auto;
+    background-color: #f8f9fa;
+    white-space: pre-wrap;
+    font-family: 'Courier New', monospace;
+    font-size: 14px;
+}
+
+.message {
+    padding: 10px;
+    border-radius: 5px;
+    margin: 10px 0;
+    display: none;
+}
+
+.error-message {
+    background: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+.success-message {
+    background: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.warning-message {
+    background: #fff3cd;
+    color: #856404;
+    border: 1px solid #ffeaa7;
+}
+
+.loading {
+    display: none;
+    text-align: center;
+    padding: 20px;
+}
+
+.spinner {
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #667eea;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    animation: spin 1s linear infinite;
+    margin: 0 auto;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.copy-btn {
+    padding: 5px 15px;
+    background: #28a745;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.copy-btn:hover {
+    background: #218838;
+}
+
+.progress-container {
+    margin: 15px 0;
+    display: none;
+}
+
+.progress-bar {
+    width: 100%;
+    height: 20px;
+    background-color: #f0f0f0;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #667eea, #764ba2);
+    width: 0%;
+    transition: width 0.3s ease;
+}
+
+.progress-text {
+    text-align: center;
+    margin-top: 5px;
+    font-size: 14px;
+    color: #666;
+}
+
+/* 自定义模态框样式 */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+.modal-content {
+    background-color: #fff;
+    margin: 15% auto;
+    padding: 20px;
+    border-radius: 10px;
+    width: 80%;
+    max-width: 500px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    text-align: center;
+}
+
+.modal-header {
+    margin-bottom: 20px;
+}
+
+.modal-header h2 {
+    margin: 0;
+    color: #4a4a4a;
+}
+
+.modal-body {
+    margin-bottom: 20px;
+    color: #666;
+}
+
+.modal-footer {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
+
+.modal-btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.modal-btn-confirm {
+    background: #28a745;
+    color: white;
+}
+
+.modal-btn-cancel {
+    background: #6c757d;
+    color: white;
+}
+
+.modal-btn-confirm:hover {
+    background: #218838;
+}
+
+.modal-btn-cancel:hover {
+    background: #5a6268;
+}
+
+footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    transition: transform 0.5s ease;
+    transform: translateY(0);
+}
+
+footer.hidden {
+    transform: translateY(100%);
+}

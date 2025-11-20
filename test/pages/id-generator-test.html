@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>身份证信息生成器测试</title>
+    <link rel="stylesheet" href="../../css/id-generator.css">
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .test-case { margin: 20px 0; padding: 15px; border: 1px solid #ccc; border-radius: 5px; }
+        .test-result { margin-top: 10px; padding: 10px; border-radius: 3px; }
+        .pass { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .fail { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        button { padding: 10px 15px; background-color: #007bff; color: white; border: none; border-radius: 3px; cursor: pointer; }
+        button:hover { background-color: #0056b3; }
+        .id-info-test { 
+            border: 1px solid #eee; 
+            padding: 15px; 
+            margin-top: 10px;
+            background-color: #f9f9f9;
+        }
+        .id-field-test {
+            display: flex;
+            margin-bottom: 10px;
+        }
+        .id-label-test {
+            font-weight: bold;
+            width: 100px;
+        }
+        .id-value-test {
+            flex: 1;
+        }
+    </style>
+</head>
+<body>
+    <h1>身份证信息生成器测试</h1>
+    
+    <div class="test-case">
+        <h3>测试用例 1: 随机生成身份证信息</h3>
+        <p>测试使用默认设置生成身份证信息</p>
+        <button onclick="testRandomIdGeneration()">运行测试</button>
+        <div id="randomIdTestResult" class="test-result" style="display:none;"></div>
+        <div id="randomIdInfo" class="id-info-test" style="display:none;"></div>
+    </div>
+    
+    <div class="test-case">
+        <h3>测试用例 2: 指定性别生成身份证信息</h3>
+        <p>测试生成指定性别的身份证信息</p>
+        <button onclick="testGenderSpecificIdGeneration()">运行测试</button>
+        <div id="genderSpecificTestResult" class="test-result" style="display:none;"></div>
+        <div id="genderSpecificIdInfo" class="id-info-test" style="display:none;"></div>
+    </div>
+    
+    <div class="test-case">
+        <h3>测试用例 3: 指定年龄范围生成身份证信息</h3>
+        <p>测试在指定年龄范围内生成身份证信息</p>
+        <button onclick="testAgeRangeIdGeneration()">运行测试</button>
+        <div id="ageRangeTestResult" class="test-result" style="display:none;"></div>
+        <div id="ageRangeIdInfo" class="id-info-test" style="display:none;"></div>
+    </div>
+
+    <script src="../../js/id-data.js"></script>
+    <script>
+        // 身份证校验码计算函数
+        function calculateCheckCode(id) {
+            const weights = [7, 9, 10, 5, 8, 4, 2, 1, 6, 3, 7, 9, 10, 5, 8, 4, 2];
+            const checkCodes = ['1', '0', 'X', '9', '8', '7', '6', '5', '4', '3', '2'];
+            
+            let sum = 0;
+            for (let i = 0; i < 17; i++) {
+                sum += parseInt(id.charAt(i)) * weights[i];
+            }
+            
+            return checkCodes[sum % 11];
+        }
+        
+        // 验证身份证号码格式
+        function validateIdNumber(id) {
+            if (!id || id.length !== 18) return false;
+            
+            // 检查前17位是否为数字
+            if (!/^\d{17}[\dX]$/.test(id)) return false;
+            
+            // 检查校验码
+            const checkCode = calculateCheckCode(id);
+            return checkCode === id.charAt(17);
+        }
+        
+        // 根据身份证号码提取信息
+        function extractInfoFromId(id) {
+            if (!validateIdNumber(id)) return null;
+            
+            const year = parseInt(id.substring(6, 10));
+            const month = parseInt(id.substring(10, 12));
+            const day = parseInt(id.substring(12, 14));
+            
+            const birthDate = `${year}-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
+            
+            const currentDate = new Date();
+            const currentYear = currentDate.getFullYear();
+            const currentMonth = currentDate.getMonth() + 1;
+            const currentDay = currentDate.getDate();
+            
+            let age = currentYear - year;
+            if (currentMonth < month || (currentMonth === month && currentDay < day)) {
+                age--;
+            }
+            
+            const genderCode = parseInt(id.charAt(16));
+            const gender = genderCode % 2 === 0 ? '女' : '男';
+            
+            return {
+                idNumber: id,
+                birthDate: birthDate,
+                age: age,
+                gender: gender
+            };
+        }
+        
+        // 生成随机身份证号码
+        function generateRandomId() {
+            // 随机选择一个地区代码
+            const areaKeys = Object.keys(areaData);
+            const randomAreaKey = areaKeys[Math.floor(Math.random() * areaKeys.length)];
+            const areaCode = randomAreaKey.substring(0, 6);
+            
+            // 生成随机出生日期 (18-65岁)
+            const currentDate = new Date();
+            const maxYear = currentDate.getFullYear() - 18;
+            const minYear = currentDate.getFullYear() - 65;
+            const year = Math.floor(Math.random() * (maxYear - minYear + 1)) + minYear;
+            const month = Math.floor(Math.random() * 12) + 1;
+            const day = Math.floor(Math.random() * 28) + 1;
+            
+            const birthDate = `${year.toString().padStart(4, '0')}${month.toString().padStart(2, '0')}${day.toString().padStart(2, '0')}`;
+            
+            // 生成顺序码 (3位)
+            const sequenceCode = Math.floor(Math.random() * 999).toString().padStart(3, '0');
+            
+            // 生成前17位
+            const idPrefix = areaCode + birthDate + sequenceCode;
+            
+            // 计算校验码
+            const checkCode = calculateCheckCode(idPrefix);
+            
+            return idPrefix + checkCode;
+        }
+        
+        // 生成随机姓名
+        function generateRandomName() {
+            const surnames = ['张', '李', '王', '刘', '陈', '杨', '赵', '黄', '周', '吴'];
+            const names = ['伟', '芳', '娜', '敏', '静', '丽', '强', '磊', '军', '洋',
+                          '勇', '艳', '杰', '娟', '涛', '明', '超', '秀英', '霞', '平'];
+            const surname = surnames[Math.floor(Math.random() * surnames.length)];
+            const name1 = names[Math.floor(Math.random() * names.length)];
+            const name2 = names[Math.floor(Math.random() * names.length)];
+            return surname + name1 + name2;
+        }
+        
+        // 获取地区名称
+        function getAreaName(areaCode) {
+            const provinceCode = areaCode.substring(0, 2) + '0000';
+            const cityCode = areaCode.substring(0, 4) + '00';
+            
+            let areaName = '';
+            if (areaData[provinceCode]) {
+                areaName += areaData[provinceCode];
+            }
+            if (areaData[cityCode] && cityCode !== provinceCode) {
+                areaName += areaData[cityCode];
+            }
+            if (areaData[areaCode] && areaCode !== cityCode) {
+                areaName += areaData[areaCode];
+            }
+            
+            return areaName || '未知地区';
+        }
+        
+        // 测试随机生成身份证信息
+        function testRandomIdGeneration() {
+            const idNumber = generateRandomId();
+            const info = extractInfoFromId(idNumber);
+            const fullName = generateRandomName();
+            const address = getAreaName(idNumber.substring(0, 6));
+            
+            const passed = info && validateIdNumber(idNumber);
+            
+            const resultDiv = document.getElementById('randomIdTestResult');
+            resultDiv.style.display = 'block';
+            resultDiv.className = 'test-result ' + (passed ? 'pass' : 'fail');
+            resultDiv.innerHTML = passed 
+                ? '测试通过: 身份证信息生成成功' 
+                : '测试失败: 身份证信息生成失败';
+            
+            // 显示生成的信息
+            if (passed) {
+                const infoDiv = document.getElementById('randomIdInfo');
+                infoDiv.style.display = 'block';
+                infoDiv.innerHTML = `
+                    <div class="id-field-test">
+                        <div class="id-label-test">身份证号:</div>
+                        <div class="id-value-test">${info.idNumber}</div>
+                    </div>
+                    <div class="id-field-test">
+                        <div class="id-label-test">姓名:</div>
+                        <div class="id-value-test">${fullName}</div>
+                    </div>
+                    <div class="id-field-test">
+                        <div class="id-label-test">性别:</div>
+                        <div class="id-value-test">${info.gender}</div>
+                    </div>
+                    <div class="id-field-test">
+                        <div class="id-label-test">出生日期:</div>
+                        <div class="id-value-test">${info.birthDate}</div>
+                    </div>
+                    <div class="id-field-test">
+                        <div class="id-label-test">年龄:</div>
+                        <div class="id-value-test">${info.age}岁</div>
+                    </div>
+                    <div class="id-field-test">
+                        <div class="id-label-test">地址:</div>
+                        <div class="id-value-test">${address}</div>
+                    </div>
+                `;
+            }
+        }
+        
+        // 测试指定性别生成身份证信息
+        function testGenderSpecificIdGeneration() {
+            // 生成男性身份证（奇数）
+            let idNumber;
+            let info;
+            let attempts = 0;
+            
+            // 尝试生成男性身份证
+            do {
+                idNumber = generateRandomId();
+                info = extractInfoFromId(idNumber);
+                attempts++;
+            } while (info && info.gender !== '男' && attempts < 100);
+            
+            const fullName = generateRandomName();
+            const address = getAreaName(idNumber.substring(0, 6));
+            
+            const passed = info && info.gender === '男';
+            
+            const resultDiv = document.getElementById('genderSpecificTestResult');
+            resultDiv.style.display = 'block';
+            resultDiv.className = 'test-result ' + (passed ? 'pass' : 'fail');
+            resultDiv.innerHTML = passed 
+                ? '测试通过: 成功生成男性身份证信息' 
+                : '测试失败: 生成指定性别身份证信息失败';
+            
+            // 显示生成的信息
+            if (passed) {
+                const infoDiv = document.getElementById('genderSpecificIdInfo');
+                infoDiv.style.display = 'block';
+                infoDiv.innerHTML = `
+                    <div class="id-field-test">
+                        <div class="id-label-test">身份证号:</div>
+                        <div class="id-value-test">${info.idNumber}</div>
+                    </div>
+                    <div class="id-field-test">
+                        <div class="id-label-test">姓名:</div>
+                        <div class="id-value-test">${fullName}</div>
+                    </div>
+                    <div class="id-field-test">
+                        <div class="id-label-test">性别:</div>
+                        <div class="id-value-test">${info.gender}</div>
+                    </div>
+                    <div class="id-field-test">
+                        <div class="id-label-test">出生日期:</div>
+                        <div class="id-value-test">${info.birthDate}</div>
+                    </div>
+                    <div class="id-field-test">
+                        <div class="id-label-test">年龄:</div>
+                        <div class="id-value-test">${info.age}岁</div>
+                    </div>
+                    <div class="id-field-test">
+                        <div class="id-label-test">地址:</div>
+                        <div class="id-value-test">${address}</div>
+                    </div>
+                `;
+            }
+        }
+        
+        // 测试指定年龄范围生成身份证信息
+        function testAgeRangeIdGeneration() {
+            // 生成30-40岁范围内的身份证
+            let idNumber;
+            let info;
+            let attempts = 0;
+            
+            do {
+                idNumber = generateRandomId();
+                info = extractInfoFromId(idNumber);
+                attempts++;
+            } while (info && (info.age < 30 || info.age > 40) && attempts < 100);
+            
+            const fullName = generateRandomName();
+            const address = getAreaName(idNumber.substring(0, 6));
+            
+            const passed = info && info.age >= 30 && info.age <= 40;
+            
+            const resultDiv = document.getElementById('ageRangeTestResult');
+            resultDiv.style.display = 'block';
+            resultDiv.className = 'test-result ' + (passed ? 'pass' : 'fail');
+            resultDiv.innerHTML = passed 
+                ? '测试通过: 成功生成指定年龄范围身份证信息' 
+                : '测试失败: 生成指定年龄范围身份证信息失败';
+            
+            // 显示生成的信息
+            if (passed) {
+                const infoDiv = document.getElementById('ageRangeIdInfo');
+                infoDiv.style.display = 'block';
+                infoDiv.innerHTML = `
+                    <div class="id-field-test">
+                        <div class="id-label-test">身份证号:</div>
+                        <div class="id-value-test">${info.idNumber}</div>
+                    </div>
+                    <div class="id-field-test">
+                        <div class="id-label-test">姓名:</div>
+                        <div class="id-value-test">${fullName}</div>
+                    </div>
+                    <div class="id-field-test">
+                        <div class="id-label-test">性别:</div>
+                        <div class="id-value-test">${info.gender}</div>
+                    </div>
+                    <div class="id-field-test">
+                        <div class="id-label-test">出生日期:</div>
+                        <div class="id-value-test">${info.birthDate}</div>
+                    </div>
+                    <div class="id-field-test">
+                        <div class="id-label-test">年龄:</div>
+                        <div class="id-value-test">${info.age}岁</div>
+                    </div>
+                    <div class="id-field-test">
+                        <div class="id-label-test">地址:</div>
+                        <div class="id-value-test">${address}</div>
+                    </div>
+                `;
+            }
+        }
+    </script>
+</body>
+</html>

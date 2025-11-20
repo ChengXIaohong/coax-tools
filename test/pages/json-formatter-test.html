@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JSON格式化工具测试</title>
+    <link rel="stylesheet" href="../../css/json-formatter.css">
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .test-case { margin: 20px 0; padding: 15px; border: 1px solid #ccc; border-radius: 5px; }
+        .test-result { margin-top: 10px; padding: 10px; border-radius: 3px; }
+        .pass { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .fail { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        button { padding: 10px 15px; background-color: #007bff; color: white; border: none; border-radius: 3px; cursor: pointer; }
+        button:hover { background-color: #0056b3; }
+        textarea {
+            width: 100%;
+            min-height: 100px;
+            margin: 10px 0;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-family: monospace;
+        }
+    </style>
+</head>
+<body>
+    <h1>JSON格式化工具测试</h1>
+    
+    <div class="test-case">
+        <h3>测试用例 1: 基本JSON格式化</h3>
+        <p>测试将简单JSON字符串格式化为易读格式</p>
+        <textarea id="inputJson1">{"name":"张三","age":30,"city":"北京"}</textarea>
+        <button onclick="testBasicFormatting()">运行测试</button>
+        <div id="basicFormattingTestResult" class="test-result" style="display:none;"></div>
+        <textarea id="outputJson1" readonly></textarea>
+    </div>
+    
+    <div class="test-case">
+        <h3>测试用例 2: 嵌套JSON格式化</h3>
+        <p>测试包含嵌套对象和数组的JSON格式化</p>
+        <textarea id="inputJson2">{"users":[{"name":"张三","age":30,"skills":["JavaScript","Python"]},{"name":"李四","age":25,"skills":["Java","C++"]}],"total":2}</textarea>
+        <button onclick="testNestedFormatting()">运行测试</button>
+        <div id="nestedFormattingTestResult" class="test-result" style="display:none;"></div>
+        <textarea id="outputJson2" readonly></textarea>
+    </div>
+    
+    <div class="test-case">
+        <h3>测试用例 3: 自定义缩进格式化</h3>
+        <p>测试使用不同缩进空格数的格式化</p>
+        <textarea id="inputJson3">{"name":"张三","age":30,"address":{"city":"北京","district":"朝阳区"}}</textarea>
+        <label>缩进空格数: 
+            <select id="indentSize">
+                <option value="2">2</option>
+                <option value="4" selected>4</option>
+                <option value="8">8</option>
+            </select>
+        </label>
+        <button onclick="testCustomIndentFormatting()">运行测试</button>
+        <div id="customIndentTestResult" class="test-result" style="display:none;"></div>
+        <textarea id="outputJson3" readonly></textarea>
+    </div>
+
+    <script>
+        // JSON格式化函数
+        function formatJson(jsonStr, indent = 4) {
+            try {
+                const jsonObj = JSON.parse(jsonStr);
+                return JSON.stringify(jsonObj, null, indent);
+            } catch (e) {
+                return "无效的JSON格式: " + e.message;
+            }
+        }
+        
+        // 测试基本JSON格式化
+        function testBasicFormatting() {
+            const input = document.getElementById('inputJson1').value;
+            const output = formatJson(input);
+            document.getElementById('outputJson1').value = output;
+            
+            // 检查输出是否包含格式化特征
+            const passed = output.includes('\n') && output.includes('    '); // 包含换行和4空格缩进
+            
+            const resultDiv = document.getElementById('basicFormattingTestResult');
+            resultDiv.style.display = 'block';
+            resultDiv.className = 'test-result ' + (passed ? 'pass' : 'fail');
+            resultDiv.innerHTML = passed 
+                ? '测试通过: 基本JSON格式化功能正常' 
+                : '测试失败: 格式化结果不符合预期';
+        }
+        
+        // 测试嵌套JSON格式化
+        function testNestedFormatting() {
+            const input = document.getElementById('inputJson2').value;
+            const output = formatJson(input);
+            document.getElementById('outputJson2').value = output;
+            
+            // 检查输出是否包含多层嵌套格式化特征
+            const passed = output.includes('[\n        ') && output.includes('{\n            '); // 包含数组和对象的嵌套缩进
+            
+            const resultDiv = document.getElementById('nestedFormattingTestResult');
+            resultDiv.style.display = 'block';
+            resultDiv.className = 'test-result ' + (passed ? 'pass' : 'fail');
+            resultDiv.innerHTML = passed 
+                ? '测试通过: 嵌套JSON格式化功能正常' 
+                : '测试失败: 嵌套格式化结果不符合预期';
+        }
+        
+        // 测试自定义缩进格式化
+        function testCustomIndentFormatting() {
+            const input = document.getElementById('inputJson3').value;
+            const indent = parseInt(document.getElementById('indentSize').value);
+            const output = formatJson(input, indent);
+            document.getElementById('outputJson3').value = output;
+            
+            // 检查输出是否使用了指定的缩进
+            const indentStr = ' '.repeat(indent);
+            const passed = output.includes('\n') && output.includes(indentStr); // 包含换行和指定缩进
+            
+            const resultDiv = document.getElementById('customIndentTestResult');
+            resultDiv.style.display = 'block';
+            resultDiv.className = 'test-result ' + (passed ? 'pass' : 'fail');
+            resultDiv.innerHTML = passed 
+                ? `测试通过: 使用${indent}个空格缩进的格式化功能正常` 
+                : '测试失败: 自定义缩进格式化结果不符合预期';
+        }
+    </script>
+</body>
+</html>

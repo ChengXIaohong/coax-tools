@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="模拟数据生成器是一个用于生成模拟测试数据的在线工具，支持生成IP地址、电话号码、车牌号、访问时间、客户姓名等多种测试数据，适用于软件开发和测试场景。">
+    <meta name="keywords" content="模拟数据生成器, 模拟数据, IP地址生成, 电话号码生成, 车牌号生成, 测试工具, 开发工具">
+    <meta name="author" content="coax">
+    <title>模拟数据生成器</title>
+    <link rel="stylesheet" href="../css/data-generator.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>模拟数据生成器</h1>
+            <p>生成用于测试的模拟数据</p>
+        </div>
+        
+        <div class="options-container">
+            <h3>生成选项</h3>
+            <div class="row-count-input">
+                <label for="rowCount">生成行数:</label>
+                <input type="number" id="rowCount" min="1" max="10000" value="100">
+            </div>
+            
+            <div class="options-grid">
+                <div class="option-item">
+                    <input type="checkbox" id="generateIndex" checked>
+                    <label for="generateIndex">序号</label>
+                </div>
+                <div class="option-item">
+                    <input type="checkbox" id="generateIp" checked>
+                    <label for="generateIp">IP地址</label>
+                </div>
+                <div class="option-item">
+                    <input type="checkbox" id="generatePhone" checked>
+                    <label for="generatePhone">客户电话</label>
+                </div>
+                <div class="option-item">
+                    <input type="checkbox" id="generatePlate" checked>
+                    <label for="generatePlate">车牌号</label>
+                </div>
+                <div class="option-item">
+                    <input type="checkbox" id="generateTime" checked>
+                    <label for="generateTime">访问时间</label>
+                </div>
+                <div class="option-item">
+                    <input type="checkbox" id="generateName" checked>
+                    <label for="generateName">客户姓名</label>
+                </div>
+                <div class="option-item">
+                    <input type="radio" id="maskMiddle" name="nameMaskType" value="middle" checked>
+                    <label for="maskMiddle">姓名中间脱敏一位</label>
+                </div>
+                <div class="option-item">
+                    <input type="radio" id="maskAfterFirst" name="nameMaskType" value="afterFirst">
+                    <label for="maskAfterFirst">姓名第一位之后全部脱敏</label>
+                </div>
+            </div>
+        </div>
+        
+        <div class="controls">
+            <button id="previewBtn" class="preview-btn">预览生成</button>
+            <button id="startBtn" class="start-btn">开始生成</button>
+        </div>
+        
+        <div class="progress-container" id="progressContainer">
+            <h3>生成进度</h3>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <p id="progressText">准备中...</p>
+        </div>
+        
+        <div class="preview-container">
+            <h3>数据预览</h3>
+            <div id="preview">
+                <div class="empty-preview">
+                    <i>📊</i>
+                    <p>点击"预览生成"查看数据样本</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Preview Modal -->
+    <div id="previewModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>预览数据</h2>
+                <span class="close">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div id="modalPreviewContent"></div>
+            </div>
+            <div class="modal-footer">
+                <button id="cancelPreviewBtn" class="preview-btn">放弃</button>
+                <button id="confirmPreviewBtn" class="start-btn">确认生成</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.bootcdn.net/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    <script src="../js/id-data.js"></script>
+    <script src="../js/data-generator.js"></script>
+    
+    <!-- Disclaimer -->
+    <div style="margin-top: 20px; padding: 15px; background-color: #fffbe6; border-left: 4px solid #ffe58f; font-size: 14px;">
+        <h4 style="margin-top: 0; color: #fa8c16;">免责声明</h4>
+        <p style="margin: 5px 0;">1. 本工具生成的所有数据均为模拟数据，仅用于测试和开发目的。</p>
+        <p style="margin: 5px 0;">2. 请勿将生成的数据用于任何非法或不道德的用途。</p>
+        <p style="margin: 5px 0;">3. 生成的数据不包含任何真实个人或组织的信息。</p>
+        <p style="margin: 5px 0;">4. 用户应妥善保管和使用生成的数据，对其使用承担全部责任。</p>
+        <p style="margin: 5px 0;">5. 本工具不对因误用生成数据而导致的任何后果负责。</p>
+    </div>
+</body>
+</html>

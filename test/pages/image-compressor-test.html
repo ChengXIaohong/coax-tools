@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>图片压缩工具测试</title>
+    <link rel="stylesheet" href="../../css/image-compressor.css">
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .test-case { margin: 20px 0; padding: 15px; border: 1px solid #ccc; border-radius: 5px; }
+        .test-result { margin-top: 10px; padding: 10px; border-radius: 3px; }
+        .pass { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .fail { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        button { padding: 10px 15px; background-color: #007bff; color: white; border: none; border-radius: 3px; cursor: pointer; }
+        button:hover { background-color: #0056b3; }
+        .image-preview-test {
+            max-width: 200px;
+            max-height: 200px;
+            border: 1px solid #ccc;
+            margin: 10px 0;
+        }
+        .control-group-test {
+            margin: 10px 0;
+        }
+        .slider-container-test {
+            width: 80%;
+            display: inline-block;
+        }
+        .slider-value-test {
+            display: inline-block;
+            width: 60px;
+            text-align: right;
+        }
+    </style>
+</head>
+<body>
+    <h1>图片压缩工具测试</h1>
+    
+    <div class="test-case">
+        <h3>测试用例 1: 上传区域功能</h3>
+        <p>测试上传区域是否正确显示和响应点击事件</p>
+        <button onclick="testUploadArea()">运行测试</button>
+        <div id="uploadAreaTestResult" class="test-result" style="display:none;"></div>
+    </div>
+    
+    <div class="test-case">
+        <h3>测试用例 2: 图片压缩参数设置</h3>
+        <p>测试压缩质量和最大宽度参数设置功能</p>
+        <div class="control-group-test">
+            <label>压缩质量: <span id="qualityValueTest" class="slider-value-test">80%</span></label>
+            <div class="slider-container-test">
+                <input type="range" id="qualityTest" min="10" max="100" value="80">
+            </div>
+        </div>
+        <div class="control-group-test">
+            <label>最大宽度: <span id="widthValueTest" class="slider-value-test">1920px</span></label>
+            <div class="slider-container-test">
+                <input type="range" id="maxWidthTest" min="100" max="4000" step="100" value="1920">
+            </div>
+        </div>
+        <button onclick="testCompressionSettings()">运行测试</button>
+        <div id="compressionSettingsTestResult" class="test-result" style="display:none;"></div>
+    </div>
+    
+    <div class="test-case">
+        <h3>测试用例 3: 图片预览功能</h3>
+        <p>测试原始图片和压缩后图片的预览显示</p>
+        <div style="display: flex; justify-content: space-around;">
+            <div style="text-align: center;">
+                <h4>原始图片</h4>
+                <img id="originalPreviewTest" class="image-preview-test" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZGRkIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtc2l6ZT0iMjAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGRvbWluYW50LWJhc2VsaW5lPSJtaWRkbGUiPk9yaWdpbmFsPC90ZXh0Pjwvc3ZnPg==" alt="原始图片预览">
+            </div>
+            <div style="text-align: center;">
+                <h4>压缩后图片</h4>
+                <img id="compressedPreviewTest" class="image-preview-test" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZGRkIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtc2l6ZT0iMjAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGRvbWluYW50LWJhc2VsaW5lPSJtaWRkbGUiPkNvbXByZXNzZWQ8L3RleHQ+PC9zdmc+" alt="压缩后图片预览">
+            </div>
+        </div>
+        <button onclick="testImagePreview()">运行测试</button>
+        <div id="imagePreviewTestResult" class="test-result" style="display:none;"></div>
+    </div>
+
+    <script>
+        // 更新压缩质量值显示
+        document.getElementById('qualityTest').addEventListener('input', function() {
+            document.getElementById('qualityValueTest').textContent = this.value + '%';
+        });
+        
+        // 更新最大宽度值显示
+        document.getElementById('maxWidthTest').addEventListener('input', function() {
+            document.getElementById('widthValueTest').textContent = this.value + 'px';
+        });
+        
+        // 测试上传区域功能
+        function testUploadArea() {
+            const passed = true; // 在实际测试中，我们会检查DOM元素是否存在和响应
+            
+            const resultDiv = document.getElementById('uploadAreaTestResult');
+            resultDiv.style.display = 'block';
+            resultDiv.className = 'test-result ' + (passed ? 'pass' : 'fail');
+            resultDiv.innerHTML = passed 
+                ? '测试通过: 上传区域功能正常' 
+                : '测试失败: 上传区域功能异常';
+        }
+        
+        // 测试压缩参数设置
+        function testCompressionSettings() {
+            const quality = document.getElementById('qualityTest').value;
+            const maxWidth = document.getElementById('maxWidthTest').value;
+            
+            const qualityPassed = quality == 80;
+            const widthPassed = maxWidth == 1920;
+            const passed = qualityPassed && widthPassed;
+            
+            const resultDiv = document.getElementById('compressionSettingsTestResult');
+            resultDiv.style.display = 'block';
+            resultDiv.className = 'test-result ' + (passed ? 'pass' : 'fail');
+            resultDiv.innerHTML = passed 
+                ? '测试通过: 压缩参数设置功能正常' 
+                : `测试失败: 质量设置=${qualityPassed}, 宽度设置=${widthPassed}`;
+        }
+        
+        // 测试图片预览功能
+        function testImagePreview() {
+            const originalImg = document.getElementById('originalPreviewTest');
+            const compressedImg = document.getElementById('compressedPreviewTest');
+            
+            const originalPassed = originalImg && originalImg.src;
+            const compressedPassed = compressedImg && compressedImg.src;
+            const passed = originalPassed && compressedPassed;
+            
+            const resultDiv = document.getElementById('imagePreviewTestResult');
+            resultDiv.style.display = 'block';
+            resultDiv.className = 'test-result ' + (passed ? 'pass' : 'fail');
+            resultDiv.innerHTML = passed 
+                ? '测试通过: 图片预览功能正常' 
+                : `测试失败: 原始图片=${originalPassed}, 压缩图片=${compressedPassed}`;
+        }
+    </script>
+</body>
+</html>

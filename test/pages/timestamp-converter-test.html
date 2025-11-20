@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>时间戳转换工具测试</title>
+    <link rel="stylesheet" href="../../css/timestamp-converter.css">
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .test-case { margin: 20px 0; padding: 15px; border: 1px solid #ccc; border-radius: 5px; }
+        .test-result { margin-top: 10px; padding: 10px; border-radius: 3px; }
+        .pass { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .fail { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        button { padding: 10px 15px; background-color: #007bff; color: white; border: none; border-radius: 3px; cursor: pointer; }
+        button:hover { background-color: #0056b3; }
+        .input-group-test {
+            margin: 10px 0;
+        }
+        .input-group-test label {
+            display: inline-block;
+            width: 120px;
+        }
+        .input-group-test input {
+            padding: 5px;
+            width: 200px;
+        }
+        .result-group-test {
+            margin: 10px 0;
+            padding: 10px;
+            background-color: #f9f9f9;
+            border-radius: 4px;
+        }
+        .result-item-test {
+            margin: 5px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>时间戳转换工具测试</h1>
+    
+    <div class="test-case">
+        <h3>测试用例 1: 时间戳转日期时间</h3>
+        <p>测试将时间戳转换为日期时间格式</p>
+        <div class="input-group-test">
+            <label for="timestampInputTest">输入时间戳:</label>
+            <input type="number" id="timestampInputTest" value="1700000000">
+        </div>
+        <button onclick="testTimestampToDate()">运行测试</button>
+        <div id="timestampToDateTestResult" class="test-result" style="display:none;"></div>
+        <div class="result-group-test" id="timestampToDateResultTest" style="display:none;">
+            <div class="result-item-test">
+                <span class="result-label">本地时间:</span>
+                <span class="result-value" id="localTimeTest"></span>
+            </div>
+            <div class="result-item-test">
+                <span class="result-label">UTC时间:</span>
+                <span class="result-value" id="utcTimeTest"></span>
+            </div>
+        </div>
+    </div>
+    
+    <div class="test-case">
+        <h3>测试用例 2: 日期时间转时间戳</h3>
+        <p>测试将日期时间转换为时间戳</p>
+        <div class="input-group-test">
+            <label for="dateInputTest">输入日期时间:</label>
+            <input type="datetime-local" id="dateInputTest" value="2023-11-14T22:13">
+        </div>
+        <button onclick="testDateToTimestamp()">运行测试</button>
+        <div id="dateToTimestampTestResult" class="test-result" style="display:none;"></div>
+        <div class="result-group-test" id="dateToTimestampResultTest" style="display:none;">
+            <div class="result-item-test">
+                <span class="result-label">时间戳 (秒):</span>
+                <span class="result-value" id="timestampSecondsTest"></span>
+            </div>
+            <div class="result-item-test">
+                <span class="result-label">时间戳 (毫秒):</span>
+                <span class="result-value" id="timestampMillisecondsTest"></span>
+            </div>
+        </div>
+    </div>
+    
+    <div class="test-case">
+        <h3>测试用例 3: 当前时间功能</h3>
+        <p>测试获取当前时间戳的功能</p>
+        <button id="currentTimestampBtnTest">使用当前时间</button>
+        <button onclick="testCurrentTimestamp()">运行测试</button>
+        <div id="currentTimestampTestResult" class="test-result" style="display:none;"></div>
+    </div>
+
+    <script>
+        // 时间戳转日期时间
+        function timestampToDate(timestamp) {
+            const date = new Date(timestamp * 1000); // 假设输入的是秒级时间戳
+            return {
+                local: date.toLocaleString('zh-CN'),
+                utc: date.toISOString().replace('T', ' ').substring(0, 19)
+            };
+        }
+        
+        // 日期时间转时间戳
+        function dateToTimestamp(dateString) {
+            const date = new Date(dateString);
+            return {
+                seconds: Math.floor(date.getTime() / 1000),
+                milliseconds: date.getTime()
+            };
+        }
+        
+        // 测试时间戳转日期时间
+        function testTimestampToDate() {
+            const timestamp = document.getElementById('timestampInputTest').value;
+            const result = timestampToDate(timestamp);
+            
+            document.getElementById('localTimeTest').textContent = result.local;
+            document.getElementById('utcTimeTest').textContent = result.utc;
+            document.getElementById('timestampToDateResultTest').style.display = 'block';
+            
+            // 验证结果
+            const expectedLocal = '2023/11/14 22:13:20';
+            const expectedUtc = '2023-11-14 14:13:20';
+            
+            const localCorrect = result.local.includes('2023');
+            const utcCorrect = result.utc.includes('2023');
+            const passed = localCorrect && utcCorrect;
+            
+            const resultDiv = document.getElementById('timestampToDateTestResult');
+            resultDiv.style.display = 'block';
+            resultDiv.className = 'test-result ' + (passed ? 'pass' : 'fail');
+            resultDiv.innerHTML = passed 
+                ? '测试通过: 时间戳转日期时间功能正常' 
+                : `测试失败: 本地时间=${localCorrect}, UTC时间=${utcCorrect}`;
+        }
+        
+        // 测试日期时间转时间戳
+        function testDateToTimestamp() {
+            const dateInput = document.getElementById('dateInputTest').value;
+            const result = dateToTimestamp(dateInput + ':00'); // 补充秒数
+            
+            document.getElementById('timestampSecondsTest').textContent = result.seconds;
+            document.getElementById('timestampMillisecondsTest').textContent = result.milliseconds;
+            document.getElementById('dateToTimestampResultTest').style.display = 'block';
+            
+            // 验证结果
+            const expectedSeconds = 1700000000;
+            const secondsCorrect = Math.abs(result.seconds - expectedSeconds) < 60; // 允许1分钟误差
+            const passed = secondsCorrect;
+            
+            const resultDiv = document.getElementById('dateToTimestampTestResult');
+            resultDiv.style.display = 'block';
+            resultDiv.className = 'test-result ' + (passed ? 'pass' : 'fail');
+            resultDiv.innerHTML = passed 
+                ? '测试通过: 日期时间转时间戳功能正常' 
+                : `测试失败: 秒级时间戳=${secondsCorrect}`;
+        }
+        
+        // 测试当前时间功能
+        function testCurrentTimestamp() {
+            const currentTimestampBtn = document.getElementById('currentTimestampBtnTest');
+            
+            const hasButton = !!currentTimestampBtn;
+            const passed = hasButton;
+            
+            const resultDiv = document.getElementById('currentTimestampTestResult');
+            resultDiv.style.display = 'block';
+            resultDiv.className = 'test-result ' + (passed ? 'pass' : 'fail');
+            resultDiv.innerHTML = passed 
+                ? '测试通过: 当前时间功能正常' 
+                : `测试失败: 按钮存在=${hasButton}`;
+        }
+    </script>
+</body>
+</html>

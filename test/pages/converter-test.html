@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>单位换算器测试</title>
+    <link rel="stylesheet" href="../../css/converter.css">
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .test-case { margin: 20px 0; padding: 15px; border: 1px solid #ccc; border-radius: 5px; }
+        .test-result { margin-top: 10px; padding: 10px; border-radius: 3px; }
+        .pass { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .fail { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        button { padding: 10px 15px; background-color: #007bff; color: white; border: none; border-radius: 3px; cursor: pointer; }
+        button:hover { background-color: #0056b3; }
+    </style>
+</head>
+<body>
+    <h1>单位换算器测试</h1>
+    
+    <div class="test-case">
+        <h3>测试用例 1: 长度单位换算 (米到千米)</h3>
+        <p>输入值: 1000 米</p>
+        <p>期望结果: 1 千米</p>
+        <button onclick="testLengthConversion()">运行测试</button>
+        <div id="lengthTestResult" class="test-result" style="display:none;"></div>
+    </div>
+    
+    <div class="test-case">
+        <h3>测试用例 2: 重量单位换算 (克到千克)</h3>
+        <p>输入值: 1000 克</p>
+        <p>期望结果: 1 千克</p>
+        <button onclick="testWeightConversion()">运行测试</button>
+        <div id="weightTestResult" class="test-result" style="display:none;"></div>
+    </div>
+    
+    <div class="test-case">
+        <h3>测试用例 3: 温度单位换算 (摄氏度到华氏度)</h3>
+        <p>输入值: 0 ℃</p>
+        <p>期望结果: 32 ℉</p>
+        <button onclick="testTemperatureConversion()">运行测试</button>
+        <div id="temperatureTestResult" class="test-result" style="display:none;"></div>
+    </div>
+
+    <script src="../../js/unit-data.js"></script>
+    <script src="../../js/converter.js"></script>
+    <script>
+        // 测试长度换算
+        function testLengthConversion() {
+            document.getElementById('fromValue').value = 1000;
+            document.getElementById('category').value = 'length';
+            updateUnits();
+            document.getElementById('fromUnit').value = 'm';
+            document.getElementById('toUnit').value = 'km';
+            
+            convertUnits();
+            
+            const result = document.getElementById('toValue').value;
+            const expectedResult = 1;
+            const passed = parseFloat(result) === expectedResult;
+            
+            const resultDiv = document.getElementById('lengthTestResult');
+            resultDiv.style.display = 'block';
+            resultDiv.className = 'test-result ' + (passed ? 'pass' : 'fail');
+            resultDiv.innerHTML = passed 
+                ? '测试通过: 结果为 ' + result + ' km' 
+                : '测试失败: 期望 ' + expectedResult + ' km, 实际 ' + result + ' km';
+        }
+        
+        // 测试重量换算
+        function testWeightConversion() {
+            document.getElementById('fromValue').value = 1000;
+            document.getElementById('category').value = 'weight';
+            updateUnits();
+            document.getElementById('fromUnit').value = 'g';
+            document.getElementById('toUnit').value = 'kg';
+            
+            convertUnits();
+            
+            const result = document.getElementById('toValue').value;
+            const expectedResult = 1;
+            const passed = parseFloat(result) === expectedResult;
+            
+            const resultDiv = document.getElementById('weightTestResult');
+            resultDiv.style.display = 'block';
+            resultDiv.className = 'test-result ' + (passed ? 'pass' : 'fail');
+            resultDiv.innerHTML = passed 
+                ? '测试通过: 结果为 ' + result + ' kg' 
+                : '测试失败: 期望 ' + expectedResult + ' kg, 实际 ' + result + ' kg';
+        }
+        
+        // 测试温度换算
+        function testTemperatureConversion() {
+            document.getElementById('fromValue').value = 0;
+            document.getElementById('category').value = 'temperature';
+            updateUnits();
+            document.getElementById('fromUnit').value = 'C';
+            document.getElementById('toUnit').value = 'F';
+            
+            convertUnits();
+            
+            const result = document.getElementById('toValue').value;
+            const expectedResult = 32;
+            const passed = Math.abs(parseFloat(result) - expectedResult) < 0.01; // 允许小误差
+            
+            const resultDiv = document.getElementById('temperatureTestResult');
+            resultDiv.style.display = 'block';
+            resultDiv.className = 'test-result ' + (passed ? 'pass' : 'fail');
+            resultDiv.innerHTML = passed 
+                ? '测试通过: 结果为 ' + result + ' ℉' 
+                : '测试失败: 期望 ' + expectedResult + ' ℉, 实际 ' + result + ' ℉';
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="时间戳转换工具支持时间戳与日期时间的相互转换，可显示本地时间和UTC时间，适用于编程开发和系统运维场景。">
+    <meta name="keywords" content="时间戳转换, 时间转换, 时间戳工具, 日期时间转换, UTC时间">
+    <meta name="author" content="coax">
+    <title>时间戳转换工具 - coax的小工具</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/timestamp-converter.css">
+</head>
+<body>
+    <div class="container">
+        <main>
+            <div class="converter-container">
+                <div class="converter-header">
+                    <h1>时间戳转换工具</h1>
+                    <p>支持时间戳与日期时间的相互转换</p>
+                </div>
+                
+                <div class="message" id="message"></div>
+                
+                <div class="converter-section">
+                    <h2>时间戳转日期时间</h2>
+                    <div class="input-group">
+                        <label for="timestampInput">输入时间戳:</label>
+                        <input type="number" id="timestampInput" placeholder="请输入时间戳，例如: 1700000000">
+                    </div>
+                    <button id="timestampToDateBtn" class="btn convert-btn">转换为日期时间</button>
+                    
+                    <div class="result-group" id="timestampToDateResult" style="display: none;">
+                        <div class="result-item">
+                            <span class="result-label">本地时间:</span>
+                            <span class="result-value" id="localTime"></span>
+                        </div>
+                        <div class="result-item">
+                            <span class="result-label">UTC时间:</span>
+                            <span class="result-value" id="utcTime"></span>
+                        </div>
+                        <div class="result-item">
+                            <span class="result-label">可读格式:</span>
+                            <span class="result-value" id="readableTime"></span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="converter-section">
+                    <h2>日期时间转时间戳</h2>
+                    <div class="input-group">
+                        <label for="dateInput">输入日期时间:</label>
+                        <input type="datetime-local" id="dateInput">
+                    </div>
+                    <button id="dateToTimestampBtn" class="btn convert-btn">转换为时间戳</button>
+                    <button id="currentTimestampBtn" class="btn current-time-btn">使用当前时间</button>
+                    
+                    <div class="result-group" id="dateToTimestampResult" style="display: none;">
+                        <div class="result-item">
+                            <span class="result-label">时间戳 (秒):</span>
+                            <span class="result-value" id="timestampSeconds"></span>
+                        </div>
+                        <div class="result-item">
+                            <span class="result-label">时间戳 (毫秒):</span>
+                            <span class="result-value" id="timestampMilliseconds"></span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="examples">
+                    <h3>使用说明</h3>
+                    <ul>
+                        <li>时间戳转日期时间：输入时间戳（秒或毫秒）获取对应的日期时间</li>
+                        <li>日期时间转时间戳：选择日期时间获取对应的时间戳</li>
+                        <li>支持自动识别10位（秒）和13位（毫秒）时间戳</li>
+                        <li>显示本地时间和UTC时间两种格式</li>
+                    </ul>
+                </div>
+            </div>
+        </main>
+
+        <footer id="pageFooter">
+            <div class="footer-content">
+                <p>&copy; <span id="currentYear"></span> coax的小工具. 保留所有权利。</p>
+                <p>渝ICP备2025071398号</p>
+            </div>
+        </footer>
+    </div>
+
+    <script src="../js/timestamp-converter.js"></script>
+    <script src="../js/common.js"></script>
+</body>
+</html>

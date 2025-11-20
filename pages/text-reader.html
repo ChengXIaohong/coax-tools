@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="大文本文件在线阅读器，支持超大文件的分块加载和虚拟滚动显示，实现流畅的阅读体验。">
+    <meta name="keywords" content="文本阅读器, 大文件阅读, 虚拟滚动, 分块加载, 在线阅读">
+    <meta name="author" content="coax">
+    <title>大文本文件阅读器 - coax的小工具</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/text-reader.css">
+</head>
+<body>
+    <div class="container">
+        <main>
+            <div class="reader-container">
+                <div class="reader-header">
+                    <h1>大文本文件阅读器</h1>
+                    <p>支持超大文件的分块加载和虚拟滚动显示</p>
+                    <button id="resetBtn" class="btn reset-btn reset-btn-top">重置</button>
+                </div>
+                
+                <div class="message" id="message"></div>
+                
+                <div class="upload-area" id="uploadArea">
+                    <i>📄</i>
+                    <h3>拖拽文本文件到此处或点击上传</h3>
+                    <p>支持 TXT, LOG, CSV 等文本格式</p>
+                    <div class="file-input-wrapper">
+                        <button class="file-input-button">选择文件</button>
+                        <input type="file" id="fileInput" accept=".txt,.log,.csv,text/*">
+                    </div>
+                    <p id="fileInfo"></p>
+                </div>
+                
+                <div class="reader-controls">
+                    <div class="control-group">
+                        <label for="encodingSelect">文件编码:</label>
+                        <select id="encodingSelect">
+                            <option value="utf-8" selected>UTF-8</option>
+                            <option value="gbk">GBK</option>
+                            <option value="gb2312">GB2312</option>
+                            <option value="utf-16le">UTF-16LE</option>
+                            <option value="utf-16be">UTF-16BE</option>
+                            <option value="ascii">ASCII</option>
+                        </select>
+                    </div>
+                    <div class="control-group">
+                        <label for="lineNumberInput">跳转到行:</label>
+                        <input type="number" id="lineNumberInput" min="1" placeholder="行号">
+                        <button id="goToLineBtn">跳转</button>
+                    </div>
+                    <!-- 保存位置按钮已移到页脚 -->
+                </div>
+                
+                <div class="reader-content" id="readerContent">
+                    <div class="line-numbers" id="lineNumbers"></div>
+                    <div class="text-content" id="textContent"></div>
+                </div>
+                
+                <div class="encoding-tip">
+                    <strong>编码提示：</strong>如果出现乱码（如黑色菱形问号◆、方框等），请尝试更改编码格式。
+                    常见编码说明：UTF-8（国际通用编码）、GBK（简体中文Windows默认编码）、GB2312（简体中文旧版编码）
+                </div>
+                
+                <div class="reader-footer">
+                    <div class="file-info">
+                        <span id="loadedInfo">已加载: 0 行</span>
+                        <span id="totalInfo">总行数: -</span>
+                        <span id="positionInfo">位置: 第 0 行</span>
+                    </div>
+                    <div class="navigation">
+                        <button id="savePositionBtn" class="nav-btn">保存位置</button>
+                        <button id="prevPageBtn" class="nav-btn">上一页</button>
+                        <button id="nextPageBtn" class="nav-btn">下一页</button>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <footer id="pageFooter">
+            <div class="footer-content">
+                <p>&copy; <span id="currentYear"></span> coax的小工具. 保留所有权利。</p>
+                <p>渝ICP备2025071398号</p>
+            </div>
+        </footer>
+    </div>
+
+    <script src="../js/text-reader.js"></script>
+    <script src="../js/common.js"></script>
+</body>
+</html>

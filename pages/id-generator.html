@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="身份证信息生成器可生成用于测试开发的模拟身份证信息，包括身份证号、姓名、性别、出生日期、地址等，仅供开发测试使用。">
+    <meta name="keywords" content="身份证生成, 身份证信息, 模拟数据, 测试数据, 开发工具">
+    <meta name="author" content="coax">
+    <title>身份证信息生成器 - coax的小工具</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/id-generator.css">
+    <!-- 添加favicon图标 -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔧</text></svg>">
+    <script src="../js/id-data.js"></script>
+</head>
+<body>
+    <div class="container">
+        <main>
+            <div class="id-generator-container">
+                <div class="id-generator-header">
+                    <h1>身份证信息生成器</h1>
+                    <p>生成用于测试的模拟身份证信息</p>
+                </div>
+                
+                <div class="options">
+                    <div class="option-group">
+                        <div class="option-label">性别:</div>
+                        <select id="genderSelect">
+                            <option value="random">随机</option>
+                            <option value="male">男</option>
+                            <option value="female">女</option>
+                        </select>
+                    </div>
+                    
+                    <div class="option-group">
+                        <div class="option-label">年龄:</div>
+                        <input type="number" id="minAge" placeholder="最小年龄" min="1" max="100" value="18">
+                        <span>到</span>
+                        <input type="number" id="maxAge" placeholder="最大年龄" min="1" max="100" value="65">
+                    </div>
+                    
+                    <div class="option-group">
+                        <div class="option-label">地址:</div>
+                        <select id="areaSelect">
+                            <option value="random">随机地区</option>
+                            <option value="110000">北京市</option>
+                            <option value="120000">天津市</option>
+                            <option value="130000">河北省</option>
+                            <option value="140000">山西省</option>
+                            <option value="150000">内蒙古自治区</option>
+                            <option value="210000">辽宁省</option>
+                            <option value="220000">吉林省</option>
+                            <option value="230000">黑龙江省</option>
+                            <option value="310000">上海市</option>
+                            <option value="320000">江苏省</option>
+                            <option value="330000">浙江省</option>
+                            <option value="340000">安徽省</option>
+                            <option value="350000">福建省</option>
+                            <option value="360000">江西省</option>
+                            <option value="370000">山东省</option>
+                            <option value="410000">河南省</option>
+                            <option value="420000">湖北省</option>
+                            <option value="430000">湖南省</option>
+                            <option value="440000">广东省</option>
+                            <option value="450000">广西壮族自治区</option>
+                            <option value="460000">海南省</option>
+                            <option value="500000">重庆市</option>
+                            <option value="510000">四川省</option>
+                            <option value="520000">贵州省</option>
+                            <option value="530000">云南省</option>
+                            <option value="540000">西藏自治区</option>
+                            <option value="610000">陕西省</option>
+                            <option value="620000">甘肃省</option>
+                            <option value="630000">青海省</option>
+                            <option value="640000">宁夏回族自治区</option>
+                            <option value="650000">新疆维吾尔自治区</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="controls">
+                    <button id="generateBtn" class="generate-btn">生成身份证信息</button>
+                    <button id="copyJsonBtn" class="copy-json-btn">复制JSON</button>
+                </div>
+                
+                <div class="id-info" id="idInfo">
+                    <div class="id-field">
+                        <div class="id-label">身份证号:</div>
+                        <div class="id-value">
+                            <span id="idNumber"></span>
+                            <button class="copy-btn" data-target="idNumber">复制</button>
+                        </div>
+                    </div>
+                    <div class="id-field">
+                        <div class="id-label">姓名:</div>
+                        <div class="id-value">
+                            <span id="fullName"></span>
+                            <button class="copy-btn" data-target="fullName">复制</button>
+                        </div>
+                    </div>
+                    <div class="id-field">
+                        <div class="id-label">性别:</div>
+                        <div class="id-value">
+                            <span id="gender"></span>
+                            <button class="copy-btn" data-target="gender">复制</button>
+                        </div>
+                    </div>
+                    <div class="id-field">
+                        <div class="id-label">出生日期:</div>
+                        <div class="id-value">
+                            <span id="birthDate"></span>
+                            <button class="copy-btn" data-target="birthDate">复制</button>
+                        </div>
+                    </div>
+                    <div class="id-field">
+                        <div class="id-label">年龄:</div>
+                        <div class="id-value">
+                            <span id="age"></span>
+                            <button class="copy-btn" data-target="age">复制</button>
+                        </div>
+                    </div>
+                    <div class="id-field">
+                        <div class="id-label">地址:</div>
+                        <div class="id-value">
+                            <span id="address"></span>
+                            <button class="copy-btn" data-target="address">复制</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="disclaimer">
+                    <h3>免责声明与风险提示</h3>
+                    <ul>
+                        <li>本工具仅供开发测试使用，生成的所有信息均为虚构的模拟数据</li>
+                        <li>严禁将生成的身份证信息用于任何非法用途</li>
+                        <li>请勿将生成的信息用于真实身份验证、注册账户等场景</li>
+                        <li>使用本工具生成的数据所造成的任何法律后果由使用者自行承担</li>
+                        <li>本工具不保证生成数据的真实性、准确性和合法性</li>
+                        <li>建议在测试完成后及时删除相关模拟数据</li>
+                    </ul>
+                </div>
+            </div>
+        </main>
+
+        <footer id="pageFooter">
+            <div class="footer-content">
+                <p>&copy; <span id="currentYear"></span> coax的小工具. 保留所有权利。</p>
+                <p>渝ICP备2025071398号</p>
+            </div>
+        </footer>
+    </div>
+
+    <script src="../js/id-generator.js"></script>
+    <script src="../js/common.js"></script>
+</body>
+</html>

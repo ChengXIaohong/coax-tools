@@ -1,0 +1,15 @@
+User-agent: *
+Disallow: /test/
+Disallow: /node_modules/
+Disallow: /.venv/
+Disallow: /.idea/
+
+Sitemap: https://www.tools.coax.uno/sitemap.xml
+
+# 允许访问所有其他内容
+Allow: /
+
+# 特别说明：
+# 1. 禁止访问测试目录
+# 2. 禁止访问依赖和配置目录
+# 3. 允许搜索引擎索引主要工具页面
