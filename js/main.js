@@ -65,6 +65,12 @@ const tools = [
         title: "大文本文件阅读器",
         description: "支持超大文件的分块加载和虚拟滚动显示，实现流畅的阅读体验。",
         link: "pages/text-reader.html"
+    },
+    {
+        id: 12,
+        title: "GPU性能测试",
+        description: "基于WebGL的交互式3D体积渲染器，实现实时参数调整与即时渲染反馈，创建类似Mandelbulb的分形结构渲染，集成性能监控和帧率显示功能。",
+        link: "pages/gpu-test.html"
     }
 ];
 

@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="基于WebGL的交互式3D体积渲染器，实现实时参数调整与即时渲染反馈，创建类似Mandelbulb的分形结构渲染，集成性能监控和帧率显示功能。">
+    <meta name="keywords" content="GPU性能测试, WebGL, 3D渲染, 分形结构, 性能监控, 帧率显示">
+    <meta name="author" content="coax">
+    <title>GPU性能测试 - coax的小工具</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/gpu-test.css">
+    <link rel="stylesheet" href="../css/gpu-test-inline.css">
+    <!-- 添加favicon图标 -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔧</text></svg>">
+</head>
+<body>
+    <div class="container">
+        <main>
+            <div class="gpu-test-container">
+                <div class="gpu-test-header">
+                    <h1>GPU性能测试</h1>
+                    <p>基于WebGL的交互式3D体积渲染器</p>
+                </div>
+                
+                <div class="gpu-content">
+                    <div id="main">
+                        <canvas id="c1" width="1024" height="1024">
+                            <span>不支持canvas浏览器</span>
+                        </canvas>
+                    </div>
+                    <button id="btn">CONFIG</button>
+                    <div id="config">
+                        <textarea name="" id="kernel" cols="30" rows="10"></textarea>
+                        <br />
+                        <button id="apply">APPLY</button>
+                        <button id="cancle">CANCEL</button>
+                    </div>
+                    
+                    <div class="config-panel" id="configPanel">
+                        <div class="panel-header">
+                            <h2>说明</h2>
+                            <button id="togglePanel" class="toggle-btn">收起</button>
+                        </div>
+                        <div class="panel-content">
+                            <p>以上是基于参考网站实现的毒蘑菇测试。该测试通过渲染复杂的3D分形结构来测试GPU性能。</p>
+                            <p><strong>操作说明：</strong></p>
+                            <ul>
+                                <li>鼠标左键拖拽：旋转视角</li>
+                                <li>鼠标右键拖拽：平移视角</li>
+                                <li>鼠标滚轮：缩放</li>
+                                <li>点击"CONFIG"按钮：可查看和修改着色器代码</li>
+                            </ul>
+                            <p><strong>警告：</strong>在性能较弱的设备（如手机）上运行此测试可能导致系统卡顿或发热。</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <footer id="pageFooter">
+            <div class="footer-content">
+                <p>&copy; <span id="currentYear"></span> coax的小工具. 保留所有权利。</p>
+                <p>渝ICP备2025071398号</p>
+            </div>
+        </footer>
+    </div>
+
+    <script src="../js/gpu-test.js"></script>
+    <script src="../js/common.js"></script>
+    <script src="../js/gpu-test-inline.js"></script>
+</body>
+</html>

@@ -1,0 +1,252 @@
+.gpu-test-container {
+    max-width: 800px;
+    margin: 2rem auto;
+    padding: 2rem;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    position: relative;
+}
+
+.gpu-test-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.gpu-test-header h1 {
+    color: #4a4a4a;
+    margin-bottom: 0.5rem;
+}
+
+.gpu-content {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    position: relative;
+}
+
+#main {
+    width: 100%;
+    height: 500px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    overflow: hidden;
+    position: relative;
+}
+
+#configPanel {
+    margin-top: 20px;
+    background: #f8f9fa;
+    padding: 15px;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+}
+
+.panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.panel-header h2 {
+    margin: 0;
+    font-size: 1.3rem;
+    color: #4a4a4a;
+}
+
+.toggle-btn {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.toggle-btn:hover {
+    opacity: 0.9;
+}
+
+.panel-content {
+    color: #666;
+}
+
+.panel-content ul {
+    padding-left: 20px;
+}
+
+.panel-content li {
+    margin-bottom: 5px;
+}
+
+.config-group {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    padding: 0.5rem 0;
+}
+
+.config-group label {
+    flex: 1;
+    min-width: 200px;
+    font-weight: bold;
+    color: #4a4a4a;
+}
+
+.config-group input[type="range"] {
+    flex: 2;
+    min-width: 200px;
+}
+
+.config-group input[type="checkbox"] {
+    margin-right: 0.5rem;
+}
+
+.config-group span {
+    flex: 1;
+    min-width: 50px;
+    text-align: right;
+    font-family: 'Courier New', monospace;
+}
+
+.config-actions {
+    text-align: center;
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid #ddd;
+}
+
+.btn-small {
+    padding: 0.5rem 1rem;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.btn-small:hover {
+    opacity: 0.9;
+}
+
+/* 收起面板样式 */
+.config-panel.collapsed .panel-content {
+    display: none;
+}
+
+.config-panel.collapsed .panel-header {
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 1rem;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+    .gpu-test-container {
+        padding: 1rem;
+    }
+    
+    .config-group {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .config-group label {
+        min-width: auto;
+        margin-bottom: 0.5rem;
+    }
+    
+    .config-group input[type="range"] {
+        width: 100%;
+    }
+    
+    .config-group span {
+        text-align: left;
+        width: 100%;
+    }
+    
+    #config {
+        width: calc(100% - 40px);
+        right: 20px;
+        left: 20px;
+    }
+    
+    #main {
+        height: 300px;
+    }
+}
+
+/* CONFIG按钮样式 */
+#btn {
+    position: absolute;
+    right: 20px;
+    top: 20px;
+    width: 80px;
+    height: 35px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+    color: white;
+    font-size: 12px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+#btn:hover {
+    opacity: 0.9;
+}
+
+/* CONFIG面板样式 */
+#config {
+    position: fixed;
+    right: 20px;
+    top: 70px;
+    width: 320px;
+    height: 480px;
+    background: white;
+    border: solid 1px #ccc;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    font-size: 12px;
+    font-family: sans-serif;
+    text-align: left;
+    z-index: 1000;
+    border-radius: 5px;
+}
+
+#config textarea {
+    width: calc(100% - 20px);
+    height: 360px;
+    border: 1px solid #ddd;
+    background: #f8f9fa;
+    font-size: 12px;
+    font-family: 'Courier New', monospace;
+    padding: 10px;
+    border-radius: 4px;
+    margin: 10px;
+}
+
+#config button {
+    width: 70px;
+    height: 35px;
+    margin: 0 10px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+    color: white;
+    font-size: 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    float: right;
+}
+
+#config button:hover {
+    opacity: 0.9;
+}
+
+#c1 {
+    width: 100%;
+    height: 100%;
+    background: #fbf7fe;
+}
