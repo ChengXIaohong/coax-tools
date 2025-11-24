@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="文本文件合成器可以将多个纯文本文件合并成一个大文件并提供下载功能，方便批量处理文本文件。">
+    <meta name="keywords" content="文本合并, 文件合成, 文本处理, 批量处理, 在线工具">
+    <meta name="author" content="coax">
+    <title>文本文件合成器 - coax的小工具</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/text-file-merger.css">
+    <!-- 添加favicon图标 -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔧</text></svg>">
+</head>
+<body>
+    <div class="container">
+        <main>
+            <div class="converter-container">
+                <div class="converter-header">
+                    <h1>文本文件合成器</h1>
+                    <p>将多个纯文本文件合并成一个大文件并提供下载</p>
+                </div>
+                
+                <div class="upload-area" id="uploadArea">
+                    <div class="upload-icon">📁</div>
+                    <p>拖拽文件到这里或点击选择文件</p>
+                    <input type="file" id="fileInput" class="file-input" accept=".txt,.json,.log,.yaml,.yml,.ini,.toml,.csv,.md,.xml,.conf,.cfg,.properties,.env,.sql,.sh,.bat,.cmd,.ps1" multiple>
+                    <label for="fileInput" class="file-label" id="fileLabel">选择文本文件</label>
+                    <p style="font-size: 12px; color: #666; margin-top: 10px;">支持多种文本格式: txt, json, log, yaml, yml, ini, toml, csv, md, xml 等</p>
+                </div>
+                
+                <div class="file-list-container" id="fileListContainer">
+                    <h3>已选择的文件 (<span id="fileCount">0</span>)</h3>
+                    <ul class="file-list" id="fileList"></ul>
+                    <button id="clearAllBtn" class="clear-btn">清空所有</button>
+                </div>
+                
+                <div class="merge-options">
+                    <h3>合并选项</h3>
+                    <div class="option-group">
+                        <label for="separator">文件间分隔符:</label>
+                        <select id="separator">
+                            <option value="\n">换行 (\n)</option>
+                            <option value="\n---\n">带标记的分隔符</option>
+                            <option value="">无分隔符</option>
+                            <option value=",">逗号 (,)</option>
+                            <option value=";">分号 (;)</option>
+                        </select>
+                    </div>
+                    <div class="option-group">
+                        <label for="fileName">输出文件名:</label>
+                        <input type="text" id="fileName" value="merged-text-file.txt">
+                    </div>
+                </div>
+                
+                <button id="mergeBtn" class="merge-btn">合并并下载</button>
+                
+                <div class="progress-container" id="progressContainer">
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill"></div>
+                    </div>
+                    <div class="progress-text" id="progressText">准备就绪</div>
+                </div>
+                
+                <div class="loading" id="loading">
+                    <div class="spinner"></div>
+                    <p>正在处理文件，请稍候...</p>
+                </div>
+                
+                <div class="message error-message" id="errorMessage"></div>
+                <div class="message success-message" id="successMessage"></div>
+            </div>
+        </main>
+
+        <footer id="pageFooter">
+            <div class="footer-content">
+                <p>&copy; <span id="currentYear"></span> coax的小工具. 保留所有权利。</p>
+                <p>渝ICP备2025071398号</p>
+            </div>
+        </footer>
+    </div>
+
+    <script src="../js/text-file-merger.js"></script>
+    <script src="../js/common.js"></script>
+</body>
+</html>

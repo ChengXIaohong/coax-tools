@@ -68,8 +68,14 @@ const tools = [
     },
     {
         id: 12,
+        title: "文本文件合成器",
+        description: "将多个纯文本文件合并成一个大文件并提供下载功能，方便批量处理文本文件。",
+        link: "pages/text-file-merger.html"
+    },
+    {
+        id: 13,
         title: "GPU性能测试",
-        description: "基于WebGL的交互式3D体积渲染器，实现实时参数调整与即时渲染反馈，创建类似Mandelbulb的分形结构渲染，集成性能监控和帧率显示功能。",
+        description: "基于WebGL的交互式3D体积渲染器，毒蘑菇的复刻，也不知道最开始是哪位大佬贡献的，暂时引用不了",
         link: "pages/gpu-test.html"
     }
 ];
