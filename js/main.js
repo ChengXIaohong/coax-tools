@@ -77,6 +77,12 @@ const tools = [
         title: "GPU性能测试",
         description: "基于WebGL的交互式3D体积渲染器，毒蘑菇的复刻，也不知道最开始是哪位大佬贡献的，暂时引用不了",
         link: "pages/gpu-test.html"
+    },
+    {
+        id: 14,
+        title: "敏感词校验器",
+        description: "检测文本中的敏感词，支持自定义敏感词库，帮助用户过滤不当内容。",
+        link: "pages/sensitive-word-checker.html"
     }
 ];
 

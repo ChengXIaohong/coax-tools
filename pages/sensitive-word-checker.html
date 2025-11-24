@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="敏感词校验器可以检测文本中的敏感词，支持自定义敏感词库，帮助用户过滤不当内容。">
+    <meta name="keywords" content="敏感词检测, 文本过滤, 内容审核, 在线工具">
+    <meta name="author" content="coax">
+    <title>敏感词校验器 - coax的小工具</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/text-file-merger.css">
+    <link rel="stylesheet" href="../css/converter.css">
+    <!-- 添加favicon图标 -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔧</text></svg>">
+    <style>
+        .checker-container {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        
+        .checker-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        
+        .checker-header h1 {
+            color: #4a4a4a;
+            margin-bottom: 0.5rem;
+        }
+        
+        .input-section {
+            margin-bottom: 2rem;
+        }
+        
+        .input-methods {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .input-method {
+            padding: 0.5rem 1rem;
+            background: #f0f0f0;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        
+        .input-method.active {
+            background: #667eea;
+            color: white;
+        }
+        
+        .text-input-container, .file-input-container {
+            display: none;
+        }
+        
+        .text-input-container.active, .file-input-container.active {
+            display: block;
+        }
+        
+        textarea {
+            width: 100%;
+            min-height: 200px;
+            padding: 1rem;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            resize: vertical;
+            font-family: monospace;
+        }
+        
+        .file-upload-area {
+            border: 2px dashed #ccc;
+            border-radius: 8px;
+            padding: 40px;
+            text-align: center;
+            margin: 20px 0;
+            transition: border-color 0.3s;
+            cursor: pointer;
+            background-color: #f8f9fa;
+        }
+        
+        .file-upload-area:hover, .file-upload-area.dragover {
+            border-color: #667eea;
+            background-color: #f0f2ff;
+        }
+        
+        .file-upload-area .upload-icon {
+            font-size: 48px;
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+        
+        .file-input {
+            display: none;
+        }
+        
+        .file-label {
+            display: inline-block;
+            padding: 10px 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: opacity 0.3s;
+        }
+        
+        .file-label:hover {
+            opacity: 0.9;
+        }
+        
+        .custom-words-section {
+            margin: 2rem 0;
+            padding: 1rem;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #f8f9fa;
+        }
+        
+        .custom-words-section h3 {
+            margin-top: 0;
+            color: #4a4a4a;
+        }
+        
+        .word-input-group {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .word-input {
+            flex: 1;
+            padding: 0.5rem;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        
+        .add-word-btn {
+            padding: 0.5rem 1rem;
+            background: #28a745;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        .word-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        
+        .word-list li {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .word-list li:last-child {
+            border-bottom: none;
+        }
+        
+        .remove-word-btn {
+            background: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 3px;
+            padding: 0.2rem 0.5rem;
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+        
+        .check-btn {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #28a745 0%, #218838 100%);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            margin: 20px 0;
+            transition: opacity 0.3s;
+        }
+        
+        .check-btn:hover:not(:disabled) {
+            opacity: 0.9;
+        }
+        
+        .check-btn:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+        }
+        
+        .result-section {
+            margin-top: 2rem;
+            padding: 1rem;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #f8f9fa;
+            display: none;
+        }
+        
+        .result-section h3 {
+            margin-top: 0;
+            color: #4a4a4a;
+        }
+        
+        .sensitive-words-list {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .sensitive-words-list li {
+            padding: 0.5rem;
+            margin-bottom: 0.5rem;
+            background: #fff;
+            border-radius: 4px;
+            border-left: 4px solid #dc3545;
+        }
+        
+        .highlight {
+            background-color: #ffeb3b;
+            padding: 0.1rem 0.2rem;
+            border-radius: 3px;
+        }
+        
+        .preview-content {
+            white-space: pre-wrap;
+            word-break: break-word;
+            background: white;
+            padding: 1rem;
+            border-radius: 4px;
+            margin-top: 1rem;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <main>
+            <div class="checker-container">
+                <div class="checker-header">
+                    <h1>敏感词校验器</h1>
+                    <p>检测文本中的敏感词，支持自定义敏感词库</p>
+                </div>
+                
+                <div class="input-section">
+                    <h3>输入方式</h3>
+                    <div class="input-methods">
+                        <button class="input-method active" data-method="text">手动输入</button>
+                        <button class="input-method" data-method="file">文件上传</button>
+                    </div>
+                    
+                    <div class="text-input-container active">
+                        <textarea id="textInput" placeholder="请输入要检测的文本内容..."></textarea>
+                    </div>
+                    
+                    <div class="file-input-container">
+                        <div class="file-upload-area" id="uploadArea">
+                            <div class="upload-icon">📁</div>
+                            <p>拖拽文件到这里或点击选择文件</p>
+                            <input type="file" id="fileInput" class="file-input" accept=".txt">
+                            <label for="fileInput" class="file-label" id="fileLabel">选择文本文件</label>
+                            <p style="font-size: 12px; color: #666; margin-top: 10px;">支持 .txt 格式文件</p>
+                        </div>
+                        <div class="file-info" id="fileInfo"></div>
+                    </div>
+                </div>
+                
+                <div class="custom-words-section">
+                    <h3>自定义敏感词</h3>
+                    <div class="word-input-group">
+                        <input type="text" class="word-input" id="wordInput" placeholder="输入敏感词">
+                        <button class="add-word-btn" id="addWordBtn">添加</button>
+                    </div>
+                    <ul class="word-list" id="wordList"></ul>
+                </div>
+                
+                <button id="checkBtn" class="check-btn">开始检测</button>
+                
+                <div class="loading" id="loading">
+                    <div class="spinner"></div>
+                    <p>正在检测中，请稍候...</p>
+                </div>
+                
+                <div class="message error-message" id="errorMessage"></div>
+                <div class="message success-message" id="successMessage"></div>
+                
+                <div class="result-section" id="resultSection">
+                    <h3>检测结果</h3>
+                    <div id="resultSummary"></div>
+                    <div id="previewContainer">
+                        <h4>文本预览（敏感词已高亮）</h4>
+                        <div class="preview-content" id="previewContent"></div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <footer id="pageFooter">
+            <div class="footer-content">
+                <p>&copy; <span id="currentYear"></span> coax的小工具. 保留所有权利。</p>
+                <p>渝ICP备2025071398号</p>
+            </div>
+        </footer>
+    </div>
+
+    <script src="../js/sensitive-word-checker.js"></script>
+    <script src="../js/common.js"></script>
+</body>
+</html>

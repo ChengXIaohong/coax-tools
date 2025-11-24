@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>敏感词校验器测试</title>
+    <link rel="stylesheet" href="../../css/style.css">
+    <link rel="stylesheet" href="../../css/text-file-merger.css">
+    <link rel="stylesheet" href="../../test/assets/test-styles.css">
+    <style>
+        .test-case {
+            margin: 1rem 0;
+            padding: 1rem;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        
+        .test-input {
+            width: 100%;
+            min-height: 100px;
+            margin: 0.5rem 0;
+            padding: 0.5rem;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-family: monospace;
+        }
+        
+        .test-output {
+            background: #f8f9fa;
+            padding: 0.5rem;
+            border-radius: 4px;
+            margin: 0.5rem 0;
+            white-space: pre-wrap;
+        }
+        
+        .highlight {
+            background-color: #ffeb3b;
+            padding: 0.1rem 0.2rem;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>敏感词校验器测试</h1>
+            <nav>
+                <a href="../index.html">返回测试首页</a>
+            </nav>
+        </header>
+        
+        <main>
+            <div class="test-suite">
+                <h2>功能测试</h2>
+                
+                <div class="test-case">
+                    <h3>测试用例 1: 基本敏感词检测</h3>
+                    <p>描述: 测试系统是否能正确检测内置敏感词</p>
+                    <textarea class="test-input" id="test1-input">这是一段包含暴力和色情内容的文本，用于测试敏感词检测功能。</textarea>
+                    <button onclick="runTest1()">运行测试</button>
+                    <div class="test-output" id="test1-output"></div>
+                </div>
+                
+                <div class="test-case">
+                    <h3>测试用例 2: 自定义敏感词检测</h3>
+                    <p>描述: 测试自定义敏感词的添加和检测功能</p>
+                    <input type="text" id="custom-word" placeholder="输入自定义敏感词" value="测试敏感词">
+                    <button onclick="addCustomWord()">添加自定义敏感词</button>
+                    <textarea class="test-input" id="test2-input">这是一段包含测试敏感词的内容，用于验证自定义敏感词功能。</textarea>
+                    <button onclick="runTest2()">运行测试</button>
+                    <div class="test-output" id="test2-output"></div>
+                </div>
+                
+                <div class="test-case">
+                    <h3>测试用例 3: 多个敏感词检测</h3>
+                    <p>描述: 测试同时检测多个敏感词的情况</p>
+                    <textarea class="test-input" id="test3-input">文本中包含多个敏感词：暴力、色情、赌博和诈骗等内容。</textarea>
+                    <button onclick="runTest3()">运行测试</button>
+                    <div class="test-output" id="test3-output"></div>
+                </div>
+                
+                <div class="test-case">
+                    <h3>测试用例 4: 英文敏感词检测</h3>
+                    <p>描述: 测试英文敏感词的检测能力</p>
+                    <textarea class="test-input" id="test4-input">This text contains violence, porn and fraud content for testing English sensitive words detection.</textarea>
+                    <button onclick="runTest4()">运行测试</button>
+                    <div class="test-output" id="test4-output"></div>
+                </div>
+                
+                <div class="test-case">
+                    <h3>测试用例 5: 无敏感词文本</h3>
+                    <p>描述: 测试不包含敏感词的正常文本</p>
+                    <textarea class="test-input" id="test5-input">这是一段完全正常的文本内容，不包含任何敏感词，用于测试无敏感词情况下的处理。</textarea>
+                    <button onclick="runTest5()">运行测试</button>
+                    <div class="test-output" id="test5-output"></div>
+                </div>
+            </div>
+        </main>
+        
+        <footer>
+            <p>&copy; <span id="currentYear"></span> coax的小工具. 敏感词校验器测试页面</p>
+        </footer>
+    </div>
+    
+    <script>
+        // 初始化年份
+        document.getElementById('currentYear').textContent = new Date().getFullYear();
+        
+        // 模拟敏感词校验器的核心功能
+        const defaultSensitiveWords = [
+            '暴力', '色情', '赌博', '诈骗', '毒品', '黑客', '病毒', '木马', '色情网站',
+            '非法', '违法', '犯罪', '恐怖', '极端主义', '分裂主义', '泄露', '机密',
+            '国家机密', '隐私', '个人信息', '侮辱', '诽谤', '歧视', '种族歧视',
+            '性别歧视', '宗教歧视', '政治敏感', '反政府', '颠覆国家',
+            // 英文敏感词
+            'violence', 'porn', 'gambling', 'fraud', 'drugs', 'hack', 'virus', 'trojan',
+            'illegal', 'crime', 'terror', 'extremism', 'separatism', 'leak', 'secret',
+            'confidential', 'privacy', 'insult', 'defamation', 'discrimination'
+        ];
+        
+        let customSensitiveWords = [];
+        
+        // 添加自定义敏感词
+        function addCustomWord() {
+            const word = document.getElementById('custom-word').value.trim();
+            if (word && !customSensitiveWords.includes(word)) {
+                customSensitiveWords.push(word);
+                alert(`已添加自定义敏感词: ${word}`);
+            } else if (customSensitiveWords.includes(word)) {
+                alert('该敏感词已存在');
+            } else {
+                alert('请输入有效的敏感词');
+            }
+        }
+        
+        // 检测敏感词
+        function detectSensitiveWords(text) {
+            const allSensitiveWords = [...defaultSensitiveWords, ...customSensitiveWords];
+            const detected = [];
+            const foundWords = new Set();
+            
+            allSensitiveWords.forEach(word => {
+                const escapedWord = word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                const regex = new RegExp(escapedWord, 'gi');
+                let match;
+                
+                while ((match = regex.exec(text)) !== null) {
+                    if (!foundWords.has(match[0])) {
+                        detected.push({
+                            word: match[0],
+                            index: match.index
+                        });
+                        foundWords.add(match[0]);
+                    }
+                }
+            });
+            
+            return detected.sort((a, b) => a.index - b.index);
+        }
+        
+        // 高亮敏感词
+        function highlightSensitiveWords(text, detectedWords) {
+            let highlightedText = text;
+            const sortedWords = [...detectedWords].sort((a, b) => b.word.length - a.word.length);
+            
+            sortedWords.forEach(item => {
+                const escapedWord = item.word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                const regex = new RegExp(`(${escapedWord})`, 'gi');
+                highlightedText = highlightedText.replace(regex, '<span class="highlight">$1</span>');
+            });
+            
+            return highlightedText;
+        }
+        
+        // 测试用例 1: 基本敏感词检测
+        function runTest1() {
+            const input = document.getElementById('test1-input').value;
+            const output = document.getElementById('test1-output');
+            
+            try {
+                const detectedWords = detectSensitiveWords(input);
+                if (detectedWords.length > 0) {
+                    const highlightedText = highlightSensitiveWords(input, detectedWords);
+                    output.innerHTML = `检测到 ${detectedWords.length} 个敏感词:
+${detectedWords.map(w => `- ${w.word}`).join('
+')}
+
+高亮文本:
+${highlightedText}`;
+                } else {
+                    output.textContent = '未检测到敏感词';
+                }
+            } catch (error) {
+                output.textContent = `测试失败: ${error.message}`;
+            }
+        }
+        
+        // 测试用例 2: 自定义敏感词检测
+        function runTest2() {
+            const input = document.getElementById('test2-input').value;
+            const output = document.getElementById('test2-output');
+            
+            try {
+                const detectedWords = detectSensitiveWords(input);
+                if (detectedWords.length > 0) {
+                    const highlightedText = highlightSensitiveWords(input, detectedWords);
+                    output.innerHTML = `检测到 ${detectedWords.length} 个敏感词:
+${detectedWords.map(w => `- ${w.word}`).join('
+')}
+
+高亮文本:
+${highlightedText}`;
+                } else {
+                    output.textContent = '未检测到敏感词';
+                }
+            } catch (error) {
+                output.textContent = `测试失败: ${error.message}`;
+            }
+        }
+        
+        // 测试用例 3: 多个敏感词检测
+        function runTest3() {
+            const input = document.getElementById('test3-input').value;
+            const output = document.getElementById('test3-output');
+            
+            try {
+                const detectedWords = detectSensitiveWords(input);
+                if (detectedWords.length > 0) {
+                    const highlightedText = highlightSensitiveWords(input, detectedWords);
+                    output.innerHTML = `检测到 ${detectedWords.length} 个敏感词:
+${detectedWords.map(w => `- ${w.word}`).join('
+')}
+
+高亮文本:
+${highlightedText}`;
+                } else {
+                    output.textContent = '未检测到敏感词';
+                }
+            } catch (error) {
+                output.textContent = `测试失败: ${error.message}`;
+            }
+        }
+        
+        // 测试用例 4: 英文敏感词检测
+        function runTest4() {
+            const input = document.getElementById('test4-input').value;
+            const output = document.getElementById('test4-output');
+            
+            try {
+                const detectedWords = detectSensitiveWords(input);
+                if (detectedWords.length > 0) {
+                    const highlightedText = highlightSensitiveWords(input, detectedWords);
+                    output.innerHTML = `检测到 ${detectedWords.length} 个敏感词:
+${detectedWords.map(w => `- ${w.word}`).join('
+')}
+
+高亮文本:
+${highlightedText}`;
+                } else {
+                    output.textContent = '未检测到敏感词';
+                }
+            } catch (error) {
+                output.textContent = `测试失败: ${error.message}`;
+            }
+        }
+        
+        // 测试用例 5: 无敏感词文本
+        function runTest5() {
+            const input = document.getElementById('test5-input').value;
+            const output = document.getElementById('test5-output');
+            
+            try {
+                const detectedWords = detectSensitiveWords(input);
+                if (detectedWords.length > 0) {
+                    const highlightedText = highlightSensitiveWords(input, detectedWords);
+                    output.innerHTML = `检测到 ${detectedWords.length} 个敏感词:
+${detectedWords.map(w => `- ${w.word}`).join('
+')}
+
+高亮文本:
+${highlightedText}`;
+                } else {
+                    output.textContent = '未检测到敏感词，文本内容安全';
+                }
+            } catch (error) {
+                output.textContent = `测试失败: ${error.message}`;
+            }
+        }
+    </script>
+</body>
+</html>
