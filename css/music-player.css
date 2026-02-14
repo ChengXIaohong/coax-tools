@@ -1,0 +1,275 @@
+/* 音乐播放器样式 */
+.music-player-container {
+    max-width: 800px;
+    margin: 2rem auto;
+    padding: 2rem;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    font-family: 'Arial', sans-serif;
+}
+
+.player-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.player-header h1 {
+    color: #4a4a4a;
+    margin-bottom: 0.5rem;
+}
+
+.player-controls {
+    background: #f8f9fa;
+    padding: 1.5rem;
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+}
+
+.track-info {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.album-art {
+    width: 120px;
+    height: 120px;
+    border-radius: 8px;
+    overflow: hidden;
+    margin-right: 1rem;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.album-art img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.track-details h2 {
+    margin: 0 0 0.5rem 0;
+    font-size: 1.5rem;
+    color: #333;
+}
+
+.track-details p {
+    margin: 0;
+    color: #666;
+    font-size: 1.1rem;
+}
+
+.progress-container {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    gap: 1rem;
+}
+
+.progress-container span {
+    min-width: 40px;
+    text-align: center;
+    color: #555;
+    font-size: 0.9rem;
+}
+
+#progressBar {
+    flex: 1;
+    height: 6px;
+    -webkit-appearance: none;
+    background: #ddd;
+    border-radius: 3px;
+    outline: none;
+}
+
+#progressBar::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: #667eea;
+    cursor: pointer;
+}
+
+.playback-controls {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.control-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.3s;
+    color: #555;
+}
+
+.control-btn:hover {
+    background-color: #e9ecef;
+    color: #667eea;
+}
+
+.play-btn {
+    width: 60px;
+    height: 60px;
+    background-color: #667eea;
+    color: white;
+}
+
+.play-btn:hover {
+    background-color: #5a6fd8;
+    color: white;
+}
+
+.volume-control {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    justify-content: center;
+}
+
+#volumeControl {
+    width: 100px;
+    height: 6px;
+    -webkit-appearance: none;
+    background: #ddd;
+    border-radius: 3px;
+    outline: none;
+}
+
+#volumeControl::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: #667eea;
+    cursor: pointer;
+}
+
+.file-upload {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.upload-label {
+    display: inline-block;
+    padding: 0.8rem 1.5rem;
+    background: #667eea;
+    color: white;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    font-weight: bold;
+}
+
+.upload-label:hover {
+    background: #5a6fd8;
+}
+
+#audioFiles {
+    display: none;
+}
+
+.file-info {
+    margin-top: 0.5rem;
+    color: #666;
+    font-size: 0.9rem;
+}
+
+.playlist-container {
+    margin-top: 1.5rem;
+}
+
+.playlist-container h3 {
+    margin-bottom: 1rem;
+    color: #4a4a4a;
+}
+
+.playlist {
+    list-style: none;
+    padding: 0;
+    max-height: 300px;
+    overflow-y: auto;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    background: #f8f9fa;
+}
+
+.playlist-item {
+    padding: 0.8rem 1rem;
+    border-bottom: 1px solid #eee;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.playlist-item:last-child {
+    border-bottom: none;
+}
+
+.playlist-item:hover {
+    background-color: #e9ecef;
+}
+
+.playlist-item.active {
+    background-color: #667eea;
+    color: white;
+}
+
+.playlist-item.empty-playlist {
+    text-align: center;
+    color: #999;
+    font-style: italic;
+}
+
+.track-duration {
+    color: #666;
+    font-size: 0.8rem;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+    .music-player-container {
+        margin: 1rem;
+        padding: 1rem;
+    }
+    
+    .track-info {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .album-art {
+        margin-right: 0;
+        margin-bottom: 1rem;
+    }
+    
+    .progress-container {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    
+    .playback-controls {
+        gap: 1rem;
+    }
+    
+    .volume-control {
+        justify-content: center;
+    }
+    
+    #volumeControl {
+        width: 80px;
+    }
+}

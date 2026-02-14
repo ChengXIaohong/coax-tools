@@ -83,6 +83,12 @@ const tools = [
         title: "敏感词校验器",
         description: "检测文本中的敏感词，支持自定义敏感词库，帮助用户过滤不当内容。",
         link: "pages/sensitive-word-checker.html"
+    },
+    {
+        id: 15,
+        title: "本地音乐播放器",
+        description: "支持多种音频格式的本地音乐播放，可创建播放列表，调节音量和进度。",
+        link: "pages/music-player.html"
     }
 ];
 

@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <rect width="200" height="200" fill="#f0f0f0"/>
+  <circle cx="100" cy="100" r="80" fill="#d0d0d0"/>
+  <path d="M80 70 L140 100 L80 130 Z" fill="#667eea"/>
+  <text x="100" y="160" text-anchor="middle" font-family="Arial" font-size="16" fill="#333">音乐</text>
+</svg>
