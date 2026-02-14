@@ -137,12 +137,12 @@ function swapUnits() {
 // 转换单位
 function convertUnits(event) {
     event.preventDefault();
-    
+
     const category = categorySelect.value;
     const fromValue = parseFloat(fromValueInput.value);
     const fromUnit = fromUnitSelect.value;
     const toUnit = toUnitSelect.value;
-    
+
     // 验证输入
     if (isNaN(fromValue)) {
         resultDiv.textContent = '请输入有效的数值';
@@ -150,9 +150,9 @@ function convertUnits(event) {
         toValueInput.value = '';
         return;
     }
-    
+
     let result;
-    
+
     // 特殊处理温度转换
     if (category === 'temperature') {
         result = convertTemperature(fromValue, fromUnit, toUnit);
@@ -162,7 +162,7 @@ function convertUnits(event) {
         const toFactor = UnitData[category].units[toUnit].factor;
         result = fromValue * fromFactor / toFactor;
     }
-    
+
     // 显示结果
     toValueInput.value = result.toFixed(6).replace(/\.?0+$/, '');
     resultDiv.textContent = `${fromValue} ${UnitData[category].units[fromUnit].name} = ${toValueInput.value} ${UnitData[category].units[toUnit].name}`;

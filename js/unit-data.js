@@ -87,7 +87,9 @@ const units = {
         units: {
             'Pa': { name: '帕斯卡', factor: 1 },
             'MPa': { name: '兆帕', factor: 1000000 },
-            'bar': { name: '巴', factor: 100000 }
+            'bar': { name: '巴', factor: 100000 },
+            'hPa': { name: '百帕', factor: 100 },
+            'mmHg': { name: '毫米汞柱', factor: 133.322 }
         }
     },
     power: {
@@ -106,28 +108,6 @@ const units = {
             'kWh': { name: '千瓦时', factor: 3600000 }
         }
     },
-    concentration: {
-        name: '浓度',
-        units: {
-            'mol_per_l': { name: '摩尔浓度(mol/L)', factor: 1 },
-            'g_per_l': { name: '质量浓度(g/L)', factor: 1 },
-            'percent': { name: '百分比浓度(%)', factor: 0.01 }
-        }
-    },
-    reaction_rate: {
-        name: '反应速率',
-        units: {
-            'mol_per_ls': { name: 'mol/(L·s)', factor: 1 },
-            'kmol_per_m3h': { name: 'kmol/(m³·h)', factor: 1 }
-        }
-    },
-    flow_rate: {
-        name: '流量',
-        units: {
-            'l_per_min': { name: '升/分钟(L/min)', factor: 1/60 },
-            'ncum_per_h': { name: '标准立方米/小时(Nm³/h)', factor: 1 }
-        }
-    },
     frequency: {
         name: '频率',
         units: {
@@ -140,31 +120,15 @@ const units = {
         name: '角度',
         units: {
             'deg': { name: '度', factor: 1 },
-            'rad': { name: '弧度', factor: 57.2958 },
+            'rad': { name: '弧度', factor: 180/Math.PI }, // 正确的弧度到度换算因子
             'grad': { name: '百分度', factor: 0.9 }
         }
     },
-    volume_capacity: {
-        name: '体积与容量',
+    flow_rate: {
+        name: '流量',
         units: {
-            'cum': { name: '立方米', factor: 1 },
-            'L': { name: '升', factor: 0.001 },
-            'gal': { name: '加仑', factor: 0.00378541 },
-            'bbl': { name: '桶', factor: 0.158987 }
-        }
-    },
-    mass_units: {
-        name: '质量单位',
-        units: {
-            'mg': { name: '毫克', factor: 0.001 },
-            'ug': { name: '微克', factor: 0.000001 }
-        }
-    },
-    pressure: {
-        name: '压力',
-        units: {
-            'hPa': { name: '百帕', factor: 100 },
-            'mmHg': { name: '毫米汞柱', factor: 133.322 }
+            'l_per_min': { name: '升/分钟(L/min)', factor: 1/60 }, // 相对于 L/s
+            'ncum_per_h': { name: '标准立方米/小时(Nm³/h)', factor: 1/3600 } // 相对于 m³/s
         }
     }
 };
