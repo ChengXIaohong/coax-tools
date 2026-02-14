@@ -33,7 +33,53 @@ document.addEventListener('DOMContentLoaded', function() {
     toonConvertBtn.addEventListener('click', convertToToonFromOutput);
     yamlConvertBtn.addEventListener('click', convertToYamlFromOutput);
     loadSampleBtn.addEventListener('click', loadSampleData);
+    
+    // 初始化可调整大小功能
+    initializeResizablePanels();
 });
+
+// 初始化可调整大小的面板
+function initializeResizablePanels() {
+    const container = document.querySelector('.input-output-container');
+    const leftPanel = container.querySelector('.panel:first-child');
+    const resizeHandle = container.querySelector('.resize-handle');
+    
+    // 检查是否在移动设备上，如果是则不启用调整大小功能
+    const isMobile = window.matchMedia('(max-width: 768px)').matches;
+    if (isMobile) {
+        // 在移动设备上隐藏调整手柄
+        resizeHandle.style.display = 'none';
+        return;
+    }
+    
+    let isResizing = false;
+    
+    resizeHandle.addEventListener('mousedown', function(e) {
+        isResizing = true;
+        document.body.style.userSelect = 'none';
+        e.preventDefault();
+    });
+    
+    document.addEventListener('mousemove', function(e) {
+        if (!isResizing) return;
+        
+        const containerRect = container.getBoundingClientRect();
+        const xPosition = e.clientX - containerRect.left;
+        
+        // 计算左侧面板的百分比宽度
+        const percentage = (xPosition / containerRect.width) * 100;
+        
+        // 设置最小和最大宽度限制（至少30%，最多70%）
+        const clampedPercentage = Math.max(30, Math.min(70, percentage));
+        
+        leftPanel.style.flex = `0 0 ${clampedPercentage}%`;
+    });
+    
+    document.addEventListener('mouseup', function() {
+        isResizing = false;
+        document.body.style.userSelect = '';
+    });
+}
 
 // 格式化JSON
 function formatJson() {
