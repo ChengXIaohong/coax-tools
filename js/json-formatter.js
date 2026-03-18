@@ -1,274 +1,287 @@
 // DOM 元素
 const inputJson = document.getElementById('inputJson');
 const outputJson = document.getElementById('outputJson');
-const formatBtn = document.getElementById('formatBtn');
-const structureBtn = document.getElementById('structureBtn');
-const toonBtn = document.getElementById('toonBtn');
-const yamlBtn = document.getElementById('yamlBtn');
-const clearBtn = document.getElementById('clearBtn');
-const clearInputBtn = document.getElementById('clearInput');
-const copyOutputBtn = document.getElementById('copyOutput');
-const extractStructureBtn = document.getElementById('extractStructure');
-const toonConvertBtn = document.getElementById('toonConvert');
+const actionToggle = document.getElementById('actionToggle');
+const actionMenu = document.getElementById('actionMenu');
 const yamlConvertBtn = document.getElementById('yamlConvert');
-const indentSize = document.getElementById('indentSize');
-const loadSampleBtn = document.getElementById('loadSample');
-const messageDiv = document.getElementById('message');
-const currentYearSpan = document.getElementById('currentYear');
+const toonConvertBtn = document.getElementById('toonConvert');
+const extractStructureBtn = document.getElementById('extractStructure');
+const compressJsonBtn = document.getElementById('compressJson');
+const sortKeysBtn = document.getElementById('sortKeys');
+const copyOutputBtn = document.getElementById('copyOutput');
+const jsonPathInput = document.getElementById('jsonPathInput');
+const jsonPathSearchBtn = document.getElementById('jsonPathSearch');
 
-// 初始化年份
-currentYearSpan.textContent = new Date().getFullYear();
+// 默认缩进
+const DEFAULT_INDENT = 2;
 
-// 页面加载完成后初始化
-document.addEventListener('DOMContentLoaded', function() {
-    // 绑定事件监听器
-    formatBtn.addEventListener('click', formatJson);
-    structureBtn.addEventListener('click', extractStructure);
-    toonBtn.addEventListener('click', convertToToon);
-    yamlBtn.addEventListener('click', convertToYaml);
-    clearBtn.addEventListener('click', clearAll);
-    clearInputBtn.addEventListener('click', clearInput);
-    copyOutputBtn.addEventListener('click', copyOutput);
-    extractStructureBtn.addEventListener('click', extractStructureFromOutput);
-    toonConvertBtn.addEventListener('click', convertToToonFromOutput);
-    yamlConvertBtn.addEventListener('click', convertToYamlFromOutput);
-    loadSampleBtn.addEventListener('click', loadSampleData);
-    
-    // 初始化可调整大小功能
-    initializeResizablePanels();
-});
-
-// 初始化可调整大小的面板
-function initializeResizablePanels() {
-    const container = document.querySelector('.input-output-container');
-    const leftPanel = container.querySelector('.panel:first-child');
-    const resizeHandle = container.querySelector('.resize-handle');
-    
-    // 检查是否在移动设备上，如果是则不启用调整大小功能
-    const isMobile = window.matchMedia('(max-width: 768px)').matches;
-    if (isMobile) {
-        // 在移动设备上隐藏调整手柄
-        resizeHandle.style.display = 'none';
-        return;
-    }
-    
-    let isResizing = false;
-    
-    resizeHandle.addEventListener('mousedown', function(e) {
-        isResizing = true;
-        document.body.style.userSelect = 'none';
-        e.preventDefault();
-    });
-    
-    document.addEventListener('mousemove', function(e) {
-        if (!isResizing) return;
-        
-        const containerRect = container.getBoundingClientRect();
-        const xPosition = e.clientX - containerRect.left;
-        
-        // 计算左侧面板的百分比宽度
-        const percentage = (xPosition / containerRect.width) * 100;
-        
-        // 设置最小和最大宽度限制（至少30%，最多70%）
-        const clampedPercentage = Math.max(30, Math.min(70, percentage));
-        
-        leftPanel.style.flex = `0 0 ${clampedPercentage}%`;
-    });
-    
-    document.addEventListener('mouseup', function() {
-        isResizing = false;
-        document.body.style.userSelect = '';
-    });
-}
-
-// 格式化JSON
-function formatJson() {
-    const jsonString = inputJson.value.trim();
-    
-    // 检查输入是否为空
-    if (!jsonString) {
-        showMessage('请输入JSON数据', 'error');
-        return;
-    }
-    
-    try {
-        // 解析JSON
-        const parsedJson = JSON.parse(jsonString);
-        
-        // 格式化JSON
-        const indent = parseInt(indentSize.value);
-        const formattedJson = JSON.stringify(parsedJson, null, indent);
-        
-        // 显示格式化结果
-        outputJson.value = formattedJson;
-        
-        // 显示成功消息
-        showMessage('JSON格式化成功!', 'success');
-    } catch (error) {
-        // 显示错误消息
-        showMessage(`JSON格式错误: ${error.message}`, 'error');
-    }
-}
-
-// 提取JSON结构
-function extractStructure() {
-    const jsonString = inputJson.value.trim();
-    
-    // 检查输入是否为空
-    if (!jsonString) {
-        showMessage('请输入JSON数据', 'error');
-        return;
-    }
-    
-    try {
-        // 解析JSON
-        const parsedJson = JSON.parse(jsonString);
-        
-        // 提取结构
-        const structure = extractJsonStructure(parsedJson);
-        
-        // 格式化结构
-        const indent = parseInt(indentSize.value);
-        const formattedStructure = JSON.stringify(structure, null, indent);
-        
-        // 显示结果
-        outputJson.value = formattedStructure;
-        
-        // 显示成功消息
-        showMessage('JSON结构提取成功!', 'success');
-    } catch (error) {
-        // 显示错误消息
-        showMessage(`JSON格式错误: ${error.message}`, 'error');
-    }
-}
-
-// 从输出中提取结构（当点击输出面板的提取结构按钮时）
-function extractStructureFromOutput() {
+function compressJson() {
     const jsonString = outputJson.value.trim();
-    
-    // 检查输入是否为空
-    if (!jsonString) {
-        showMessage('输出区域没有JSON数据', 'error');
-        return;
-    }
+    if (!jsonString) return;
     
     try {
-        // 解析JSON
         const parsedJson = JSON.parse(jsonString);
-        
-        // 提取结构
-        const structure = extractJsonStructure(parsedJson);
-        
-        // 格式化结构
-        const indent = parseInt(indentSize.value);
-        const formattedStructure = JSON.stringify(structure, null, indent);
-        
-        // 显示结果
-        outputJson.value = formattedStructure;
-        
-        // 显示成功消息
-        showMessage('JSON结构提取成功!', 'success');
-    } catch (error) {
-        // 显示错误消息
-        showMessage(`JSON格式错误: ${error.message}`, 'error');
-    }
+        outputJson.value = JSON.stringify(parsedJson);
+    } catch (e) {}
 }
 
-// 递归提取JSON结构
-function extractJsonStructure(obj) {
-    if (obj === null || obj === undefined) {
-        return null;
-    }
+function sortJsonKeys() {
+    const jsonString = outputJson.value.trim();
+    if (!jsonString) return;
     
+    try {
+        const parsedJson = JSON.parse(jsonString);
+        const sorted = sortKeysRecursive(parsedJson);
+        outputJson.value = JSON.stringify(sorted, null, DEFAULT_INDENT);
+    } catch (e) {}
+}
+
+function sortKeysRecursive(obj) {
     if (Array.isArray(obj)) {
-        if (obj.length === 0) {
-            return [];
+        return obj.map(item => sortKeysRecursive(item));
+    }
+    if (obj !== null && typeof obj === 'object') {
+        const sorted = {};
+        Object.keys(obj).sort().forEach(key => {
+            sorted[key] = sortKeysRecursive(obj[key]);
+        });
+        return sorted;
+    }
+    return obj;
+}
+
+function jsonPathQuery() {
+    const jsonString = outputJson.value.trim();
+    const path = jsonPathInput.value.trim();
+    if (!jsonString || !path) return;
+    
+    try {
+        const parsedJson = JSON.parse(jsonString);
+        const result = jsonPathGet(parsedJson, path);
+        if (result !== undefined) {
+            outputJson.value = JSON.stringify(result, null, DEFAULT_INDENT);
         }
+    } catch (e) {}
+}
+
+function jsonPathGet(obj, path) {
+    const tokens = parseJsonPath(path);
+    let current = obj;
+    
+    for (const token of tokens) {
+        if (current === undefined || current === null) return undefined;
         
-        // 对于数组，我们只保留第一个元素的结构
-        return [extractJsonStructure(obj[0])];
+        if (token.type === 'root') {
+            continue;
+        } else if (token.type === 'key') {
+            current = current[token.value];
+        } else if (token.type === 'index') {
+            current = current[token.value];
+        } else if (token.type === 'wildcard') {
+            if (Array.isArray(current)) {
+                return current.map(item => jsonPathGet(item, path.slice(path.indexOf(token.raw) + token.raw.length)));
+            } else if (typeof current === 'object') {
+                const results = [];
+                for (const key in current) {
+                    results.push(jsonPathGet(current[key], path.slice(path.indexOf(token.raw) + token.raw.length)));
+                }
+                return results;
+            }
+        } else if (token.type === 'recursive') {
+            return getRecursive(current, tokens.slice(tokens.indexOf(token) + 1));
+        }
     }
     
-    if (typeof obj === 'object') {
-        const structure = {};
-        for (const key in obj) {
-            if (obj.hasOwnProperty(key)) {
-                structure[key] = extractJsonStructure(obj[key]);
+    return current;
+}
+
+function getRecursive(obj, remainingTokens) {
+    if (obj === null || typeof obj !== 'object') return [];
+    const results = [];
+    
+    function traverse(o) {
+        if (Array.isArray(o)) {
+            o.forEach(item => traverse(item));
+        } else if (typeof o === 'object') {
+            for (const key in o) {
+                if (o.hasOwnProperty(key)) {
+                    const result = jsonPathGet(o[key], remainingTokens.map(t => t.raw).join(''));
+                    if (result !== undefined) results.push(result);
+                    traverse(o[key]);
+                }
             }
         }
-        return structure;
     }
     
-    // 对于基本类型，返回类型的占位符
-    if (typeof obj === 'string') {
-        return '';
-    }
-    
-    if (typeof obj === 'number') {
-        return 0;
-    }
-    
-    if (typeof obj === 'boolean') {
-        return false;
-    }
-    
-    return null;
+    traverse(obj);
+    return results;
 }
 
-// 转换为TOON格式
-function convertToToon() {
+function parseJsonPath(path) {
+    const tokens = [];
+    let i = 0;
+    
+    while (i < path.length) {
+        if (path[i] === '$') {
+            tokens.push({ type: 'root', value: '$', raw: '$' });
+            i++;
+        } else if (path[i] === '.') {
+            if (path[i + 1] === '.') {
+                tokens.push({ type: 'recursive', value: '..', raw: '..' });
+                i += 2;
+            } else {
+                i++;
+            }
+        } else if (path[i] === '[') {
+            let j = path.indexOf(']', i);
+            if (j === -1) j = path.length;
+            const bracket = path.slice(i + 1, j);
+            if (/^\d+$/.test(bracket)) {
+                tokens.push({ type: 'index', value: parseInt(bracket), raw: bracket });
+            } else {
+                tokens.push({ type: 'key', value: bracket.replace(/^["']|["']$/g, ''), raw: bracket });
+            }
+            i = j + 1;
+        } else if (path[i] === '*') {
+            tokens.push({ type: 'wildcard', value: '*', raw: '*' });
+            i++;
+        } else {
+            let j = i;
+            while (j < path.length && path[j] !== '.' && path[j] !== '[') j++;
+            const key = path.slice(i, j);
+            if (key) {
+                tokens.push({ type: 'key', value: key, raw: key });
+            }
+            i = j;
+        }
+    }
+    
+    return tokens;
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    // 自动格式化
+    inputJson.addEventListener('input', autoFormat);
+    inputJson.addEventListener('paste', () => setTimeout(autoFormat, 0));
+    
+    // 操作菜单
+    actionToggle.addEventListener('click', toggleActionMenu);
+    document.addEventListener('click', closeActionMenu);
+    
+    // 操作按钮
+    yamlConvertBtn.addEventListener('click', () => convertFromOutput('yaml'));
+    toonConvertBtn.addEventListener('click', () => convertFromOutput('toon'));
+    extractStructureBtn.addEventListener('click', () => convertFromOutput('structure'));
+    compressJsonBtn.addEventListener('click', compressJson);
+    sortKeysBtn.addEventListener('click', sortJsonKeys);
+    copyOutputBtn.addEventListener('click', copyOutput);
+    
+    // JSON Path 查询
+    jsonPathSearchBtn.addEventListener('click', jsonPathQuery);
+    jsonPathInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') jsonPathQuery();
+    });
+    
+    // 加载示例数据
+    loadSampleData();
+});
+
+// 自动格式化
+function autoFormat() {
     const jsonString = inputJson.value.trim();
-    
-    // 检查输入是否为空
     if (!jsonString) {
-        showMessage('请输入JSON数据', 'error');
+        outputJson.value = '';
         return;
     }
     
     try {
-        // 解析JSON
         const parsedJson = JSON.parse(jsonString);
-        
-        // 转换为TOON格式
-        const toonString = convertToToonFormat(parsedJson, 0);
-        
-        // 显示结果
-        outputJson.value = toonString;
-        
-        // 显示成功消息
-        showMessage('JSON转TOON格式成功!', 'success');
-    } catch (error) {
-        // 显示错误消息
-        showMessage(`JSON格式错误: ${error.message}`, 'error');
+        outputJson.value = JSON.stringify(parsedJson, null, DEFAULT_INDENT);
+    } catch (e) {
+        // 无效JSON，不处理
     }
 }
 
-// 从输出中转换为TOON格式
-function convertToToonFromOutput() {
-    const jsonString = outputJson.value.trim();
-    
-    // 检查输入是否为空
-    if (!jsonString) {
-        showMessage('输出区域没有JSON数据', 'error');
-        return;
+// 加载示例数据
+function loadSampleData() {
+    inputJson.value = JSON.stringify({
+        "name": "张三",
+        "age": 30,
+        "email": "zhangsan@example.com",
+        "address": {
+            "country": "中国",
+            "city": "北京"
+        },
+        "hobbies": ["读书", "游泳", "编程"],
+        "married": true
+    }, null, DEFAULT_INDENT);
+    autoFormat();
+}
+
+// 切换操作菜单
+function toggleActionMenu(e) {
+    e.stopPropagation();
+    actionMenu.classList.toggle('show');
+}
+
+function closeActionMenu(e) {
+    if (!actionMenu.contains(e.target)) {
+        actionMenu.classList.remove('show');
     }
+}
+
+// 从输出区转换
+function convertFromOutput(type) {
+    const jsonString = outputJson.value.trim();
+    if (!jsonString) return;
     
     try {
-        // 解析JSON
         const parsedJson = JSON.parse(jsonString);
+        let result;
         
-        // 转换为TOON格式
-        const toonString = convertToToonFormat(parsedJson, 0);
+        switch (type) {
+            case 'yaml':
+                result = convertToYamlFormat(parsedJson, 0, DEFAULT_INDENT);
+                break;
+            case 'toon':
+                result = convertToToonFormat(parsedJson, 0);
+                break;
+            case 'structure':
+                result = extractJsonStructure(parsedJson);
+                result = JSON.stringify(result, null, DEFAULT_INDENT);
+                break;
+        }
         
-        // 显示结果
-        outputJson.value = toonString;
-        
-        // 显示成功消息
-        showMessage('JSON转TOON格式成功!', 'success');
-    } catch (error) {
-        // 显示错误消息
-        showMessage(`JSON格式错误: ${error.message}`, 'error');
+        outputJson.value = result;
+    } catch (e) {
+        // 转换失败不处理
     }
+    actionMenu.classList.remove('show');
+}
+
+// 复制输出
+function copyOutput() {
+    if (!outputJson.value) return;
+    
+    navigator.clipboard.writeText(outputJson.value);
+    actionMenu.classList.remove('show');
+}
+
+// 加载示例数据
+function loadSampleData() {
+    const sampleData = {
+        "name": "张三",
+        "age": 30,
+        "email": "zhangsan@example.com",
+        "address": {
+            "country": "中国",
+            "city": "北京"
+        },
+        "hobbies": ["读书", "游泳", "编程"],
+        "married": true
+    };
+    inputJson.value = JSON.stringify(sampleData, null, 2);
+    autoFormat();
 }
 
 // 将对象转换为TOON格式
@@ -362,62 +375,33 @@ function formatToonValue(value) {
     return String(value);
 }
 
-// 转换为YAML格式
-function convertToYaml() {
-    const jsonString = inputJson.value.trim();
-    
-    // 检查输入是否为空
-    if (!jsonString) {
-        showMessage('请输入JSON数据', 'error');
-        return;
+// 递归提取JSON结构
+function extractJsonStructure(obj) {
+    if (obj === null || obj === undefined) {
+        return null;
     }
     
-    try {
-        // 解析JSON
-        const parsedJson = JSON.parse(jsonString);
-        
-        // 转换为YAML格式
-        const indent = parseInt(indentSize.value);
-        const yamlString = convertToYamlFormat(parsedJson, 0, indent);
-        
-        // 显示结果
-        outputJson.value = yamlString;
-        
-        // 显示成功消息
-        showMessage('JSON转YAML格式成功!', 'success');
-    } catch (error) {
-        // 显示错误消息
-        showMessage(`JSON格式错误: ${error.message}`, 'error');
-    }
-}
-
-// 从输出中转换为YAML格式
-function convertToYamlFromOutput() {
-    const jsonString = outputJson.value.trim();
-    
-    // 检查输入是否为空
-    if (!jsonString) {
-        showMessage('输出区域没有JSON数据', 'error');
-        return;
+    if (Array.isArray(obj)) {
+        if (obj.length === 0) {
+            return [];
+        }
+        return [extractJsonStructure(obj[0])];
     }
     
-    try {
-        // 解析JSON
-        const parsedJson = JSON.parse(jsonString);
-        
-        // 转换为YAML格式
-        const indent = parseInt(indentSize.value);
-        const yamlString = convertToYamlFormat(parsedJson, 0, indent);
-        
-        // 显示结果
-        outputJson.value = yamlString;
-        
-        // 显示成功消息
-        showMessage('JSON转YAML格式成功!', 'success');
-    } catch (error) {
-        // 显示错误消息
-        showMessage(`JSON格式错误: ${error.message}`, 'error');
+    if (typeof obj === 'object') {
+        const structure = {};
+        for (const key in obj) {
+            if (obj.hasOwnProperty(key)) {
+                structure[key] = extractJsonStructure(obj[key]);
+            }
+        }
+        return structure;
     }
+    
+    if (typeof obj === 'string') return '';
+    if (typeof obj === 'number') return 0;
+    if (typeof obj === 'boolean') return false;
+    return null;
 }
 
 // 将对象转换为YAML格式
@@ -519,75 +503,4 @@ function formatYamlValue(value) {
     }
     
     return String(value);
-}
-
-// 清空所有内容
-function clearAll() {
-    inputJson.value = '';
-    outputJson.value = '';
-    hideMessage();
-}
-
-// 清空输入
-function clearInput() {
-    inputJson.value = '';
-    hideMessage();
-}
-
-// 复制输出结果
-function copyOutput() {
-    if (!outputJson.value) {
-        showMessage('没有内容可复制', 'error');
-        return;
-    }
-    
-    outputJson.select();
-    outputJson.setSelectionRange(0, 99999); // For mobile devices
-    
-    navigator.clipboard.writeText(outputJson.value).then(() => {
-        showMessage('已复制到剪贴板!', 'success');
-    }).catch(err => {
-        console.error('复制失败: ', err);
-        showMessage('复制失败，请手动复制', 'error');
-    });
-}
-
-// 加载示例数据
-function loadSampleData() {
-    const sampleData = {
-        "姓名": "张三",
-        "年龄": 30,
-        "邮箱": "zhangsan@example.com",
-        "地址": {
-            "国家": "中国",
-            "城市": "北京",
-            "邮编": "100000"
-        },
-        "爱好": [
-            "读书",
-            "游泳",
-            "编程"
-        ],
-        "已婚": true,
-        "子女": null
-    };
-    
-    inputJson.value = JSON.stringify(sampleData, null, 2);
-    showMessage('已加载示例数据', 'success');
-}
-
-// 显示消息
-function showMessage(text, type) {
-    messageDiv.textContent = text;
-    messageDiv.className = 'message';
-    messageDiv.classList.add(type + '-message');
-    messageDiv.style.display = 'block';
-    
-    // 3秒后自动隐藏消息
-    setTimeout(hideMessage, 3000);
-}
-
-// 隐藏消息
-function hideMessage() {
-    messageDiv.style.display = 'none';
 }

@@ -4,6 +4,7 @@ const units = {
     length: {
         name: '长度',
         units: {
+            'um': { name: '微米', factor: 0.000001 },
             'mm': { name: '毫米', factor: 0.001 },
             'cm': { name: '厘米', factor: 0.01 },
             'm': { name: '米', factor: 1 },
@@ -11,7 +12,8 @@ const units = {
             'in': { name: '英寸', factor: 0.0254 },
             'ft': { name: '英尺', factor: 0.3048 },
             'yd': { name: '码', factor: 0.9144 },
-            'mi': { name: '英里', factor: 1609.344 }
+            'mi': { name: '英里', factor: 1609.344 },
+            'nmi': { name: '海里', factor: 1852 }
         }
     },
     weight: {
@@ -22,7 +24,8 @@ const units = {
             'kg': { name: '千克', factor: 1 },
             't': { name: '吨', factor: 1000 },
             'oz': { name: '盎司', factor: 0.0283495 },
-            'lb': { name: '磅', factor: 0.453592 }
+            'lb': { name: '磅', factor: 0.453592 },
+            'st': { name: '英石', factor: 6.35029 }
         }
     },
     temperature: {
@@ -36,42 +39,44 @@ const units = {
     area: {
         name: '面积',
         units: {
-            'sqmm': { name: '平方毫米', factor: 0.000001 },
-            'sqcm': { name: '平方厘米', factor: 0.0001 },
-            'sqm': { name: '平方米', factor: 1 },
+            'mm2': { name: '平方毫米', factor: 0.000001 },
+            'cm2': { name: '平方厘米', factor: 0.0001 },
+            'm2': { name: '平方米', factor: 1 },
+            'km2': { name: '平方千米', factor: 1000000 },
             'ha': { name: '公顷', factor: 10000 },
-            'sqkm': { name: '平方千米', factor: 1000000 },
-            'sqin': { name: '平方英寸', factor: 0.00064516 },
-            'sqft': { name: '平方英尺', factor: 0.092903 },
-            'sqyd': { name: '平方码', factor: 0.836127 },
+            'in2': { name: '平方英寸', factor: 0.00064516 },
+            'ft2': { name: '平方英尺', factor: 0.092903 },
+            'yd2': { name: '平方码', factor: 0.836127 },
             'acre': { name: '英亩', factor: 4046.86 },
-            'sqmi': { name: '平方英里', factor: 2589988.11 }
+            'mi2': { name: '平方英里', factor: 2589988.11 }
         }
     },
     volume: {
         name: '体积',
         units: {
-            'ml': { name: '毫升', factor: 0.001 },
-            'l': { name: '升', factor: 1 },
-            'cum': { name: '立方米', factor: 1000 },
-            'tsp': { name: '茶匙', factor: 0.00492892 },
-            'tbsp': { name: '汤匙', factor: 0.0147868 },
-            'floz': { name: '液盎司', factor: 0.0295735 },
-            'cup': { name: '杯', factor: 0.24 },
-            'pt': { name: '品脱', factor: 0.473176 },
-            'qt': { name: '夸脱', factor: 0.946353 },
-            'gal': { name: '加仑', factor: 3.78541 }
+            'mm3': { name: '立方毫米', factor: 0.000000001 },
+            'cm3': { name: '立方厘米', factor: 0.000001 },
+            'ml': { name: '毫升', factor: 0.000001 },
+            'l': { name: '升', factor: 0.001 },
+            'm3': { name: '立方米', factor: 1 },
+            'tsp': { name: '茶匙(美)', factor: 0.00000492892 },
+            'tbsp': { name: '汤匙(美)', factor: 0.0000147868 },
+            'floz': { name: '液盎司(美)', factor: 0.0000295735 },
+            'cup': { name: '杯(美)', factor: 0.000236588 },
+            'pt': { name: '品脱(美)', factor: 0.000473176 },
+            'qt': { name: '夸脱(美)', factor: 0.000946353 },
+            'gal': { name: '加仑(美)', factor: 0.00378541 },
+            'gal_uk': { name: '加仑(英)', factor: 0.00454609 }
         }
     },
     speed: {
         name: '速度',
         units: {
             'mps': { name: '米/秒', factor: 1 },
-            'kph': { name: '千米/小时', factor: 0.277778 },
+            'kmh': { name: '千米/小时', factor: 0.277778 },
             'mph': { name: '英里/小时', factor: 0.44704 },
             'fps': { name: '英尺/秒', factor: 0.3048 },
-            'knot': { name: '节', factor: 0.514444 },
-            'c': { name: '光速(你相信光吗就问你)', factor: 299792458 } // 光速 ≈ 299,792,458 米/秒
+            'knot': { name: '节', factor: 0.514444 }
         }
     },
     force: {
@@ -79,17 +84,24 @@ const units = {
         units: {
             'N': { name: '牛顿', factor: 1 },
             'kN': { name: '千牛', factor: 1000 },
-            'lbf': { name: '磅力', factor: 4.44822 }
+            'lbf': { name: '磅力', factor: 4.44822 },
+            'kgf': { name: '千克力', factor: 9.80665 },
+            'dyn': { name: '达因', factor: 0.00001 }
         }
     },
     pressure: {
         name: '压力',
         units: {
             'Pa': { name: '帕斯卡', factor: 1 },
+            'kPa': { name: '千帕', factor: 1000 },
             'MPa': { name: '兆帕', factor: 1000000 },
             'bar': { name: '巴', factor: 100000 },
+            'mbar': { name: '毫巴', factor: 100 },
             'hPa': { name: '百帕', factor: 100 },
-            'mmHg': { name: '毫米汞柱', factor: 133.322 }
+            'atm': { name: '标准大气压', factor: 101325 },
+            'psi': { name: '磅/平方英寸', factor: 6894.76 },
+            'mmHg': { name: '毫米汞柱', factor: 133.322 },
+            'inHg': { name: '英寸汞柱', factor: 3386.39 }
         }
     },
     power: {
@@ -98,46 +110,49 @@ const units = {
             'W': { name: '瓦特', factor: 1 },
             'kW': { name: '千瓦', factor: 1000 },
             'MW': { name: '兆瓦', factor: 1000000 },
-            'hp': { name: '马力', factor: 745.7 }
+            'hp': { name: '马力(英)', factor: 745.7 },
+            'ps': { name: '马力(公)', factor: 735.5 }
         }
     },
     energy: {
         name: '能量',
         units: {
             'J': { name: '焦耳', factor: 1 },
-            'kWh': { name: '千瓦时', factor: 3600000 }
-        }
-    },
-    frequency: {
-        name: '频率',
-        units: {
-            'Hz': { name: '赫兹', factor: 1 },
-            'kHz': { name: '千赫兹', factor: 1000 },
-            'MHz': { name: '兆赫兹', factor: 1000000 }
+            'kJ': { name: '千焦', factor: 1000 },
+            'cal': { name: '卡路里', factor: 4.184 },
+            'kcal': { name: '千卡', factor: 4184 },
+            'Wh': { name: '瓦时', factor: 3600 },
+            'kWh': { name: '千瓦时', factor: 3600000 },
+            'BTU': { name: '英热单位', factor: 1055.06 },
+            'eV': { name: '电子伏特', factor: 1.60218e-19 }
         }
     },
     angle: {
         name: '角度',
         units: {
             'deg': { name: '度', factor: 1 },
-            'rad': { name: '弧度', factor: 180/Math.PI }, // 正确的弧度到度换算因子
-            'grad': { name: '百分度', factor: 0.9 }
+            'rad': { name: '弧度', factor: 180 / Math.PI },
+            'grad': { name: '百分度', factor: 0.9 },
+            'arcmin': { name: '角分', factor: 1/60 },
+            'arcsec': { name: '角秒', factor: 1/3600 }
         }
     },
     flow_rate: {
         name: '流量',
         units: {
-            'l_per_min': { name: '升/分钟(L/min)', factor: 1/60 }, // 相对于 L/s
-            'ncum_per_h': { name: '标准立方米/小时(Nm³/h)', factor: 1/3600 } // 相对于 m³/s
+            'm3s': { name: '立方米/秒', factor: 1 },
+            'm3h': { name: '立方米/小时', factor: 1/3600 },
+            'ls': { name: '升/秒', factor: 0.001 },
+            'lmin': { name: '升/分钟', factor: 1/60000 },
+            'lh': { name: '升/小时', factor: 1/3600000 },
+            'gpm': { name: '加仑/分钟(美)', factor: 0.0000630902 }
         }
     }
 };
 
 // 导出数据
 if (typeof module !== 'undefined' && module.exports) {
-    // Node.js 环境
     module.exports = units;
 } else if (typeof window !== 'undefined') {
-    // 浏览器环境
     window.UnitData = units;
 }

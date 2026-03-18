@@ -7,10 +7,11 @@
     <meta name="keywords" content="文本阅读器, 大文件阅读, 虚拟滚动, 分块加载, 在线阅读">
     <meta name="author" content="coax">
     <title>大文本文件阅读器 - coax的小工具</title>
-    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../styles/theme-base.css">
+    <link rel="stylesheet" href="../styles/theme-cli.css">
     <link rel="stylesheet" href="../css/text-reader.css">
 </head>
-<body>
+<body data-theme="cli">
     <div class="container">
         <main>
             <div class="reader-container">
@@ -78,7 +79,7 @@
             </div>
         </main>
 
-        <footer id="pageFooter">
+        <footer>
             <div class="footer-content">
                 <p>&copy; <span id="currentYear"></span> coax的小工具. 保留所有权利。</p>
                 <p>渝ICP备2025071398号</p>
@@ -87,6 +88,6 @@
     </div>
 
     <script src="../js/text-reader.js"></script>
-    <script src="../js/common.js"></script>
+    <script src="../js/theme-switcher.js"></script>
 </body>
 </html>

@@ -7,13 +7,14 @@
     <meta name="keywords" content="身份证生成, 身份证信息, 模拟数据, 测试数据, 开发工具">
     <meta name="author" content="coax">
     <title>身份证信息生成器 - coax的小工具</title>
-    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../styles/theme-base.css">
+    <link rel="stylesheet" href="../styles/theme-cli.css">
     <link rel="stylesheet" href="../css/id-generator.css">
     <!-- 添加favicon图标 -->
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔧</text></svg>">
     <script src="../js/id-data.js"></script>
 </head>
-<body>
+<body data-theme="cli">
     <div class="container">
         <main>
             <div class="id-generator-container">
@@ -142,7 +143,7 @@
             </div>
         </main>
 
-        <footer id="pageFooter">
+        <footer>
             <div class="footer-content">
                 <p>&copy; <span id="currentYear"></span> coax的小工具. 保留所有权利。</p>
                 <p>渝ICP备2025071398号</p>
@@ -151,6 +152,6 @@
     </div>
 
     <script src="../js/id-generator.js"></script>
-    <script src="../js/common.js"></script>
+    <script src="../js/theme-switcher.js"></script>
 </body>
 </html>

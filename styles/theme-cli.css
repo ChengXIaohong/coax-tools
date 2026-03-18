@@ -1,0 +1,823 @@
+/*
+ * Linux CLI 风格主题
+ * 模拟经典终端界面，支持 light/dark 模式
+ */
+
+/* ========================================
+   Dark 模式变量 (默认)
+   ======================================== */
+
+body[data-theme="cli"] {
+    --cli-bg: #0c0c0c;
+    --cli-bg-alt: #141414;
+    --cli-fg: #00ff00;
+    --cli-fg-dim: #008800;
+    --cli-accent: #00ff00;
+    --cli-error: #ff4444;
+    --cli-warning: #ffaa00;
+    --cli-info: #00aaff;
+    --cli-border: #333333;
+    --cli-selection-bg: #00ff00;
+    --cli-selection-fg: #0c0c0c;
+    --cli-input-bg: #1a1a1a;
+    --cli-scrollbar: #444444;
+}
+
+/* ========================================
+   Light 模式变量
+   ======================================== */
+
+body[data-theme="cli"][data-mode="light"] {
+    --cli-bg: #f8f8f8;
+    --cli-bg-alt: #ffffff;
+    --cli-fg: #006400;
+    --cli-fg-dim: #228b22;
+    --cli-accent: #008000;
+    --cli-error: #cc0000;
+    --cli-warning: #cc6600;
+    --cli-info: #0066cc;
+    --cli-border: #d0d0d0;
+    --cli-selection-bg: #006400;
+    --cli-selection-fg: #ffffff;
+    --cli-input-bg: #ffffff;
+    --cli-scrollbar: #aaaaaa;
+}
+
+/* ========================================
+   基础样式
+   ======================================== */
+
+body[data-theme="cli"] {
+    font-family: 'SF Mono', 'Fira Code', 'Consolas', 'Monaco', 'Courier New', monospace;
+    font-size: 14px;
+    line-height: 1.5;
+    background: var(--cli-bg);
+    color: var(--cli-fg);
+    min-height: 100vh;
+}
+
+/* ========================================
+   终端容器
+   ======================================== */
+
+body[data-theme="cli"] .container {
+    width: 95vw;
+    max-width: none;
+    margin: 0 auto;
+    padding: 1.5vw;
+    min-height: 100vh;
+}
+
+/* ========================================
+   头部 - 模拟终端标题栏
+   ======================================== */
+
+body[data-theme="cli"] header {
+    background: transparent;
+    color: var(--cli-fg);
+    padding: 1.5vw 0;
+    border-bottom: 1px dashed var(--cli-border);
+    margin-bottom: 2vw;
+}
+
+body[data-theme="cli"] .header-search {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 2vw;
+    flex-wrap: wrap;
+}
+
+body[data-theme="cli"] .header-content {
+    position: relative;
+}
+
+body[data-theme="cli"] .header-content::before {
+    content: 'root@coax-tools:~$ ';
+    font-weight: bold;
+}
+
+body[data-theme="cli"] .editable-title {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4vw;
+}
+
+body[data-theme="cli"] .title-text {
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 0.2vw 0.4vw;
+    border: 1px dashed transparent;
+    transition: border-color 0.2s;
+}
+
+body[data-theme="cli"] .title-text:hover {
+    border-color: var(--cli-fg-dim);
+}
+
+body[data-theme="cli"] .title-text::after {
+    content: '_';
+    animation: blink 1s infinite;
+}
+
+body[data-theme="cli"] .title-input {
+    font-size: 1.5rem;
+    background: transparent;
+    border: 1px solid var(--cli-fg);
+    color: var(--cli-fg);
+    padding: 0.2vw 0.4vw;
+    font-family: inherit;
+    width: 15vw;
+}
+
+body[data-theme="cli"] .title-input:focus {
+    outline: none;
+    box-shadow: 0 0 0 1px var(--cli-fg);
+}
+
+body[data-theme="cli"] .title-edit-btn {
+    background: transparent;
+    border: 1px solid var(--cli-border);
+    color: var(--cli-fg-dim);
+    cursor: pointer;
+    padding: 0.2vw 0.6vw;
+    font-family: inherit;
+    font-size: 0.85rem;
+    transition: all 0.2s;
+}
+
+body[data-theme="cli"] .title-edit-btn:hover {
+    border-color: var(--cli-fg);
+    color: var(--cli-fg);
+}
+
+/* ========================================
+   搜索框
+   ======================================== */
+
+body[data-theme="cli"] .search-box {
+    display: flex;
+    align-items: center;
+    border: 1px solid var(--cli-border);
+    background: var(--cli-input-bg);
+    padding: 0.6vw 1vw;
+    min-width: 20vw;
+}
+
+body[data-theme="cli"] .search-box:focus-within {
+    border-color: var(--cli-fg);
+}
+
+body[data-theme="cli"] .search-box input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    color: var(--cli-fg);
+    font-family: inherit;
+    font-size: 1rem;
+    padding: 0;
+    width: 100%;
+}
+
+body[data-theme="cli"] .search-box input:focus {
+    outline: none;
+    box-shadow: none;
+}
+
+body[data-theme="cli"] .search-box input::placeholder {
+    color: var(--cli-fg-dim);
+    opacity: 0.6;
+}
+
+body[data-theme="cli"] .search-hint {
+    color: var(--cli-fg-dim);
+    font-size: 0.85rem;
+    margin-left: 0.8vw;
+    padding: 0.2vw 0.6vw;
+    border: 1px solid var(--cli-border);
+}
+
+/* ========================================
+   无搜索结果
+   ======================================== */
+
+body[data-theme="cli"] .no-results {
+    text-align: center;
+    padding: 4vw 2vw;
+    color: var(--cli-fg-dim);
+}
+
+body[data-theme="cli"] .no-results p::before {
+    content: '> ';
+}
+
+/* ========================================
+   终端输出样式
+   ======================================== */
+
+body[data-theme="cli"] main {
+    padding: 0;
+}
+
+body[data-theme="cli"] .terminal-output {
+    margin: 20px 0;
+    padding: 16px;
+    background: rgba(0, 255, 0, 0.02);
+    border: 1px solid var(--cli-border);
+    border-radius: 4px;
+}
+
+body[data-theme="cli"][data-mode="light"] .terminal-output {
+    background: rgba(0, 100, 0, 0.03);
+}
+
+body[data-theme="cli"] .terminal-line {
+    margin: 4px 0;
+    display: flex;
+    align-items: flex-start;
+}
+
+body[data-theme="cli"] .terminal-line::before {
+    content: '$ ';
+    color: var(--cli-fg-dim);
+    margin-right: 8px;
+    flex-shrink: 0;
+}
+
+body[data-theme="cli"] .terminal-line.success::before {
+    content: '✓ ';
+    color: var(--cli-fg);
+}
+
+body[data-theme="cli"] .terminal-line.error::before {
+    content: '✗ ';
+    color: var(--cli-error);
+}
+
+body[data-theme="cli"] .terminal-line.info::before {
+    content: '● ';
+    color: var(--cli-info);
+}
+
+body[data-theme="cli"] .terminal-line.warning::before {
+    content: '⚠ ';
+    color: var(--cli-warning);
+}
+
+/* ========================================
+   工具网格 - 终端风格
+   ======================================== */
+
+body[data-theme="cli"] .tools-grid {
+    display: block;
+    margin: 0;
+    gap: 0;
+}
+
+body[data-theme="cli"] .tool-card {
+    background: transparent;
+    border: 1px dashed var(--cli-border);
+    border-radius: 0;
+    padding: 1.2vw 1.5vw;
+    margin-bottom: 0.8vw;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 1.5vw;
+    transition: all 0.15s;
+}
+
+body[data-theme="cli"] .tool-card:hover,
+body[data-theme="cli"] .tool-card:focus {
+    background: rgba(0, 255, 0, 0.05);
+    border-color: var(--cli-fg);
+    transform: none;
+    box-shadow: none;
+}
+
+body[data-theme="cli"][data-mode="light"] .tool-card:hover,
+body[data-theme="cli"][data-mode="light"] .tool-card:focus {
+    background: rgba(0, 100, 0, 0.05);
+}
+
+body[data-theme="cli"] .tool-card h3 {
+    color: var(--cli-fg);
+    font-size: 1rem;
+    font-weight: normal;
+    margin: 0;
+}
+
+body[data-theme="cli"] .tool-card h3::before {
+    content: '[';
+    color: var(--cli-fg-dim);
+}
+
+body[data-theme="cli"] .tool-card h3::after {
+    content: ']';
+    color: var(--cli-fg-dim);
+}
+
+body[data-theme="cli"] .tool-card p {
+    color: var(--cli-fg-dim);
+    margin: 0;
+    flex: 1;
+    font-size: 0.85rem;
+}
+
+body[data-theme="cli"] .tool-card .btn {
+    background: transparent;
+    border: 1px solid var(--cli-fg);
+    color: var(--cli-fg);
+    padding: 0.4vw 1.2vw;
+    font-size: 0.85rem;
+    border-radius: 2px;
+    opacity: 0;
+    font-family: inherit;
+}
+
+body[data-theme="cli"] .tool-card:hover .btn {
+    opacity: 1;
+}
+
+body[data-theme="cli"] .tool-card .btn:hover {
+    background: var(--cli-fg);
+    color: var(--cli-bg);
+}
+
+/* ========================================
+   表单元素 - 终端风格
+   ======================================== */
+
+body[data-theme="cli"] input[type="text"],
+body[data-theme="cli"] input[type="number"],
+body[data-theme="cli"] input[type="password"],
+body[data-theme="cli"] input[type="email"],
+body[data-theme="cli"] input[type="url"],
+body[data-theme="cli"] input[type="search"],
+body[data-theme="cli"] input[type="date"],
+body[data-theme="cli"] input[type="datetime-local"],
+body[data-theme="cli"] textarea,
+body[data-theme="cli"] select {
+    background: var(--cli-input-bg);
+    border: 1px solid var(--cli-border);
+    border-radius: 0;
+    color: var(--cli-fg);
+    font-family: inherit;
+    font-size: inherit;
+    padding: 0.8vw 1vw;
+    width: 100%;
+}
+
+body[data-theme="cli"] input:focus,
+body[data-theme="cli"] textarea:focus,
+body[data-theme="cli"] select:focus {
+    outline: none;
+    border-color: var(--cli-fg);
+    box-shadow: 0 0 0 1px var(--cli-fg);
+}
+
+body[data-theme="cli"] input::placeholder,
+body[data-theme="cli"] textarea::placeholder {
+    color: var(--cli-fg-dim);
+    opacity: 0.5;
+}
+
+body[data-theme="cli"] select {
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%2300ff00'%3E%3Cpath d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 1vw center;
+    padding-right: 3vw;
+}
+
+body[data-theme="cli"][data-mode="light"] select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23006400'%3E%3Cpath d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+}
+
+body[data-theme="cli"] select option {
+    background: var(--cli-bg);
+    color: var(--cli-fg);
+}
+
+body[data-theme="cli"] label {
+    color: var(--cli-fg-dim);
+    font-size: 0.9rem;
+}
+
+body[data-theme="cli"] .form-group {
+    margin-bottom: 1.5vw;
+}
+
+/* ========================================
+   按钮 - 终端风格
+   ======================================== */
+
+body[data-theme="cli"] .btn,
+body[data-theme="cli"] button,
+body[data-theme="cli"] input[type="submit"],
+body[data-theme="cli"] input[type="button"] {
+    background: transparent;
+    border: 1px solid var(--cli-fg);
+    color: var(--cli-fg);
+    padding: 0.8vw 2vw;
+    font-family: inherit;
+    font-size: inherit;
+    cursor: pointer;
+    border-radius: 0;
+    transition: all 0.15s;
+}
+
+body[data-theme="cli"] .btn:hover,
+body[data-theme="cli"] button:hover,
+body[data-theme="cli"] input[type="submit"]:hover,
+body[data-theme="cli"] input[type="button"]:hover {
+    background: var(--cli-fg);
+    color: var(--cli-bg);
+}
+
+body[data-theme="cli"] .btn:active,
+body[data-theme="cli"] button:active {
+    transform: scale(0.98);
+}
+
+body[data-theme="cli"] .btn-primary {
+    background: var(--cli-fg);
+    color: var(--cli-bg);
+}
+
+body[data-theme="cli"] .btn-primary:hover {
+    background: transparent;
+    color: var(--cli-fg);
+}
+
+body[data-theme="cli"] .btn-secondary {
+    border-color: var(--cli-border);
+    color: var(--cli-fg-dim);
+}
+
+body[data-theme="cli"] .btn-secondary:hover {
+    border-color: var(--cli-fg);
+    color: var(--cli-fg);
+    background: transparent;
+}
+
+/* ========================================
+   消息提示 - 终端风格
+   ======================================== */
+
+body[data-theme="cli"] .message {
+    background: transparent;
+    border: 1px dashed var(--cli-border);
+    border-radius: 0;
+    color: var(--cli-fg);
+    padding: 1vw 1.5vw;
+    margin: 1.5vw 0;
+    font-family: inherit;
+}
+
+body[data-theme="cli"] .message::before {
+    content: '[MSG] ';
+    color: var(--cli-fg-dim);
+}
+
+body[data-theme="cli"] .message-success {
+    border-color: var(--cli-fg);
+    color: var(--cli-fg);
+}
+
+body[data-theme="cli"] .message-success::before {
+    content: '[OK] ';
+}
+
+body[data-theme="cli"] .message-error {
+    border-color: var(--cli-error);
+    color: var(--cli-error);
+}
+
+body[data-theme="cli"] .message-error::before {
+    content: '[ERR] ';
+}
+
+body[data-theme="cli"] .message-info {
+    border-color: var(--cli-info);
+    color: var(--cli-info);
+}
+
+body[data-theme="cli"] .message-info::before {
+    content: '[INFO] ';
+}
+
+/* ========================================
+   帮助模态框 - 终端风格
+   ======================================== */
+
+body[data-theme="cli"] .help-icon {
+    background: transparent;
+    border: 1px solid var(--cli-fg);
+    color: var(--cli-fg);
+    font-family: inherit;
+}
+
+body[data-theme="cli"] .help-icon:hover {
+    background: var(--cli-fg);
+    color: var(--cli-bg);
+}
+
+body[data-theme="cli"] .help-modal {
+    background: rgba(0, 0, 0, 0.9);
+}
+
+body[data-theme="cli"][data-mode="light"] .help-modal {
+    background: rgba(0, 0, 0, 0.5);
+}
+
+body[data-theme="cli"] .help-content {
+    background: var(--cli-bg);
+    border: 1px solid var(--cli-fg);
+    color: var(--cli-fg);
+    padding: 2vw;
+    max-width: 95vw;
+    font-family: inherit;
+}
+
+body[data-theme="cli"] .help-content .close {
+    color: var(--cli-fg);
+    font-family: inherit;
+}
+
+body[data-theme="cli"] .help-content h2 {
+    color: var(--cli-fg);
+    border-bottom: 1px dashed var(--cli-border);
+    padding-bottom: 1vw;
+    margin-bottom: 2vw;
+}
+
+body[data-theme="cli"] .help-content h2::before {
+    content: '## ';
+    color: var(--cli-fg-dim);
+}
+
+body[data-theme="cli"] .help-content h3 {
+    color: var(--cli-fg);
+    margin: 1.5vw 0 0.8vw;
+}
+
+body[data-theme="cli"] .help-content h3::before {
+    content: '### ';
+    color: var(--cli-fg-dim);
+}
+
+body[data-theme="cli"] .help-content p {
+    color: var(--cli-fg-dim);
+    margin: 0.8vw 0;
+    line-height: 1.6;
+}
+
+body[data-theme="cli"] .help-section {
+    margin: 1.5vw 0;
+    padding: 1vw;
+    border-left: 2px solid var(--cli-border);
+}
+
+/* ========================================
+   页脚 - 终端风格
+   ======================================== */
+
+body[data-theme="cli"] footer {
+    background: transparent;
+    color: var(--cli-fg-dim);
+    border-top: 1px dashed var(--cli-border);
+    padding: 1.5vw 0;
+    margin-top: 4vw;
+    font-size: 0.85rem;
+}
+
+body[data-theme="cli"] .footer-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.8vw;
+}
+
+body[data-theme="cli"] .footer-content p {
+    margin: 0;
+    opacity: 0.6;
+}
+
+body[data-theme="cli"] .footer-content p::before {
+    content: '# ';
+}
+
+/* ========================================
+   主题切换器 - 终端风格
+   ======================================== */
+
+body[data-theme="cli"] .theme-switcher {
+    position: fixed;
+    top: 1vw;
+    right: 1vw;
+    z-index: 9999;
+    display: flex;
+    gap: 0;
+    padding: 0;
+    border: 1px solid var(--cli-border);
+    background: var(--cli-bg);
+}
+
+body[data-theme="cli"] .theme-btn {
+    padding: 0.5vw 1vw;
+    font-size: 0.85rem;
+    border: none;
+    border-right: 1px solid var(--cli-border);
+    cursor: pointer;
+    background: transparent;
+    color: var(--cli-fg-dim);
+    font-family: inherit;
+    transition: all 0.15s;
+}
+
+body[data-theme="cli"] .theme-btn:last-child {
+    border-right: none;
+}
+
+body[data-theme="cli"] .theme-btn:hover {
+    color: var(--cli-fg);
+    background: rgba(0, 255, 0, 0.1);
+}
+
+body[data-theme="cli"][data-mode="light"] .theme-btn:hover {
+    background: rgba(0, 100, 0, 0.1);
+}
+
+body[data-theme="cli"] .theme-btn.active {
+    color: var(--cli-bg);
+    background: var(--cli-fg);
+}
+
+body[data-theme="cli"] .theme-btn svg {
+    width: 1vw;
+    height: 1vw;
+    min-width: 14px;
+    min-height: 14px;
+    vertical-align: middle;
+}
+
+/* ========================================
+   滚动条 - 终端风格
+   ======================================== */
+
+body[data-theme="cli"] ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+body[data-theme="cli"] ::-webkit-scrollbar-track {
+    background: var(--cli-bg);
+}
+
+body[data-theme="cli"] ::-webkit-scrollbar-thumb {
+    background: var(--cli-scrollbar);
+    border-radius: 0;
+}
+
+body[data-theme="cli"] ::-webkit-scrollbar-thumb:hover {
+    background: var(--cli-fg-dim);
+}
+
+/* ========================================
+   文本选择 - 终端风格
+   ======================================== */
+
+body[data-theme="cli"] ::selection {
+    background: var(--cli-selection-bg);
+    color: var(--cli-selection-fg);
+}
+
+/* ========================================
+   工具页面容器
+   ======================================== */
+
+body[data-theme="cli"] .tool-container {
+    padding: 0;
+    width: 95vw;
+    max-width: none;
+}
+
+body[data-theme="cli"] .tool-header {
+    margin-bottom: 2vw;
+    padding-bottom: 1.5vw;
+    border-bottom: 1px dashed var(--cli-border);
+}
+
+body[data-theme="cli"] .tool-header h1::before {
+    content: '# ';
+    color: var(--cli-fg-dim);
+}
+
+body[data-theme="cli"] .tool-header p::before {
+    content: '// ';
+    color: var(--cli-fg-dim);
+}
+
+/* ========================================
+   输入输出面板
+   ======================================== */
+
+body[data-theme="cli"] .input-output-container {
+    display: flex;
+    gap: 1.5vw;
+    margin: 2vw 0;
+}
+
+body[data-theme="cli"] .panel {
+    flex: 1;
+    border: 1px solid var(--cli-border);
+    padding: 1vw;
+}
+
+body[data-theme="cli"] .panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1vw;
+    padding-bottom: 0.8vw;
+    border-bottom: 1px dashed var(--cli-border);
+}
+
+body[data-theme="cli"] .panel-title {
+    color: var(--cli-fg-dim);
+    font-size: 0.9rem;
+}
+
+body[data-theme="cli"] textarea {
+    width: 100%;
+    min-height: 25vw;
+    resize: vertical;
+}
+
+/* ========================================
+   结果显示
+   ======================================== */
+
+body[data-theme="cli"] .result {
+    border: 1px dashed var(--cli-fg);
+    padding: 1.5vw;
+    margin: 1.5vw 0;
+    background: rgba(0, 255, 0, 0.02);
+}
+
+body[data-theme="cli"][data-mode="light"] .result {
+    background: rgba(0, 100, 0, 0.02);
+}
+
+body[data-theme="cli"] .result::before {
+    content: '> ';
+    color: var(--cli-fg-dim);
+}
+
+/* ========================================
+   响应式
+   ======================================== */
+
+@media (max-width: 768px) {
+    body[data-theme="cli"] {
+        font-size: 13px;
+    }
+    
+    body[data-theme="cli"] .header-search {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    body[data-theme="cli"] .header-content {
+        margin-bottom: 1.5vw;
+    }
+    
+    body[data-theme="cli"] .title-text,
+    body[data-theme="cli"] .title-input {
+        font-size: 1.2rem;
+    }
+    
+    body[data-theme="cli"] .search-box {
+        width: 100%;
+        min-width: unset;
+    }
+    
+    body[data-theme="cli"] .input-output-container {
+        flex-direction: column;
+    }
+    
+    body[data-theme="cli"] .tool-card {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1vw;
+    }
+    
+    body[data-theme="cli"] .tool-card .btn {
+        opacity: 1;
+        width: 100%;
+        text-align: center;
+    }
+}

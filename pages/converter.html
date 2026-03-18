@@ -35,13 +35,12 @@
     <meta name="keywords" content="单位换算, 长度换算, 重量换算, 温度换算, 面积换算, 体积换算, 速度换算, 工程计算">
     <meta name="author" content="coax">
     <title>单位换算器 - coax的小工具</title>
-    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../styles/theme-base.css">
+    <link rel="stylesheet" href="../styles/theme-cli.css">
     <link rel="stylesheet" href="../css/converter.css">
-    <!-- 添加favicon图标 -->
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔧</text></svg>">
     <script src="../js/unit-data.js"></script>
 </head>
-<body>
+<body data-theme="cli">
     <div class="container">
         <main>
             <div class="converter-container">
@@ -59,12 +58,12 @@
                         
                         <div class="help-section">
                             <h3>长度单位</h3>
-                            <p>支持毫米(mm)、厘米(cm)、米(m)、千米(km)、英寸(in)、英尺(ft)、码(yd)、英里(mi)之间的相互转换。</p>
+                            <p>支持微米、微米(um)、毫米(mm)、厘米(cm)、米(m)、千米(km)、英寸(in)、英尺(ft)、码(yd)、英里(mi)、海里(nmi)之间的相互转换。</p>
                         </div>
                         
                         <div class="help-section">
                             <h3>重量单位</h3>
-                            <p>支持毫克(mg)、克(g)、千克(kg)、吨(t)、盎司(oz)、磅(lb)之间的相互转换。</p>
+                            <p>支持毫克(mg)、克(g)、千克(kg)、吨(t)、盎司(oz)、磅(lb)、英石(st)之间的相互转换。</p>
                         </div>
                         
                         <div class="help-section">
@@ -74,65 +73,52 @@
                         
                         <div class="help-section">
                             <h3>面积单位</h3>
-                            <p>支持平方毫米(sqmm)、平方厘米(sqcm)、平方米(sqm)、公顷(ha)、平方千米(sqkm)、平方英寸(sqin)、平方英尺(sqft)、平方码(sqyd)、英亩(acre)、平方英里(sqmi)之间的相互转换。</p>
+                            <p>支持平方毫米(mm²)、平方厘米(cm²)、平方米(m²)、平方千米(km²)、公顷(ha)、平方英寸(in²)、平方英尺(ft²)、平方码(yd²)、英亩(acre)、平方英里(mi²)之间的相互转换。</p>
                         </div>
                         
                         <div class="help-section">
                             <h3>体积单位</h3>
-                            <p>支持毫升(ml)、升(l)、立方米(cum)、茶匙(tsp)、汤匙(tbsp)、液盎司(floz)、杯(cup)、品脱(pt)、夸脱(qt)、加仑(gal)之间的相互转换。</p>
+                            <p>支持立方毫米(mm³)、立方厘米(cm³)、毫升(ml)、升(l)、立方米(m³)、茶匙(tsp)、汤匙(tbsp)、液盎司(floz)、杯(cup)、品脱(pt)、夸脱(qt)、加仑(美/英)(gal)之间的相互转换。</p>
                         </div>
                         
                         <div class="help-section">
                             <h3>速度单位</h3>
-                            <p>支持米/秒(mps)、千米/小时(kph)、英里/小时(mph)、英尺/秒(fps)、节(knot)、光速(c)之间的相互转换。</p>
-                            <p>光速是物理学中的基本常数，约等于 299,792,458 米/秒。现在用户可以在单位换算器中使用光速作为参考速度单位进行各种转换。</p>
-                        </div>
-                        
-                        <div class="help-section">
-                            <h3>角度单位</h3>
-                            <p>支持度(°)、弧度(rad)、百分度(grad)等单位间的转换。</p>
+                            <p>支持米/秒(m/s)、千米/小时(km/h)、英里/小时(mph)、英尺/秒(ft/s)、节(knot)之间的相互转换。</p>
                         </div>
                         
                         <div class="help-section">
                             <h3>力</h3>
-                            <p>支持牛顿(N)、千牛(kN)、磅力(lbf)等单位间的转换。</p>
+                            <p>支持牛顿(N)、千牛(kN)、磅力(lbf)、千克力(kgf)、达因(dyn)之间的相互转换。</p>
                         </div>
                         
                         <div class="help-section">
                             <h3>压力</h3>
-                            <p>支持帕斯卡(Pa)、兆帕(MPa)、巴(bar)、百帕(hPa)、毫米汞柱(mmHg)等单位间的转换。</p>
+                            <p>支持帕斯卡(Pa)、千帕(kPa)、兆帕(MPa)、巴(bar)、毫巴(mbar)、百帕(hPa)、标准大气压(atm)、磅/平方英寸(psi)、毫米汞柱(mmHg)、英寸汞柱(inHg)之间的相互转换。</p>
                         </div>
                         
                         <div class="help-section">
                             <h3>功率</h3>
-                            <p>支持瓦特(W)、千瓦(kW)、兆瓦(MW)、马力(hp)等单位间的转换。</p>
+                            <p>支持瓦特(W)、千瓦(kW)、兆瓦(MW)、马力-英制(hp)、马力-公制(ps)之间的相互转换。</p>
                         </div>
                         
                         <div class="help-section">
                             <h3>能量</h3>
-                            <p>支持焦耳(J)、千瓦时(kWh)等单位间的转换。</p>
+                            <p>支持焦耳(J)、千焦(kJ)、卡路里(cal)、千卡(kcal)、瓦时(Wh)、千瓦时(kWh)、英热单位(BTU)、电子伏特(eV)之间的相互转换。</p>
                         </div>
 
-                        <div class="help-section">
-                            <h3>频率</h3>
-                            <p>支持赫兹(Hz)、千赫兹(kHz)、兆赫兹(MHz)等单位间的转换。</p>
-                        </div>
+                        
 
                         <div class="help-section">
                             <h3>角度</h3>
-                            <p>支持度(°)、弧度(rad)、百分度(grad)等单位间的转换。</p>
+                            <p>支持度(°)、弧度(rad)、百分度(grad)、角分(′)、角秒(″)之间的相互转换。</p>
                         </div>
 
                         <div class="help-section">
                             <h3>流量</h3>
-                            <p>支持标准立方米/小时(Nm³/h)、升/分钟(L/min)等单位间的转换。</p>
-                            <p class="note">注意：Nm³/h表示在标准状态下（温度0°C，压力101.325kPa）的气体体积流量。</p>
+                            <p>支持立方米/秒(m³/s)、立方米/小时(m³/h)、升/秒(l/s)、升/分钟(l/min)、升/小时(l/h)、加仑/分钟(美)(gpm)之间的相互转换。</p>
                         </div>
                         
-                        <div class="help-section">
-                            <h3>频率</h3>
-                            <p>支持赫兹(Hz)、千赫兹(kHz)、兆赫兹(MHz)等单位间的转换。</p>
-                        </div>
+                        
 
                     </div>
                 </div>
@@ -176,7 +162,7 @@
             </div>
         </main>
 
-        <footer id="pageFooter">
+        <footer>
             <div class="footer-content">
                 <p>&copy; <span id="currentYear"></span> coax的小工具. 保留所有权利。</p>
                 <p>渝ICP备2025071398号</p>
@@ -185,6 +171,6 @@
     </div>
 
     <script src="../js/converter.js"></script>
-    <script src="../js/common.js"></script>
+    <script src="../js/theme-switcher.js"></script>
 </body>
 </html>

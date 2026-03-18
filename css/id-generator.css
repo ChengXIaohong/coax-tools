@@ -1,34 +1,53 @@
+/*
+ * 身份证生成器样式
+ * 适配 CLI 主题
+ */
+
 .id-generator-container {
-    max-width: 800px;
-    margin: 2rem auto;
-    padding: 2rem;
-    background: white;
-    border-radius: 10px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    padding: 0;
+    margin: 0;
+    background: transparent;
+    box-shadow: none;
+    border-radius: 0;
 }
 
 .id-generator-header {
-    text-align: center;
-    margin-bottom: 2rem;
+    text-align: left;
+    margin-bottom: 2vw;
+    padding-bottom: 1.5vw;
+    border-bottom: 1px dashed var(--cli-border);
 }
 
 .id-generator-header h1 {
-    color: #4a4a4a;
-    margin-bottom: 0.5rem;
+    color: var(--cli-fg);
+    margin-bottom: 0.5vw;
+    font-size: 1.5rem;
+}
+
+.id-generator-header h1::before {
+    content: '# ';
+    color: var(--cli-fg-dim);
+}
+
+.id-generator-header p {
+    color: var(--cli-fg-dim);
+    margin: 0;
+    font-size: 0.9rem;
 }
 
 .options {
-    background: #f8f9fa;
-    border-radius: 5px;
-    padding: 1.5rem;
-    margin-bottom: 2rem;
+    background: rgba(0, 255, 0, 0.02);
+    border: 1px dashed var(--cli-border);
+    padding: 1.5vw;
+    margin-bottom: 2vw;
 }
 
 .option-group {
     display: flex;
     flex-wrap: wrap;
-    gap: 1rem;
-    margin-bottom: 1rem;
+    gap: 1vw;
+    margin-bottom: 1vw;
+    align-items: center;
 }
 
 .option-group:last-child {
@@ -36,70 +55,74 @@
 }
 
 .option-label {
-    font-weight: bold;
-    min-width: 60px;
-    color: #4a4a4a;
-    display: flex;
-    align-items: center;
+    font-weight: normal;
+    min-width: 5vw;
+    color: var(--cli-fg-dim);
+    font-size: 0.9rem;
 }
 
-.option-group select, .option-group input {
-    padding: 0.5rem;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    font-size: 1rem;
-}
-
+.option-group select,
 .option-group input {
-    width: 100px;
+    padding: 0.6vw 0.8vw;
+    border: 1px solid var(--cli-border);
+    background: var(--cli-input-bg);
+    color: var(--cli-fg);
+    font-family: inherit;
+    font-size: 0.9rem;
+}
+
+.option-group input[type="number"] {
+    width: 8vw;
+    min-width: 80px;
+}
+
+.option-group select:focus,
+.option-group input:focus {
+    outline: none;
+    border-color: var(--cli-fg);
 }
 
 .controls {
     display: flex;
-    justify-content: center;
-    gap: 1rem;
-    margin-bottom: 2rem;
+    justify-content: flex-start;
+    gap: 1vw;
+    margin-bottom: 2vw;
+    flex-wrap: wrap;
 }
 
-.generate-btn, .copy-json-btn {
-    padding: 0.8rem 1.5rem;
-    font-size: 1rem;
-    font-weight: bold;
-    border: none;
-    border-radius: 5px;
+.generate-btn,
+.copy-json-btn {
+    padding: 0.8vw 1.5vw;
+    font-size: 0.9rem;
+    font-family: inherit;
     cursor: pointer;
-    transition: opacity 0.3s;
+    transition: all 0.15s;
+    background: transparent;
+    border: 1px solid var(--cli-fg);
+    color: var(--cli-fg);
 }
 
-.generate-btn {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-}
-
-.generate-btn:hover {
-    opacity: 0.9;
+.generate-btn:hover,
+.copy-json-btn:hover {
+    background: var(--cli-fg);
+    color: var(--cli-bg);
 }
 
 .copy-json-btn {
-    background: #28a745;
-    color: white;
     display: none;
 }
 
-.copy-json-btn:hover {
-    background: #218838;
-}
-
 .id-info {
-    background: #f8f9fa;
-    border-radius: 5px;
-    padding: 1.5rem;
+    background: rgba(0, 255, 0, 0.02);
+    border: 1px dashed var(--cli-border);
+    padding: 1.5vw;
+    margin-bottom: 2vw;
     display: none;
 }
 
 .id-field {
     display: flex;
-    margin-bottom: 1rem;
+    margin-bottom: 1vw;
 }
 
 .id-field:last-child {
@@ -107,90 +130,87 @@
 }
 
 .id-label {
-    font-weight: bold;
-    width: 120px;
-    color: #4a4a4a;
+    font-weight: normal;
+    min-width: 8vw;
+    color: var(--cli-fg-dim);
 }
 
 .id-value {
     flex: 1;
+    color: var(--cli-fg);
+    font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+    word-break: break-all;
 }
 
 .copy-btn {
-    background: #667eea;
-    color: white;
-    border: none;
-    border-radius: 3px;
-    padding: 0.2rem 0.5rem;
+    background: transparent;
+    color: var(--cli-fg);
+    border: 1px solid var(--cli-border);
+    padding: 0.2vw 0.6vw;
     cursor: pointer;
-    margin-left: 0.5rem;
+    margin-left: 0.8vw;
+    font-family: inherit;
+    font-size: 0.8rem;
+    transition: all 0.15s;
 }
 
 .copy-btn:hover {
-    opacity: 0.9;
+    border-color: var(--cli-fg);
 }
 
 .disclaimer {
-    background: #fff3cd;
-    border: 1px solid #ffeaa7;
-    border-radius: 5px;
-    padding: 1rem;
-    color: #856404;
-    font-size: 0.9rem;
+    background: rgba(255, 170, 0, 0.1);
+    border: 1px dashed var(--cli-warning);
+    padding: 1.5vw;
+    color: var(--cli-warning);
+    font-size: 0.85rem;
 }
 
 .disclaimer h3 {
-    margin-top: 0;
-    color: #856404;
+    margin: 0 0 1vw 0;
+    color: var(--cli-warning);
+    font-size: 0.95rem;
+}
+
+.disclaimer h3::before {
+    content: '[!] ';
 }
 
 .disclaimer ul {
-    padding-left: 1.2rem;
-    margin-bottom: 0;
+    padding-left: 2vw;
+    margin: 0;
 }
 
 .disclaimer li {
-    margin-bottom: 0.3rem;
-}
-
-.disclaimer li:last-child {
-    margin-bottom: 0;
-}
-
-footer {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    transition: transform 0.5s ease;
-    transform: translateY(0);
-}
-
-footer.hidden {
-    transform: translateY(100%);
+    margin-bottom: 0.4vw;
 }
 
 @media (max-width: 768px) {
-    .id-generator-container {
-        padding: 1rem;
-    }
-    
     .controls {
         flex-direction: column;
-        align-items: center;
+    }
+    
+    .controls .btn {
+        width: 100%;
     }
     
     .id-field {
         flex-direction: column;
+        gap: 0.4vw;
     }
     
     .id-label {
-        width: auto;
-        margin-bottom: 0.3rem;
+        min-width: auto;
+    }
+    
+    .copy-btn {
+        margin-left: 0;
+        align-self: flex-start;
     }
     
     .option-group {
         flex-direction: column;
+        align-items: flex-start;
     }
     
     .option-label {

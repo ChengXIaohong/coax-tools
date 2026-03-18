@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="面试刷题 - 提供 10 年 Java 程序员面试题，涵盖计算机基础、网络基础、Linux、数据结构、Java 基础、Redis、MySQL 等多个方面。">
+    <meta name="keywords" content="Java 面试题，面试题库，编程面试，技术面试，面试题，刷题">
+    <meta name="author" content="coax">
+    <title>面试刷题 - coax 的小工具</title>
+    <link rel="stylesheet" href="../styles/theme-base.css">
+    <link rel="stylesheet" href="../styles/theme-cli.css">
+    <link rel="stylesheet" href="../css/interview-brush.css">
+</head>
+<body data-theme="cli">
+    <div class="container">
+        <main>
+            <div class="brush-container">
+                <div class="brush-header">
+                    <h1>📚 面试刷题</h1>
+                    <p>10 年 Java 程序员面试题精选</p>
+                </div>
+                
+                <!-- 消息提示区域 -->
+                <div class="message" id="message"></div>
+                
+                <!-- 类型选择区域 -->
+                <div class="category-selector">
+                    <h3>选择面试类型：</h3>
+                    <select id="categorySelect" class="category-select">
+                        <option value="">-- 请选择面试类型 --</option>
+                    </select>
+                </div>
+                
+                <!-- 进度显示 -->
+                <div class="progress-section" id="progressSection" style="display: none;">
+                    <div class="progress-info">
+                        <span>当前分类：<strong id="currentCategory"></strong></span>
+                        <span>进度：<strong id="progressText">0/5</strong></span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill"></div>
+                    </div>
+                </div>
+                
+                <!-- 题目显示区域 -->
+                <div class="question-section" id="questionSection" style="display: none;">
+                    <div class="question-card">
+                        <div class="question-header">
+                            <span class="question-number" id="questionNumber">第 1 题</span>
+                            <button class="export-btn" id="exportBtn" title="导出为文档">📄 导出</button>
+                        </div>
+                        
+                        <div class="question-content">
+                            <h2 class="question-text" id="questionText"></h2>
+                            
+                            <div class="question-details">
+                                <div class="detail-section">
+                                    <h3>🎯 考察点</h3>
+                                    <ul class="key-points" id="keyPoints"></ul>
+                                </div>
+                                
+                                <div class="detail-section">
+                                    <h3>💡 参考答案</h3>
+                                    <div class="answer-content" id="answerContent"></div>
+                                </div>
+                                
+                                <div class="detail-section">
+                                    <h3>🔍 拓展范围</h3>
+                                    <div class="expansion-tags" id="expansionTags"></div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="question-actions">
+                            <button class="action-btn show-answer-btn" id="showAnswerBtn">查看答案</button>
+                            <button class="action-btn prev-btn" id="prevBtn" disabled>⬅ 上一题</button>
+                            <button class="action-btn next-btn" id="nextBtn">下一题 ➡</button>
+                            <button class="action-btn random-btn" id="randomBtn">🎲 随机一题</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 初始提示 -->
+                <div class="empty-state" id="emptyState">
+                    <div class="empty-icon">📝</div>
+                    <h3>请选择一个面试类型开始刷题</h3>
+                    <p>每个类型包含 5 道经典面试题，涵盖从基础到进阶的知识点</p>
+                </div>
+                
+                <!-- 完成提示 -->
+                <div class="completion-state" id="completionState" style="display: none;">
+                    <div class="completion-icon">🎉</div>
+                    <h3>恭喜！已完成本分类所有题目</h3>
+                    <p>继续学习其他分类或重新练习</p>
+                    <button class="action-btn choose-category-btn" id="chooseCategoryBtn">选择其他分类</button>
+                </div>
+            </div>
+        </main>
+
+        <footer>
+            <div class="footer-content">
+                <p>&copy; <span id="currentYear"></span> coax 的小工具。保留所有权利。</p>
+                <p>渝 ICP 备 2025071398 号</p>
+            </div>
+        </footer>
+    </div>
+
+    <script src="../js/interview-brush.js"></script>
+    <script src="../js/theme-switcher.js"></script>
+</body>
+</html>

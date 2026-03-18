@@ -4,7 +4,7 @@ Disallow: /node_modules/
 Disallow: /.venv/
 Disallow: /.idea/
 
-Sitemap: https://YOUR-DOMAIN.COM/sitemap.xml
+Sitemap: https://www.tools.coax.uno/sitemap.xml
 
 # 允许访问所有其他内容
 Allow: /

@@ -6,12 +6,12 @@ const includeUppercase = document.getElementById('includeUppercase');
 const includeLowercase = document.getElementById('includeLowercase');
 const includeNumbers = document.getElementById('includeNumbers');
 const includeSymbols = document.getElementById('includeSymbols');
-const excludeSimilar = document.getElementById('excludeSimilar');
-const excludeAmbiguous = document.getElementById('excludeAmbiguous');
 const generateBtn = document.getElementById('generateBtn');
 const copyBtn = document.getElementById('copyBtn');
 const copiedMessage = document.getElementById('copiedMessage');
 const currentYearSpan = document.getElementById('currentYear');
+const passwordOptions = document.getElementById('passwordOptions');
+const toggleOptionsBtn = document.getElementById('toggleOptionsBtn');
 
 // 新增的DOM元素
 const historyBtn = document.getElementById('historyBtn');
@@ -31,10 +31,6 @@ const charSets = {
     symbols: '!@#$%^&*()_+-=[]{}|;:,.<>?'
 };
 
-// 相似字符和模糊字符
-const similarChars = 'il1Lo0O';
-const ambiguousChars = '{}[]()/\\\'"`~,;.<>';
-
 // 初始化年份
 currentYearSpan.textContent = new Date().getFullYear();
 
@@ -44,6 +40,7 @@ document.addEventListener('DOMContentLoaded', function() {
     passwordLength.addEventListener('input', updateLengthValue);
     generateBtn.addEventListener('click', generatePassword);
     copyBtn.addEventListener('click', copyPassword);
+    toggleOptionsBtn.addEventListener('click', toggleOptions);
     
     // 新增的事件监听器
     historyBtn.addEventListener('click', showHistory);
@@ -78,6 +75,17 @@ function updateLengthValue() {
     lengthValue.textContent = passwordLength.value;
 }
 
+// 切换选项显示/隐藏
+function toggleOptions() {
+    if (passwordOptions.style.display === 'none') {
+        passwordOptions.style.display = 'block';
+        toggleOptionsBtn.textContent = '▲ 收起选项';
+    } else {
+        passwordOptions.style.display = 'none';
+        toggleOptionsBtn.textContent = '⚙ 设置选项';
+    }
+}
+
 // 生成密码
 function generatePassword() {
     const length = parseInt(passwordLength.value);
@@ -96,59 +104,23 @@ function generatePassword() {
     let requiredChars = '';
     
     if (includeUppercase.checked) {
-        let chars = charSets.uppercase;
-        if (excludeSimilar.checked) {
-            chars = removeChars(chars, similarChars);
-        }
-        if (excludeAmbiguous.checked) {
-            chars = removeChars(chars, ambiguousChars);
-        }
-        charset += chars;
-        if (chars.length > 0) {
-            requiredChars += chars[Math.floor(Math.random() * chars.length)];
-        }
+        charset += charSets.uppercase;
+        requiredChars += charSets.uppercase[Math.floor(Math.random() * charSets.uppercase.length)];
     }
     
     if (includeLowercase.checked) {
-        let chars = charSets.lowercase;
-        if (excludeSimilar.checked) {
-            chars = removeChars(chars, similarChars);
-        }
-        if (excludeAmbiguous.checked) {
-            chars = removeChars(chars, ambiguousChars);
-        }
-        charset += chars;
-        if (chars.length > 0) {
-            requiredChars += chars[Math.floor(Math.random() * chars.length)];
-        }
+        charset += charSets.lowercase;
+        requiredChars += charSets.lowercase[Math.floor(Math.random() * charSets.lowercase.length)];
     }
     
     if (includeNumbers.checked) {
-        let chars = charSets.numbers;
-        if (excludeSimilar.checked) {
-            chars = removeChars(chars, similarChars);
-        }
-        if (excludeAmbiguous.checked) {
-            chars = removeChars(chars, ambiguousChars);
-        }
-        charset += chars;
-        if (chars.length > 0) {
-            requiredChars += chars[Math.floor(Math.random() * chars.length)];
-        }
+        charset += charSets.numbers;
+        requiredChars += charSets.numbers[Math.floor(Math.random() * charSets.numbers.length)];
     }
     
     if (includeSymbols.checked) {
-        let chars = charSets.symbols;
-        if (excludeSimilar.checked) {
-            chars = removeChars(chars, similarChars);
-        }
-        if (excludeAmbiguous.checked) {
-            chars = removeChars(chars, ambiguousChars);
-        }
-        charset += chars;
-        if (chars.length > 0) {
-            requiredChars += chars[Math.floor(Math.random() * chars.length)];
-        }
+        charset += charSets.symbols;
+        requiredChars += charSets.symbols[Math.floor(Math.random() * charSets.symbols.length)];
     }
     
     // 生成密码
@@ -169,19 +141,14 @@ function generatePassword() {
     // 显示密码
     passwordOutput.value = password;
     
+    // 隐藏选项区域
+    passwordOptions.style.display = 'none';
+    toggleOptionsBtn.textContent = '⚙ 设置选项';
+    
     // 保存到历史记录（只有点击生成按钮才记录）
     if (event && event.type === 'click') {
         saveToHistory(password);
     }
-}
-
-// 从字符串中移除指定字符
-function removeChars(str, charsToRemove) {
-    let result = str;
-    for (let char of charsToRemove) {
-        result = result.replace(new RegExp(char, 'g'), '');
-    }
-    return result;
 }
 
 // 打乱字符串顺序
