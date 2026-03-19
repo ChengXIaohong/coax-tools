@@ -230,364 +230,58 @@ select:focus {
     border-bottom: 1px solid #ddd;
 }
 
-.tab-btn {
-    padding: 0.8vw 2vw;
-    background: transparent;
-    border: none;
-    border-bottom: 2px solid transparent;
-    cursor: pointer;
-    transition: all 0.2s;
-}
-
-.tab-btn.active {
-    border-bottom-color: #667eea;
-    color: #667eea;
-}
-
-.tab-content {
-    display: none;
-}
-
-.tab-content.active {
-    display: block;
-}
-
-/* 手风琴 */
-.accordion {
-    border: 1px solid #ddd;
-    border-radius: 0.5vw;
-    overflow: hidden;
-}
-
-.accordion-item {
-    border-bottom: 1px solid #ddd;
-}
-
-.accordion-item:last-child {
-    border-bottom: none;
-}
-
-.accordion-header {
-    width: 100%;
-    padding: 1vw 1.5vw;
-    background: #f8f9fa;
-    border: none;
-    text-align: left;
-    cursor: pointer;
-    font-weight: 500;
-}
-
-.accordion-header:hover {
-    background: #e9ecef;
-}
-
-.accordion-body {
-    padding: 1.5vw;
-    display: none;
-}
-
-.accordion-item.open .accordion-body {
-    display: block;
-}
-
-/* 工具提示框 */
-.tooltip {
-    position: absolute;
-    padding: 0.4vw 0.8vw;
-    background: rgba(0, 0, 0, 0.85);
-    color: white;
-    font-size: 0.85rem;
-    border-radius: 0.3vw;
-    white-space: nowrap;
-    z-index: 1000;
-    pointer-events: none;
-}
-
-/* 模态框基础 */
-.modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.5);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 9999;
-    opacity: 0;
-    visibility: hidden;
-    transition: all 0.3s;
-}
-
-.modal-overlay.show {
-    opacity: 1;
-    visibility: visible;
-}
-
-.modal-content {
-    background: white;
-    border-radius: 12px;
-    max-width: 90vw;
-    max-height: 90vh;
-    overflow: auto;
-    transform: scale(0.9);
-    transition: transform 0.3s;
-}
-
-.modal-overlay.show .modal-content {
-    transform: scale(1);
-}
-
-/* 滚动条美化 */
-::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
-}
-
-::-webkit-scrollbar-track {
-    background: #f1f1f1;
-}
-
-::-webkit-scrollbar-thumb {
-    background: #888;
-    border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-    background: #555;
-}
-
-/* ========================================
-   工具页面通用布局
-   ======================================== */
-
-.tool-container {
-    max-width: none;
-    width: 95vw;
-    margin: 0 auto;
-    padding: 0;
-}
-
-.tool-header {
-    margin-bottom: 2vw;
-}
-
-.tool-header h1 {
-    font-size: 1.8rem;
-    margin-bottom: 8px;
-}
-
-.tool-header p {
-    color: #666;
-}
-
-.tool-form {
-    display: flex;
-    flex-direction: column;
-    gap: 1.5vw;
-}
-
-.form-group {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5vw;
-}
-
-.form-group label {
-    font-weight: 500;
-    color: #333;
-}
-
-.form-row {
-    display: flex;
-    gap: 1.5vw;
-    flex-wrap: wrap;
-}
-
-.form-row .form-group {
-    flex: 1;
-    min-width: 15vw;
-}
-
-.input-with-button {
-    display: flex;
-    gap: 0.8vw;
-}
-
-.input-with-button input {
-    flex: 1;
-}
-
-/* 帮助图标 - 通用位置 */
-.help-icon {
-    position: fixed;
-    bottom: 2vw;
-    right: 2vw;
-    width: 3vw;
-    height: 3vw;
-    min-width: 36px;
-    min-height: 36px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: bold;
-    cursor: pointer;
-    z-index: 100;
-    transition: transform 0.2s;
-}
-
-.help-icon:hover {
-    transform: scale(1.1);
-}
-
-/* 帮助模态框 - 通用结构 */
-.help-modal {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.6);
-    display: none;
-    align-items: center;
-    justify-content: center;
-    z-index: 10000;
-    padding: 2vw;
-}
-
-.help-modal.show {
-    display: flex;
-}
-
-.help-content {
-    max-width: 600px;
-    max-height: 80vh;
-    overflow-y: auto;
-    border-radius: 12px;
-    position: relative;
-}
-
-.help-content .close {
-    position: absolute;
-    top: 10px;
-    right: 15px;
-    font-size: 28px;
-    cursor: pointer;
-    line-height: 1;
-}
-
-.help-content h2 {
-    margin-bottom: 16px;
-    padding-bottom: 8px;
-    border-bottom: 1px solid currentColor;
-    opacity: 0.3;
-}
-
-.help-section {
-    margin-bottom: 16px;
-}
-
-.help-section h3 {
-    font-size: 1rem;
-    margin-bottom: 6px;
-}
-
-.help-section p {
-    line-height: 1.6;
-    opacity: 0.8;
-}
-
-/* ========================================
-   响应式基础
-   ======================================== */
-
-@media (max-width: 768px) {
-    .form-row {
-        flex-direction: column;
-    }
-    
-    .form-row .form-group {
-        min-width: 100%;
-    }
-    
-    .input-with-button {
-        flex-direction: column;
-    }
-    
-    .tool-container {
-        padding: 16px;
-    }
-}
-
-/* ========================================
-   主题切换器样式
-   ======================================== */
-
-.theme-switcher {
-    position: fixed;
-    top: 10px;
-    right: 10px;
-    z-index: 9999;
-    display: flex;
-    gap: 4px;
-    padding: 4px;
-    border-radius: 8px;
-}
-
-.theme-btn {
-    padding: 6px 12px;
-    font-size: 12px;
-    border: 1px solid transparent;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: all 0.2s;
-    background: transparent;
-}
-
-.theme-btn:hover {
-    background: rgba(255, 255, 255, 0.1);
-}
-
-.theme-btn.active {
-    border-color: currentColor;
-}
-
-/* ========================================
-   工具卡片 - 主页用
-   ======================================== */
-
-.tools-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-    gap: 1.5vw;
-    margin-top: 2vw;
-}
-
+/* 工具卡片加载动画 - 打字机风格 */
 .tool-card {
-    padding: 1.5vw;
-    border-radius: 0.8vw;
-    transition: all 0.3s ease;
-    cursor: pointer;
+    opacity: 0;
 }
 
-.tool-card:hover {
-    transform: translateY(-4px);
+.tool-card.animate {
+    animation: fadeIn 0.08s ease forwards;
 }
 
-.tool-card h3 {
-    font-size: 1.1rem;
-    margin-bottom: 0.5vw;
+.tool-card.animate h3 {
+    overflow: hidden;
+    white-space: nowrap;
 }
 
-.tool-card p {
-    font-size: 0.85rem;
-    margin-bottom: 1vw;
-    opacity: 0.8;
+.tool-card.animate p {
+    animation: fadeSlideIn 0.08s ease forwards;
+    animation-delay: 0.08s;
+    opacity: 0;
 }
 
-.tool-card .btn {
-    font-size: 13px;
-    padding: 6px 14px;
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes fadeSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-5px);
+    }
+    to {
+        opacity: 0.8;
+        transform: translateY(0);
+    }
+}
+
+/* 共享光标 */
+.type-cursor {
+    position: fixed;
+    width: 2px;
+    height: 1.2em;
+    background: #333;
+    animation: cursorBlink 0.3s steps(1) infinite;
+    pointer-events: none;
+    z-index: 1000;
+    display: none;
+}
+
+.type-cursor.active {
+    display: block;
+}
+
+@keyframes cursorBlink {
+    50% { opacity: 0; }
 }

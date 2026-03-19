@@ -305,16 +305,12 @@ body[data-theme="cli"] .tool-card h3 {
     font-size: 1rem;
     font-weight: normal;
     margin: 0;
+    overflow: hidden;
+    white-space: nowrap;
 }
 
-body[data-theme="cli"] .tool-card h3::before {
-    content: '[';
-    color: var(--cli-fg-dim);
-}
-
-body[data-theme="cli"] .tool-card h3::after {
-    content: ']';
-    color: var(--cli-fg-dim);
+body[data-theme="cli"] .type-cursor {
+    background: var(--cli-fg);
 }
 
 body[data-theme="cli"] .tool-card p {
@@ -322,26 +318,32 @@ body[data-theme="cli"] .tool-card p {
     margin: 0;
     flex: 1;
     font-size: 0.85rem;
-}
-
-body[data-theme="cli"] .tool-card .btn {
-    background: transparent;
-    border: 1px solid var(--cli-fg);
-    color: var(--cli-fg);
-    padding: 0.4vw 1.2vw;
-    font-size: 0.85rem;
-    border-radius: 2px;
+    max-height: 0;
+    overflow: hidden;
     opacity: 0;
-    font-family: inherit;
+    transition: all 0.3s ease;
+    animation: none;
 }
 
-body[data-theme="cli"] .tool-card:hover .btn {
-    opacity: 1;
+body[data-theme="cli"] .tool-card:hover p {
+    max-height: 3vw;
+    opacity: 0.8;
 }
 
-body[data-theme="cli"] .tool-card .btn:hover {
-    background: var(--cli-fg);
-    color: var(--cli-bg);
+body[data-theme="cli"] .tool-card p {
+    color: var(--cli-fg-dim);
+    margin: 0;
+    flex: 1;
+    font-size: 0.85rem;
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    transition: all 0.3s ease;
+}
+
+body[data-theme="cli"] .tool-card:hover p {
+    max-height: 3vw;
+    opacity: 0.8;
 }
 
 /* ========================================
@@ -620,35 +622,28 @@ body[data-theme="cli"] .theme-switcher {
     right: 1vw;
     z-index: 9999;
     display: flex;
-    gap: 0;
-    padding: 0;
+    align-items: center;
+    justify-content: center;
+    padding: 0.5vw;
     border: 1px solid var(--cli-border);
     background: var(--cli-bg);
-}
-
-body[data-theme="cli"] .theme-btn {
-    padding: 0.5vw 1vw;
-    font-size: 0.85rem;
-    border: none;
-    border-right: 1px solid var(--cli-border);
-    cursor: pointer;
-    background: transparent;
     color: var(--cli-fg-dim);
-    font-family: inherit;
+    cursor: pointer;
     transition: all 0.15s;
 }
 
-body[data-theme="cli"] .theme-btn:last-child {
-    border-right: none;
-}
-
-body[data-theme="cli"] .theme-btn:hover {
+body[data-theme="cli"] .theme-switcher:hover {
     color: var(--cli-fg);
     background: rgba(0, 255, 0, 0.1);
 }
 
-body[data-theme="cli"][data-mode="light"] .theme-btn:hover {
+body[data-theme="cli"][data-mode="light"] .theme-switcher:hover {
     background: rgba(0, 100, 0, 0.1);
+}
+
+body[data-theme="cli"] .theme-switcher svg {
+    width: 1.2vw;
+    height: 1.2vw;
 }
 
 body[data-theme="cli"] .theme-btn.active {
@@ -813,11 +808,5 @@ body[data-theme="cli"] .result::before {
         flex-direction: column;
         align-items: flex-start;
         gap: 1vw;
-    }
-    
-    body[data-theme="cli"] .tool-card .btn {
-        opacity: 1;
-        width: 100%;
-        text-align: center;
     }
 }

@@ -75,10 +75,6 @@ body[data-theme="dark"] .tool-card p {
     color: #b0b0b0;
 }
 
-body[data-theme="dark"] .tool-card .btn {
-    color: white;
-}
-
 body[data-theme="dark"] .header-content::before {
     background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
 }
@@ -158,25 +154,28 @@ main {
     transition: transform 0.3s ease, box-shadow 0.3s ease;
     cursor: pointer;
     position: relative;
-    overflow: visible; /* 允许按钮超出边界 */
+    overflow: visible;
     background-size: 200% 200%;
-    /* 为按钮预留空间 */
     padding-bottom: 3.5rem;
-    /* 初始状态用于动画 */
-    opacity: 0;
-    transform: translateY(20px);
-    transition: opacity 0.4s ease, transform 0.4s ease;
-}
-
-/* 动画类，用于触发动画 */
-.tool-card.animate {
-    opacity: 1;
-    transform: translateY(0);
 }
 
 .tool-card:hover {
     transform: translateY(-5px);
     box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+}
+
+.tool-card p {
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    margin-bottom: 0;
+    transition: max-height 0.3s ease, opacity 0.3s ease, margin-bottom 0.3s ease;
+}
+
+.tool-card:hover p {
+    max-height: 60px;
+    opacity: 1;
+    margin-bottom: 1rem;
 }
 
 /* 深色主题下的卡片悬停效果 */
@@ -197,39 +196,6 @@ body[data-theme="dark"] .tool-card:hover {
     margin-bottom: 1rem;
     position: relative;
     z-index: 1;
-}
-
-/* 立即使用按钮样式 */
-.tool-card .btn {
-    display: inline-block;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-    padding: 0.6rem 1.2rem;
-    border-radius: 5px;
-    text-decoration: none;
-    font-weight: bold;
-    transition: all 0.3s ease;
-    position: relative;
-    z-index: 1;
-    opacity: 0;
-    position: absolute;
-    bottom: 1rem;
-    left: 50%;
-    transform: translate(-50%, 100%);
-    white-space: nowrap;
-    transition: all 0.2s ease; /* 快速过渡 */
-}
-
-/* 鼠标悬停时显示按钮 */
-.tool-card:hover .btn {
-    transform: translate(-50%, 0);
-    opacity: 1;
-}
-
-.tool-card .btn:hover {
-    opacity: 0.9;
-    color: white;
-    transform: translate(-50%, 0); /* 确保悬停按钮时位置不变 */
 }
 
 /* 底部样式 */
