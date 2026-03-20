@@ -36,13 +36,15 @@
                                 <button class="action-item" id="copyOutput">复制</button>
                             </div>
                         </div>
-                        <textarea id="outputJson" placeholder="输出结果" readonly></textarea>
+                        <div id="outputJson" contenteditable="true" spellcheck="false"></div>
+                        <textarea id="outputJsonData" style="display:none;"></textarea>
                     </div>
                 </div>
             </div>
         </main>
     </div>
 
+    <script src="../js/theme-switcher.js"></script>
     <script src="../js/json-formatter.js"></script>
 </body>
 </html>

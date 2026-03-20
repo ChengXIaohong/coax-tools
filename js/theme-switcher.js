@@ -32,6 +32,8 @@ const ThemeSwitcher = (function() {
     function createThemeSwitcher() {
         const existing = document.querySelector('.theme-switcher');
         if (existing) existing.remove();
+
+        if (!isHomePage()) return;
         
         const switcher = document.createElement('button');
         switcher.className = 'theme-switcher';
@@ -43,6 +45,19 @@ const ThemeSwitcher = (function() {
         
         document.body.appendChild(switcher);
     }
+
+    function isHomePage() {
+        return window.location.pathname.endsWith('index.html') || 
+               window.location.pathname.endsWith('/') ||
+               window.location.pathname === '';
+    }
+    
+    window.addEventListener('storage', (e) => {
+        if (e.key === MODE_KEY) {
+            loadSavedMode();
+            applyMode(currentMode);
+        }
+    });
     
     function applyMode(mode) {
         currentMode = mode;

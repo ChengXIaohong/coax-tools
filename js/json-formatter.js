@@ -1,165 +1,536 @@
-// DOM 元素
-const inputJson = document.getElementById('inputJson');
-const outputJson = document.getElementById('outputJson');
-const actionToggle = document.getElementById('actionToggle');
-const actionMenu = document.getElementById('actionMenu');
-const yamlConvertBtn = document.getElementById('yamlConvert');
-const toonConvertBtn = document.getElementById('toonConvert');
-const extractStructureBtn = document.getElementById('extractStructure');
-const compressJsonBtn = document.getElementById('compressJson');
-const sortKeysBtn = document.getElementById('sortKeys');
-const copyOutputBtn = document.getElementById('copyOutput');
-const jsonPathInput = document.getElementById('jsonPathInput');
-const jsonPathSearchBtn = document.getElementById('jsonPathSearch');
-
-// 默认缩进
+// 常量
 const DEFAULT_INDENT = 2;
 
-function compressJson() {
-    const jsonString = outputJson.value.trim();
-    if (!jsonString) return;
-    
-    try {
-        const parsedJson = JSON.parse(jsonString);
-        outputJson.value = JSON.stringify(parsedJson);
-    } catch (e) {}
-}
+// DOM 元素
+let inputJson, outputJson, outputJsonData, actionToggle, actionMenu;
+let yamlConvertBtn, toonConvertBtn, extractStructureBtn, compressJsonBtn;
+let sortKeysBtn, copyOutputBtn, jsonPathInput, jsonPathSearchBtn;
 
-function sortJsonKeys() {
-    const jsonString = outputJson.value.trim();
-    if (!jsonString) return;
-    
-    try {
-        const parsedJson = JSON.parse(jsonString);
-        const sorted = sortKeysRecursive(parsedJson);
-        outputJson.value = JSON.stringify(sorted, null, DEFAULT_INDENT);
-    } catch (e) {}
-}
+// 复制策略 - 重新设计的JSON数据复制功能
+const CopyStrategy = {
+    DATA_TYPES: {
+        OBJECT: 'object',
+        ARRAY: 'array',
+        SIMPLE: 'simple',
+        EMPTY: 'empty',
+        UNKNOWN: 'unknown'
+    },
 
-function sortKeysRecursive(obj) {
-    if (Array.isArray(obj)) {
-        return obj.map(item => sortKeysRecursive(item));
-    }
-    if (obj !== null && typeof obj === 'object') {
-        const sorted = {};
-        Object.keys(obj).sort().forEach(key => {
-            sorted[key] = sortKeysRecursive(obj[key]);
-        });
-        return sorted;
-    }
-    return obj;
-}
-
-function jsonPathQuery() {
-    const jsonString = outputJson.value.trim();
-    const path = jsonPathInput.value.trim();
-    if (!jsonString || !path) return;
-    
-    try {
-        const parsedJson = JSON.parse(jsonString);
-        const result = jsonPathGet(parsedJson, path);
-        if (result !== undefined) {
-            outputJson.value = JSON.stringify(result, null, DEFAULT_INDENT);
-        }
-    } catch (e) {}
-}
-
-function jsonPathGet(obj, path) {
-    const tokens = parseJsonPath(path);
-    let current = obj;
-    
-    for (const token of tokens) {
-        if (current === undefined || current === null) return undefined;
+    detectDataType(lineText) {
+        const trimmed = lineText.trim();
         
-        if (token.type === 'root') {
-            continue;
-        } else if (token.type === 'key') {
-            current = current[token.value];
-        } else if (token.type === 'index') {
-            current = current[token.value];
-        } else if (token.type === 'wildcard') {
-            if (Array.isArray(current)) {
-                return current.map(item => jsonPathGet(item, path.slice(path.indexOf(token.raw) + token.raw.length)));
-            } else if (typeof current === 'object') {
-                const results = [];
-                for (const key in current) {
-                    results.push(jsonPathGet(current[key], path.slice(path.indexOf(token.raw) + token.raw.length)));
-                }
-                return results;
+        if (trimmed === '{}' || trimmed === '[]' || trimmed === '{},' || trimmed === '[],') {
+            return this.DATA_TYPES.EMPTY;
+        }
+        
+        if (trimmed === '{' || trimmed === '[') {
+            return trimmed === '{' ? this.DATA_TYPES.OBJECT : this.DATA_TYPES.ARRAY;
+        }
+        
+        if (trimmed === '}' || trimmed === ']') {
+            return this.DATA_TYPES.UNKNOWN;
+        }
+        
+        const colonIndex = trimmed.indexOf(':');
+        if (colonIndex === -1) return this.DATA_TYPES.UNKNOWN;
+        
+        const key = trimmed.substring(0, colonIndex).trim();
+        const value = trimmed.substring(colonIndex + 1).trim();
+        
+        if (key.startsWith('"') && key.endsWith('"')) {
+            if (value === '[' || value.startsWith('[') || value === '[]') {
+                return this.DATA_TYPES.ARRAY;
             }
-        } else if (token.type === 'recursive') {
-            return getRecursive(current, tokens.slice(tokens.indexOf(token) + 1));
+            if (value === '{' || value.startsWith('{') || value === '{}') {
+                return this.DATA_TYPES.OBJECT;
+            }
+            return this.DATA_TYPES.SIMPLE;
+        }
+        
+        return this.DATA_TYPES.UNKNOWN;
+    },
+
+    findBlockRange(lineIndex) {
+        const lines = outputJson.querySelectorAll('.json-line');
+        const lineText = getLineTextOnly(lines[lineIndex]);
+        const firstChar = lineText.trim()[0];
+        
+        if (firstChar !== '{' && firstChar !== '[') {
+            return null;
+        }
+        
+        const closing = firstChar === '{' ? '}' : ']';
+        let depth = 0;
+        let startIdx = -1;
+        let endIdx = -1;
+        
+        for (let i = lineIndex; i < lines.length; i++) {
+            const text = getLineTextOnly(lines[i]);
+            for (const char of text) {
+                if (char === firstChar) depth++;
+                else if (char === closing) depth--;
+            }
+            if (depth === 0) {
+                endIdx = i;
+                break;
+            }
+        }
+        
+        if (endIdx === -1) return null;
+        return { start: lineIndex, end: endIdx };
+    },
+
+    findBlockRangeByBracket(lineIndex, bracketPos) {
+        const lines = outputJson.querySelectorAll('.json-line');
+        const lineText = getLineTextOnly(lines[lineIndex]);
+        const firstChar = lineText[bracketPos];
+        const closing = firstChar === '{' ? '}' : ']';
+        
+        let depth = 0;
+        let endIdx = -1;
+        
+        for (let i = lineIndex; i < lines.length; i++) {
+            const text = getLineTextOnly(lines[i]);
+            const startPos = (i === lineIndex) ? bracketPos : 0;
+            
+            for (let charPos = startPos; charPos < text.length; charPos++) {
+                const char = text[charPos];
+                if (char === firstChar) depth++;
+                else if (char === closing) depth--;
+                if (depth === 0) {
+                    endIdx = i;
+                    break;
+                }
+            }
+            if (depth === 0) {
+                break;
+            }
+        }
+        
+        if (endIdx === -1) return null;
+        return { start: lineIndex, end: endIdx };
+    },
+
+    getLinesContent(startIdx, endIdx) {
+        const lines = outputJson.querySelectorAll('.json-line');
+        const content = [];
+        for (let i = startIdx; i <= endIdx; i++) {
+            if (lines[i]) {
+                content.push(getLineTextOnly(lines[i]));
+            }
+        }
+        return content.join('\n');
+    },
+
+    extractObjectContent(lineIndex) {
+        const lines = outputJson.querySelectorAll('.json-line');
+        const lineText = getLineTextOnly(lines[lineIndex]);
+        const trimmed = lineText.trim();
+        console.log('DEBUG extractObjectContent:', { lineIndex, lineText, trimmed });
+        
+        if (trimmed === '{}' || trimmed === '{},') {
+            return '{}';
+        }
+        
+        if (trimmed === '{') {
+            const range = this.findBlockRange(lineIndex);
+            console.log('DEBUG findBlockRange:', range);
+            if (!range) return null;
+            const content = this.getLinesContent(range.start, range.end);
+            console.log('DEBUG blockContent:', content);
+            const jsonStr = '{' + content.split('{').slice(1).join('{');
+            try {
+                const parsed = JSON.parse(jsonStr);
+                return JSON.stringify(parsed);
+            } catch (e) {
+                console.log('DEBUG JSON.parse error:', e);
+                return null;
+            }
+        }
+        
+        const colonIndex = trimmed.indexOf(':');
+        if (colonIndex === -1) return null;
+        
+        const key = trimmed.substring(0, colonIndex).trim().replace(/^"|"$/g, '');
+        
+        const bracketPos = trimmed.indexOf('{');
+        if (bracketPos !== -1) {
+            const range = this.findBlockRangeByBracket(lineIndex, bracketPos);
+            console.log('DEBUG object-kv range:', range);
+            if (!range) return null;
+            
+            const blockContent = this.getLinesContent(range.start, range.end);
+            let afterColon = blockContent.substring(blockContent.indexOf(':') + 1).trim();
+            if (afterColon.endsWith(',')) {
+                afterColon = afterColon.slice(0, -1).trim();
+            }
+            console.log('DEBUG afterColon:', afterColon);
+            
+            try {
+                const value = JSON.parse(afterColon);
+                return JSON.stringify({ [key]: value });
+            } catch (e) {
+                console.log('DEBUG JSON.parse error:', e);
+                return null;
+            }
+        }
+        
+        const range = this.findBlockRange(lineIndex);
+        console.log('DEBUG object-kv range:', range);
+        if (!range) return null;
+        
+        const blockContent = this.getLinesContent(range.start, range.end);
+        let afterColon = blockContent.substring(blockContent.indexOf(':') + 1).trim();
+        if (afterColon.endsWith(',')) {
+            afterColon = afterColon.slice(0, -1).trim();
+        }
+        console.log('DEBUG afterColon:', afterColon);
+        
+        try {
+            const value = JSON.parse(afterColon);
+            return JSON.stringify({ [key]: value });
+        } catch (e) {
+            console.log('DEBUG JSON.parse error:', e);
+            return null;
+        }
+    },
+
+    extractArrayContent(lineIndex) {
+        const lines = outputJson.querySelectorAll('.json-line');
+        const lineText = getLineTextOnly(lines[lineIndex]);
+        const trimmed = lineText.trim();
+        
+        if (trimmed === '[]' || trimmed === '[],') {
+            return '[]';
+        }
+        
+        if (trimmed === '[') {
+            const range = this.findBlockRange(lineIndex);
+            console.log('DEBUG array findBlockRange:', range);
+            if (!range) return null;
+            const content = this.getLinesContent(range.start, range.end);
+            console.log('DEBUG array content:', content);
+            const jsonStr = '[' + content.split('[').slice(1).join('[');
+            try {
+                const parsed = JSON.parse(jsonStr);
+                return JSON.stringify(parsed);
+            } catch (e) {
+                console.log('DEBUG array JSON.parse error:', e);
+                return null;
+            }
+        }
+        
+        const colonIndex = trimmed.indexOf(':');
+        if (colonIndex === -1) return null;
+        
+        const key = trimmed.substring(0, colonIndex).trim().replace(/^"|"$/g, '');
+        
+        const bracketPos = trimmed.indexOf('[');
+        if (bracketPos !== -1) {
+            const range = this.findBlockRangeByBracket(lineIndex, bracketPos);
+            console.log('DEBUG array-kv range:', range);
+            if (!range) return null;
+            
+            const blockContent = this.getLinesContent(range.start, range.end);
+            let afterColon = blockContent.substring(blockContent.indexOf(':') + 1).trim();
+            if (afterColon.endsWith(',')) {
+                afterColon = afterColon.slice(0, -1).trim();
+            }
+            console.log('DEBUG array afterColon:', afterColon);
+            
+            try {
+                const value = JSON.parse(afterColon);
+                return JSON.stringify({ [key]: value });
+            } catch (e) {
+                console.log('DEBUG array JSON.parse error:', e);
+                return null;
+            }
+        }
+        
+        const range = this.findBlockRange(lineIndex);
+        console.log('DEBUG array-kv range:', range);
+        if (!range) return null;
+        
+        const blockContent = this.getLinesContent(range.start, range.end);
+        let afterColon = blockContent.substring(blockContent.indexOf(':') + 1).trim();
+        if (afterColon.endsWith(',')) {
+            afterColon = afterColon.slice(0, -1).trim();
+        }
+        console.log('DEBUG array afterColon:', afterColon);
+        
+        try {
+            const value = JSON.parse(afterColon);
+            return JSON.stringify({ [key]: value });
+        } catch (e) {
+            console.log('DEBUG array JSON.parse error:', e);
+            return null;
+        }
+    },
+
+    extractSimpleValue(lineIndex) {
+        const lines = outputJson.querySelectorAll('.json-line');
+        const lineText = getLineTextOnly(lines[lineIndex]);
+        const colonIndex = lineText.indexOf(':');
+        if (colonIndex === -1) return null;
+
+        const key = lineText.substring(0, colonIndex).trim().replace(/^"|"$/g, '');
+        let value = lineText.substring(colonIndex + 1).trim().replace(/,$/, '');
+
+        let parsedValue;
+        try {
+            parsedValue = JSON.parse(value);
+        } catch (e) {
+            if (/^["']/.test(value)) {
+                parsedValue = value.slice(1, -1);
+            } else if (value === 'true' || value === 'false') {
+                parsedValue = value === 'true';
+            } else if (/^\d/.test(value)) {
+                parsedValue = Number(value);
+            } else {
+                parsedValue = value;
+            }
+        }
+
+        return JSON.stringify({ [key]: parsedValue });
+    },
+
+    extractByDataType(lineIndex, dataType) {
+        switch (dataType) {
+            case this.DATA_TYPES.OBJECT:
+                return this.extractObjectContent(lineIndex);
+            case this.DATA_TYPES.ARRAY:
+                return this.extractArrayContent(lineIndex);
+            case this.DATA_TYPES.SIMPLE:
+                return this.extractSimpleValue(lineIndex);
+            case this.DATA_TYPES.EMPTY:
+                const lineText = getLineTextOnly(outputJson.querySelectorAll('.json-line')[lineIndex]);
+                return lineText.trim() === '[' || lineText.trim().startsWith('[') ? '[]' : '{}';
+            default:
+                return null;
+        }
+    },
+
+    async copy(lineIndex) {
+        const lines = outputJson.querySelectorAll('.json-line');
+        const lineEl = lines[lineIndex];
+        
+        if (!lineEl) {
+            console.warn('行不存在:', lineIndex);
+            showMessage('复制失败: 行不存在', 'error');
+            return false;
+        }
+        
+        const lineText = getLineTextOnly(lineEl);
+        
+        if (!lineText || lineText.trim() === '') {
+            console.warn('空行无法复制');
+            showMessage('复制失败: 空行无法复制', 'error');
+            return false;
+        }
+        
+        const dataType = this.detectDataType(lineText);
+        console.log('DEBUG copy:', { lineIndex, lineText, dataType, DATA_TYPES: this.DATA_TYPES });
+        
+        if (dataType === this.DATA_TYPES.UNKNOWN) {
+            showMessage('复制失败: 无法识别的数据类型', 'error');
+            return false;
+        }
+        
+        const content = this.extractByDataType(lineIndex, dataType);
+        console.log('DEBUG extractByDataType result:', content);
+        
+        if (!content) {
+            console.warn('内容提取失败');
+            showMessage('复制失败: 内容提取失败', 'error');
+            return false;
+        }
+        
+        try {
+            const parsed = JSON.parse(content);
+            const jsonString = JSON.stringify(parsed);
+            await navigator.clipboard.writeText(jsonString);
+            showMessage('已复制到剪贴板', 'success');
+            return true;
+        } catch (error) {
+            console.error('复制失败:', error);
+            showMessage('复制失败: ' + error.message, 'error');
+            return false;
+        }
+    },
+
+    copyWithContext(lineIndex, event) {
+        if (event && event.button === 2) {
+            event.preventDefault();
+        }
+        this.copy(lineIndex);
+    }
+};
+
+// 上下文菜单管理器
+const ContextMenuManager = {
+    menu: null,
+    currentLineIndex: null,
+
+    init() {
+        this.menu = document.createElement('div');
+        this.menu.id = 'json-context-menu';
+        this.menu.className = 'context-menu';
+        this.menu.innerHTML = `
+            <div class="context-menu-item" data-action="copy">
+                <span class="context-menu-icon">📋</span>
+                <span>复制</span>
+            </div>
+            <div class="context-menu-item" data-action="copy-value">
+                <span class="context-menu-icon">📄</span>
+                <span>复制值</span>
+            </div>
+            <div class="context-menu-item" data-action="download">
+                <span class="context-menu-icon">💾</span>
+                <span>下载</span>
+            </div>
+        `;
+        document.body.appendChild(this.menu);
+        
+        this.menu.addEventListener('click', (e) => {
+            const action = e.target.closest('.context-menu-item')?.dataset.action;
+            if (action && this.currentLineIndex !== null) {
+                this.handleAction(action, this.currentLineIndex);
+            }
+            this.hide();
+        });
+        
+        document.addEventListener('click', (e) => {
+            if (!this.menu.contains(e.target)) {
+                this.hide();
+            }
+        });
+        
+        document.addEventListener('contextmenu', (e) => {
+            const lineEl = e.target.closest('.json-line');
+            if (lineEl) {
+                e.preventDefault();
+                this.currentLineIndex = parseInt(lineEl.dataset.line);
+            }
+        });
+    },
+
+    show(x, y) {
+        if (!this.menu) this.init();
+        this.menu.style.display = 'block';
+        const rect = this.menu.getBoundingClientRect();
+        const viewWidth = window.innerWidth;
+        const viewHeight = window.innerHeight;
+        
+        let posX = x;
+        let posY = y;
+        
+        if (x + rect.width > viewWidth) {
+            posX = viewWidth - rect.width - 10;
+        }
+        if (y + rect.height > viewHeight) {
+            posY = viewHeight - rect.height - 10;
+        }
+        
+        this.menu.style.left = posX + 'px';
+        this.menu.style.top = posY + 'px';
+    },
+
+    hide() {
+        if (this.menu) {
+            this.menu.style.display = 'none';
+        }
+    },
+
+    handleAction(action, lineIndex) {
+        const lineEl = outputJson.querySelector(`.json-line[data-line="${lineIndex}"]`);
+        if (!lineEl) return;
+        
+        const blockStart = lineEl.dataset.blockStart;
+        const blockEnd = lineEl.dataset.blockEnd;
+        
+        switch (action) {
+            case 'copy':
+                CopyStrategy.copy(lineIndex);
+                break;
+            case 'copy-value':
+                this.copyValueOnly(lineIndex);
+                break;
+            case 'download':
+                let content;
+                if (blockStart !== undefined && blockEnd !== undefined) {
+                    content = CopyStrategy.getLinesContent(parseInt(blockStart), parseInt(blockEnd));
+                } else {
+                    content = getLineTextOnly(lineEl);
+                }
+                downloadLineContent(content);
+                break;
+        }
+    },
+
+    copyValueOnly(lineIndex) {
+        const lines = outputJson.querySelectorAll('.json-line');
+        const lineEl = lines[lineIndex];
+        if (!lineEl) return;
+        
+        const lineText = getLineTextOnly(lineEl);
+        const colonIndex = lineText.indexOf(':');
+        
+        if (colonIndex === -1) {
+            showMessage('复制失败: 非键值对行', 'error');
+            return;
+        }
+        
+        const value = lineText.substring(colonIndex + 1).trim().replace(/,$/, '');
+        
+        try {
+            const parsed = JSON.parse(value);
+            const jsonString = JSON.stringify(parsed);
+            navigator.clipboard.writeText(jsonString);
+            showMessage('已复制值到剪贴板', 'success');
+        } catch (e) {
+            navigator.clipboard.writeText(value);
+            showMessage('已复制值到剪贴板', 'success');
         }
     }
-    
-    return current;
+};
+
+function getLineTextOnly(lineEl) {
+    if (!lineEl) return '';
+    const lineActions = lineEl.querySelector('.line-actions');
+    let textContent = lineEl.textContent;
+    if (lineActions) {
+        textContent = textContent.replace(lineActions.textContent, '');
+    }
+    return textContent.trim();
 }
 
-function getRecursive(obj, remainingTokens) {
-    if (obj === null || typeof obj !== 'object') return [];
-    const results = [];
-    
-    function traverse(o) {
-        if (Array.isArray(o)) {
-            o.forEach(item => traverse(item));
-        } else if (typeof o === 'object') {
-            for (const key in o) {
-                if (o.hasOwnProperty(key)) {
-                    const result = jsonPathGet(o[key], remainingTokens.map(t => t.raw).join(''));
-                    if (result !== undefined) results.push(result);
-                    traverse(o[key]);
-                }
-            }
+function getBlockContent(startLine, endLine) {
+    const lines = outputJson.querySelectorAll('.json-line');
+    const content = [];
+    for (let i = startLine; i <= endLine; i++) {
+        if (lines[i]) {
+            content.push(getLineTextOnly(lines[i]));
         }
     }
-    
-    traverse(obj);
-    return results;
-}
-
-function parseJsonPath(path) {
-    const tokens = [];
-    let i = 0;
-    
-    while (i < path.length) {
-        if (path[i] === '$') {
-            tokens.push({ type: 'root', value: '$', raw: '$' });
-            i++;
-        } else if (path[i] === '.') {
-            if (path[i + 1] === '.') {
-                tokens.push({ type: 'recursive', value: '..', raw: '..' });
-                i += 2;
-            } else {
-                i++;
-            }
-        } else if (path[i] === '[') {
-            let j = path.indexOf(']', i);
-            if (j === -1) j = path.length;
-            const bracket = path.slice(i + 1, j);
-            if (/^\d+$/.test(bracket)) {
-                tokens.push({ type: 'index', value: parseInt(bracket), raw: bracket });
-            } else {
-                tokens.push({ type: 'key', value: bracket.replace(/^["']|["']$/g, ''), raw: bracket });
-            }
-            i = j + 1;
-        } else if (path[i] === '*') {
-            tokens.push({ type: 'wildcard', value: '*', raw: '*' });
-            i++;
-        } else {
-            let j = i;
-            while (j < path.length && path[j] !== '.' && path[j] !== '[') j++;
-            const key = path.slice(i, j);
-            if (key) {
-                tokens.push({ type: 'key', value: key, raw: key });
-            }
-            i = j;
-        }
-    }
-    
-    return tokens;
+    return content.join('\n');
 }
 
 document.addEventListener('DOMContentLoaded', function() {
+    // 初始化 DOM 元素
+    inputJson = document.getElementById('inputJson');
+    outputJson = document.getElementById('outputJson');
+    outputJsonData = document.getElementById('outputJsonData');
+    actionToggle = document.getElementById('actionToggle');
+    actionMenu = document.getElementById('actionMenu');
+    yamlConvertBtn = document.getElementById('yamlConvert');
+    toonConvertBtn = document.getElementById('toonConvert');
+    extractStructureBtn = document.getElementById('extractStructure');
+    compressJsonBtn = document.getElementById('compressJson');
+    sortKeysBtn = document.getElementById('sortKeys');
+    copyOutputBtn = document.getElementById('copyOutput');
+    jsonPathInput = document.getElementById('jsonPathInput');
+    jsonPathSearchBtn = document.getElementById('jsonPathSearch');
+    
     // 自动格式化
     inputJson.addEventListener('input', autoFormat);
     inputJson.addEventListener('paste', () => setTimeout(autoFormat, 0));
@@ -182,40 +553,559 @@ document.addEventListener('DOMContentLoaded', function() {
         if (e.key === 'Enter') jsonPathQuery();
     });
     
+    // 括号匹配高亮
+    outputJson.addEventListener('click', highlightBracketMatch);
+    outputJson.addEventListener('keyup', highlightBracketMatch);
+    
+    // 行点击处理
+    outputJson.addEventListener('click', handleLineClick);
+    outputJson.addEventListener('contextmenu', handleContextMenu);
+    
+    // 上下文菜单
+    ContextMenuManager.init();
+    
+    // 点击空白处清除选中
+    document.addEventListener('click', (e) => {
+        if (!e.target.closest('#outputJson')) {
+            clearAllSelections();
+        }
+    });
+    
     // 加载示例数据
     loadSampleData();
 });
+
+// JSON Path 查询
+function jsonPathQuery() {
+    const path = jsonPathInput.value.trim();
+    if (!path) return;
+    
+    const jsonString = outputJsonData.value.trim();
+    if (!jsonString) return;
+    
+    try {
+        const parsed = JSON.parse(jsonString);
+        const result = getValueByPath(parsed, path);
+        
+        if (result !== undefined) {
+            inputJson.value = JSON.stringify(result, null, DEFAULT_INDENT);
+            autoFormat();
+        } else {
+            showMessage('路径未找到匹配结果', 'warning');
+        }
+    } catch (e) {
+        showMessage('JSON Path 查询失败', 'error');
+    }
+}
+
+function getValueByPath(obj, path) {
+    const cleanPath = path.replace(/^\$\.?/, '');
+    if (!cleanPath) return obj;
+    
+    const parts = cleanPath.split(/\.|\[|\]/).filter(p => p !== '');
+    let current = obj;
+    
+    for (const part of parts) {
+        if (current === null || current === undefined) {
+            return undefined;
+        }
+        
+        if (Array.isArray(current)) {
+            const index = parseInt(part, 10);
+            if (!isNaN(index)) {
+                current = current[index];
+            } else {
+                current = current[part];
+            }
+        } else if (typeof current === 'object') {
+            current = current[part];
+        } else {
+            return undefined;
+        }
+    }
+    
+    return current;
+}
+
+function showMessage(text, type) {
+    const messageDiv = document.getElementById('message') || createMessageDiv();
+    messageDiv.textContent = text;
+    messageDiv.className = 'message ' + type + '-message';
+    messageDiv.style.display = 'block';
+    setTimeout(() => { messageDiv.style.display = 'none'; }, 3000);
+}
+
+function createMessageDiv() {
+    const div = document.createElement('div');
+    div.id = 'message';
+    div.style.cssText = 'position:fixed;top:20px;left:50%;transform:translateX(-50%);padding:10px 20px;background:var(--cli-bg);color:var(--cli-fg);border:1px solid var(--cli-border);z-index:1000;';
+    document.body.appendChild(div);
+    return div;
+}
 
 // 自动格式化
 function autoFormat() {
     const jsonString = inputJson.value.trim();
     if (!jsonString) {
-        outputJson.value = '';
+        outputJson.innerHTML = '';
+        outputJsonData.value = '';
         return;
     }
     
     try {
         const parsedJson = JSON.parse(jsonString);
-        outputJson.value = JSON.stringify(parsedJson, null, DEFAULT_INDENT);
+        const formatted = JSON.stringify(parsedJson, null, DEFAULT_INDENT);
+        outputJson.innerHTML = highlightJson(formatted);
+        outputJsonData.value = formatted;
     } catch (e) {
         // 无效JSON，不处理
     }
 }
 
-// 加载示例数据
-function loadSampleData() {
-    inputJson.value = JSON.stringify({
-        "name": "张三",
-        "age": 30,
-        "email": "zhangsan@example.com",
-        "address": {
-            "country": "中国",
-            "city": "北京"
-        },
-        "hobbies": ["读书", "游泳", "编程"],
-        "married": true
-    }, null, DEFAULT_INDENT);
-    autoFormat();
+function sortJsonKeys() {
+    const jsonString = outputJsonData.value.trim();
+    if (!jsonString) return;
+    
+    try {
+        const parsedJson = JSON.parse(jsonString);
+        const sorted = sortKeysRecursive(parsedJson);
+        outputJsonData.value = JSON.stringify(sorted, null, DEFAULT_INDENT);
+        outputJson.innerHTML = highlightJson(outputJsonData.value);
+    } catch (e) {}
+}
+
+function sortKeysRecursive(obj) {
+    if (Array.isArray(obj)) {
+        return obj.map(item => sortKeysRecursive(item));
+    }
+    if (obj !== null && typeof obj === 'object') {
+        const sorted = {};
+        Object.keys(obj).sort().forEach(key => {
+            sorted[key] = sortKeysRecursive(obj[key]);
+        });
+        return sorted;
+    }
+    return obj;
+}
+
+// JSON 语法高亮
+function highlightJson(jsonString) {
+    const lines = jsonString.split('\n');
+    let result = '';
+    
+    for (let lineIndex = 0; lineIndex < lines.length; lineIndex++) {
+        const line = lines[lineIndex];
+        let lineHtml = '';
+        let i = 0;
+        
+        while (i < line.length) {
+            const char = line[i];
+            
+            if (char === '"') {
+                let key = '"';
+                i++;
+                while (i < line.length) {
+                    if (line[i] === '\\' && i + 1 < line.length) {
+                        key += line[i] + line[i + 1];
+                        i += 2;
+                    } else if (line[i] === '"') {
+                        key += '"';
+                        i++;
+                        break;
+                    } else {
+                        key += line[i];
+                        i++;
+                    }
+                }
+                
+                let nextNonSpace = i;
+                while (nextNonSpace < line.length && line[nextNonSpace] === ' ') {
+                    nextNonSpace++;
+                }
+                
+                if (line[nextNonSpace] === ':') {
+                    lineHtml += `<span class="json-key">${escapeHtml(key)}</span>`;
+                } else {
+                    lineHtml += `<span class="json-string">${escapeHtml(key)}</span>`;
+                }
+            } else if (char === '{' || char === '[') {
+                lineHtml += `<span class="json-bracket" data-bracket="${char}">${char}</span>`;
+                i++;
+            } else if (char === '}' || char === ']') {
+                lineHtml += `<span class="json-bracket" data-bracket="${char}">${char}</span>`;
+                i++;
+            } else if (char === 't' && line.slice(i, i + 4) === 'true') {
+                lineHtml += `<span class="json-boolean">true</span>`;
+                i += 4;
+            } else if (char === 'f' && line.slice(i, i + 5) === 'false') {
+                lineHtml += `<span class="json-boolean">false</span>`;
+                i += 5;
+            } else if (char === 'n' && line.slice(i, i + 4) === 'null') {
+                lineHtml += `<span class="json-null">null</span>`;
+                i += 4;
+            } else if (/\d/.test(char)) {
+                let num = '';
+                while (i < line.length && /[-\d.eE+]/.test(line[i])) {
+                    num += line[i];
+                    i++;
+                }
+                lineHtml += `<span class="json-number">${num}</span>`;
+            } else {
+                lineHtml += escapeHtml(char);
+                i++;
+            }
+        }
+        
+        const trimmedLine = line.trim();
+        const lineCopyType = CopyStrategy.detectDataType(trimmedLine);
+        const isCopyable = lineCopyType !== CopyStrategy.DATA_TYPES.UNKNOWN && lineCopyType !== CopyStrategy.DATA_TYPES.EMPTY;
+        
+        const actionsHtml = isCopyable ? `
+            <span class="line-actions">
+                <span class="line-action-btn" data-action="copy">复制</span>
+                <span class="line-action-btn" data-action="download">下载</span>
+                <span class="line-action-btn" data-action="clear">清除</span>
+            </span>
+        ` : `
+            <span class="line-actions">
+                <span class="line-action-btn" data-action="clear">清除</span>
+            </span>
+        `;
+        
+        result += `<div class="json-line" data-line="${lineIndex}">${lineHtml}${actionsHtml}</div>`;
+    }
+    
+    return result;
+}
+
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+// 行点击处理
+function handleLineClick(e) {
+    const target = e.target;
+    
+    if (target.classList.contains('line-action-btn')) {
+        e.stopPropagation();
+        const action = target.dataset.action;
+        const lineEl = target.closest('.json-line');
+        handleLineAction(action, lineEl);
+        return;
+    }
+    
+    const lineEl = target.closest('.json-line');
+    if (!lineEl) return;
+    
+    if (e.button === 2) {
+        e.preventDefault();
+        return;
+    }
+    
+    clearAllSelections();
+    
+    const lineIndex = parseInt(lineEl.dataset.line);
+    const bracketInfo = findOpeningBracket(lineIndex);
+    
+    if (bracketInfo) {
+        const { startLine, endLine } = bracketInfo;
+        selectBlock(startLine, endLine);
+        lineEl.dataset.blockStart = startLine;
+        lineEl.dataset.blockEnd = endLine;
+    } else {
+        lineEl.classList.add('selected');
+    }
+}
+
+// 右键菜单处理
+function handleContextMenu(e) {
+    const lineEl = e.target.closest('.json-line');
+    if (!lineEl) return;
+    
+    e.preventDefault();
+    const lineIndex = parseInt(lineEl.dataset.line);
+    ContextMenuManager.currentLineIndex = lineIndex;
+    ContextMenuManager.show(e.clientX, e.clientY);
+}
+
+// 查找行中的开括号及其对应的闭括号所在行
+function findOpeningBracket(lineIndex) {
+    const lines = outputJson.querySelectorAll('.json-line');
+    const line = lines[lineIndex];
+    if (!line) return null;
+    
+    const bracket = line.querySelector('.json-bracket');
+    if (!bracket) return null;
+    
+    const bracketChar = bracket.textContent;
+    if (bracketChar === '{' || bracketChar === '[') {
+        const matchBracket = bracketChar === '{' ? '}' : ']';
+        let depth = 1;
+        
+        for (let i = lineIndex + 1; i < lines.length; i++) {
+            const lineBrackets = lines[i].querySelectorAll('.json-bracket');
+            for (const b of lineBrackets) {
+                if (b.textContent === bracketChar) depth++;
+                else if (b.textContent === matchBracket) depth--;
+            }
+            if (depth === 0) {
+                return { startLine: lineIndex, endLine: i };
+            }
+        }
+    } else if (bracketChar === '}' || bracketChar === ']') {
+        const matchBracket = bracketChar === '}' ? '{' : '[';
+        let depth = 1;
+        
+        for (let i = lineIndex - 1; i >= 0; i--) {
+            const lineBrackets = lines[i].querySelectorAll('.json-bracket');
+            for (const b of lineBrackets) {
+                if (b.textContent === bracketChar) depth++;
+                else if (b.textContent === matchBracket) depth--;
+            }
+            if (depth === 0) {
+                return { startLine: i, endLine: lineIndex };
+            }
+        }
+    }
+    
+    return null;
+}
+
+// 选中整个块
+function selectBlock(startLine, endLine) {
+    const lines = outputJson.querySelectorAll('.json-line');
+    for (let i = startLine; i <= endLine; i++) {
+        if (lines[i]) {
+            lines[i].classList.add('block-selected');
+        }
+    }
+}
+
+// 清除所有选中状态
+function clearAllSelections() {
+    const lines = outputJson.querySelectorAll('.json-line');
+    lines.forEach(l => {
+        l.classList.remove('selected');
+        l.classList.remove('block-selected');
+        delete l.dataset.blockStart;
+        delete l.dataset.blockEnd;
+    });
+}
+
+// 根据 DOM 行索引构建 JSONPath
+function buildJsonPathFromLineIndex(lineIndex) {
+    const lines = outputJson.querySelectorAll('.json-line');
+    const pathParts = [];
+    
+    function addPath(idx, isArrayItem, arrayIndex) {
+        if (isArrayItem) {
+            pathParts.unshift(`[${arrayIndex}]`);
+        }
+    }
+    
+    function findParents(idx) {
+        for (let i = idx - 1; i >= 0; i--) {
+            const line = lines[i];
+            if (!line) continue;
+            const bracket = line.querySelector('.json-bracket');
+            if (!bracket) continue;
+            
+            const bracketChar = bracket.textContent;
+            if (bracketChar === '{' || bracketChar === '[') {
+                const matchBracket = bracketChar === '{' ? '}' : ']';
+                let depth = 1;
+                let endLine = -1;
+                
+                for (let j = i + 1; j < lines.length; j++) {
+                    const lineBrackets = lines[j].querySelectorAll('.json-bracket');
+                    for (const b of lineBrackets) {
+                        if (b.textContent === bracketChar) depth++;
+                        else if (b.textContent === matchBracket) depth--;
+                    }
+                    if (depth === 0) {
+                        endLine = j;
+                        break;
+                    }
+                }
+                
+                if (endLine === -1) continue;
+                
+                if (bracketChar === '[') {
+                    if (idx > i && idx <= endLine) {
+                        let itemIndex = 0;
+                        for (let k = i + 1; k < idx; k++) {
+                            const lineText = getLineTextOnly(lines[k]).trim();
+                            if (!lineText || lineText === ',' || lineText === '},' || lineText === '],') continue;
+                            if (lineText.endsWith(']') || lineText.endsWith('}')) continue;
+                            itemIndex++;
+                        }
+                        pathParts.unshift(`[${itemIndex}]`);
+                    }
+                    findParents(i);
+                } else {
+                    if (idx === idx) {
+                        const lineText = getLineTextOnly(lines[idx]).trim();
+                        const colonPos = lineText.indexOf(':');
+                        if (colonPos !== -1) {
+                            const key = lineText.substring(0, colonPos).trim().replace(/^"|"$/g, '');
+                            pathParts.unshift(`.${key}`);
+                        }
+                    }
+                    findParents(i);
+                }
+                return;
+            }
+        }
+    }
+    
+    findParents(lineIndex + 1);
+    
+    let path = pathParts.join('');
+    if (path.startsWith('.')) {
+        path = '$' + path;
+    } else if (path.startsWith('[')) {
+        path = '$' + path;
+    } else {
+        path = '$' + path;
+    }
+    
+    return path;
+}
+
+// 处理行操作
+function handleLineAction(action, lineEl) {
+    const lineIndex = parseInt(lineEl.dataset.line);
+    
+    if (action === 'copy') {
+        CopyStrategy.copy(lineIndex);
+        return;
+    }
+    
+    let content;
+    const blockStart = lineEl.dataset.blockStart;
+    const blockEnd = lineEl.dataset.blockEnd;
+    
+    if (blockStart !== undefined && blockEnd !== undefined) {
+        content = getBlockContent(parseInt(blockStart), parseInt(blockEnd));
+    } else {
+        content = lineEl.textContent.replace(/复制下载清除$/, '').trim();
+    }
+    
+    if (!content) return;
+    
+    switch (action) {
+        case 'download':
+            downloadLineContent(content);
+            break;
+        case 'clear':
+            clearLineContent(lineIndex, blockStart, blockEnd);
+            break;
+    }
+}
+
+// 下载内容
+function downloadLineContent(content) {
+    const blob = new Blob([content], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'json-block.json';
+    a.click();
+    URL.revokeObjectURL(url);
+}
+
+// 清除内容
+function clearLineContent(lineIndex, blockStart, blockEnd) {
+    if (blockStart !== undefined && blockEnd !== undefined) {
+        const lines = outputJson.querySelectorAll('.json-line');
+        for (let i = blockStart; i <= blockEnd; i++) {
+            if (lines[i]) {
+                lines[i].remove();
+            }
+        }
+        rebuildOutputData();
+    } else {
+        const line = outputJson.querySelector(`.json-line[data-line="${lineIndex}"]`);
+        if (line) {
+            line.remove();
+            rebuildOutputData();
+        }
+    }
+}
+
+// 重建输出数据
+function rebuildOutputData() {
+    const lines = outputJson.querySelectorAll('.json-line');
+    let content = [];
+    lines.forEach(line => {
+        let text = line.textContent.replace(/复制下载清除$/, '').trim();
+        content.push(text);
+    });
+    outputJsonData.value = content.join('\n');
+    
+    try {
+        const parsed = JSON.parse(outputJsonData.value);
+        inputJson.value = JSON.stringify(parsed, null, DEFAULT_INDENT);
+        autoFormat();
+    } catch (e) {
+        // ignore
+    }
+}
+
+// 括号匹配高亮
+function highlightBracketMatch() {
+    const brackets = outputJson.querySelectorAll('.json-bracket');
+    brackets.forEach(b => b.classList.remove('match'));
+    
+    const selection = window.getSelection();
+    if (!selection.rangeCount) return;
+    
+    let node = selection.anchorNode;
+    while (node && node !== outputJson) {
+        if (node.nodeType === Node.ELEMENT_NODE && node.classList && node.classList.contains('json-bracket')) {
+            break;
+        }
+        node = node.parentNode;
+    }
+    
+    if (!node || node === outputJson) return;
+    
+    const bracket = node.textContent;
+    if (bracket === '{' || bracket === '[') {
+        const matchBracket = bracket === '{' ? '}' : ']';
+        const children = Array.from(outputJson.children);
+        const startIndex = children.indexOf(node);
+        
+        let depth = 1;
+        for (let j = startIndex + 1; j < children.length; j++) {
+            const nextBracket = children[j].textContent;
+            if (nextBracket === bracket) depth++;
+            else if (nextBracket === matchBracket) depth--;
+            if (depth === 0) {
+                node.classList.add('match');
+                children[j].classList.add('match');
+                break;
+            }
+        }
+    } else if (bracket === '}' || bracket === ']') {
+        const matchBracket = bracket === '}' ? '{' : '[';
+        const children = Array.from(outputJson.children);
+        const startIndex = children.indexOf(node);
+        
+        let depth = 1;
+        for (let j = startIndex - 1; j >= 0; j--) {
+            const prevBracket = children[j].textContent;
+            if (prevBracket === bracket) depth++;
+            else if (prevBracket === matchBracket) depth--;
+            if (depth === 0) {
+                node.classList.add('match');
+                children[j].classList.add('match');
+                break;
+            }
+        }
+    }
 }
 
 // 切换操作菜单
@@ -232,7 +1122,7 @@ function closeActionMenu(e) {
 
 // 从输出区转换
 function convertFromOutput(type) {
-    const jsonString = outputJson.value.trim();
+    const jsonString = outputJsonData.value.trim();
     if (!jsonString) return;
     
     try {
@@ -252,7 +1142,8 @@ function convertFromOutput(type) {
                 break;
         }
         
-        outputJson.value = result;
+        outputJson.innerHTML = highlightJson(result);
+        outputJsonData.value = result;
     } catch (e) {
         // 转换失败不处理
     }
@@ -261,9 +1152,9 @@ function convertFromOutput(type) {
 
 // 复制输出
 function copyOutput() {
-    if (!outputJson.value) return;
+    if (!outputJsonData.value) return;
     
-    navigator.clipboard.writeText(outputJson.value);
+    navigator.clipboard.writeText(outputJsonData.value);
     actionMenu.classList.remove('show');
 }
 
@@ -280,7 +1171,7 @@ function loadSampleData() {
         "hobbies": ["读书", "游泳", "编程"],
         "married": true
     };
-    inputJson.value = JSON.stringify(sampleData, null, 2);
+    inputJson.value = JSON.stringify(sampleData, null, DEFAULT_INDENT);
     autoFormat();
 }
 

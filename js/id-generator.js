@@ -236,28 +236,19 @@ function copyToClipboard(text) {
 
 // 生成完整的身份证信息
 function generateIDInfo() {
-    // 获取用户选择的选项
     const genderSelect = document.getElementById('genderSelect');
-    const minAgeInput = document.getElementById('minAge');
-    const maxAgeInput = document.getElementById('maxAge');
+    const ageInput = document.getElementById('ageInput');
     const areaSelect = document.getElementById('areaSelect');
     
     const gender = genderSelect.value;
-    const minAge = parseInt(minAgeInput.value) || 18;
-    const maxAge = parseInt(maxAgeInput.value) || 65;
+    const age = parseInt(ageInput.value) || 18;
     const areaCode = areaSelect.value;
     
-    // 确保年龄范围有效
-    if (minAge > maxAge) {
-        alert('最小年龄不能大于最大年龄');
-        return null;
-    }
-    
-    const idNumber = generateIDNumber(gender, minAge, maxAge, areaCode);
+    const idNumber = generateIDNumber(gender, age, age, areaCode);
     const fullName = generateName();
     const genderText = getGenderFromID(idNumber);
     const birthDate = getBirthDateFromID(idNumber);
-    const age = getAgeFromID(idNumber);
+    const calculatedAge = getAgeFromID(idNumber);
     const address = generateAddress(areaCode);
     
     return {
@@ -265,7 +256,7 @@ function generateIDInfo() {
         fullName,
         gender: genderText,
         birthDate,
-        age,
+        age: calculatedAge,
         address
     };
 }
@@ -281,8 +272,46 @@ document.addEventListener('DOMContentLoaded', function() {
     const generateBtn = document.getElementById('generateBtn');
     const copyJsonBtn = document.getElementById('copyJsonBtn');
     const idInfo = document.getElementById('idInfo');
+    const optionsPanel = document.getElementById('optionsPanel');
+    const toggleOptionsBtn = document.getElementById('toggleOptionsBtn');
+    const disclaimerModal = document.getElementById('disclaimerModal');
+    const confirmDisclaimerBtn = document.getElementById('confirmDisclaimerBtn');
+    const dontShowAgain = document.getElementById('dontShowAgain');
     
     let currentInfo = null;
+    
+    // 显示免责声明弹窗
+    function showDisclaimerModal() {
+        const hasShownDisclaimer = localStorage.getItem('idGenerator_disclaimer_shown');
+        if (!hasShownDisclaimer) {
+            disclaimerModal.classList.add('show');
+        }
+    }
+    
+    // 关闭免责声明弹窗
+    function hideDisclaimerModal() {
+        disclaimerModal.classList.remove('show');
+        if (dontShowAgain.checked) {
+            localStorage.setItem('idGenerator_disclaimer_shown', 'true');
+        }
+    }
+    
+    // 页面加载时显示免责声明
+    showDisclaimerModal();
+    
+    // 确认按钮点击事件
+    confirmDisclaimerBtn.addEventListener('click', hideDisclaimerModal);
+    
+    // 收起/展开选项
+    toggleOptionsBtn.addEventListener('click', function() {
+        if (optionsPanel.style.display === 'none') {
+            optionsPanel.style.display = 'block';
+            toggleOptionsBtn.classList.remove('collapsed');
+        } else {
+            optionsPanel.style.display = 'none';
+            toggleOptionsBtn.classList.add('collapsed');
+        }
+    });
     
     // 生成按钮点击事件
     generateBtn.addEventListener('click', function() {
@@ -302,6 +331,10 @@ document.addEventListener('DOMContentLoaded', function() {
             // 显示信息区域和复制JSON按钮
             idInfo.style.display = 'block';
             copyJsonBtn.style.display = 'inline-block';
+            
+            // 收起选项面板
+            optionsPanel.style.display = 'none';
+            toggleOptionsBtn.classList.add('collapsed');
         }
     });
     
