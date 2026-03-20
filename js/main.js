@@ -67,19 +67,7 @@ const tools = [
         description: "将多个纯文本文件合并成一个大文件并提供下载功能。",
         link: "pages/text-file-merger.html"
     },
-    {
-        id: 11,
-        title: "面试题",
-        description: "提供10年Java程序员面试题，涵盖计算机基础、网络、Linux、数据结构等。",
-        link: "pages/interview-brush.html"
-    },
-    {
-        id: 12,
-        title: "颜色",
-        description: "支持HEX、RGB、RGBA、HSL、HSB格式互转，带实时预览。",
-        link: "pages/color-converter.html"
-    }
-];
+    ];
 
 let toolCards = [];
 

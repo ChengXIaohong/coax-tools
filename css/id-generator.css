@@ -1,6 +1,6 @@
 /*
  * 身份证生成器样式
- * 适配 CLI 主题
+ * 适配 CLI 主题 + 科技感风格
  */
 
 .id-generator-container {
@@ -16,17 +16,41 @@
     margin-bottom: 2vw;
     padding-bottom: 1.5vw;
     border-bottom: 1px dashed var(--cli-border);
+    position: relative;
+}
+
+.id-generator-header::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    background: linear-gradient(180deg, var(--cli-info), transparent);
+    border-radius: 2px;
+}
+
+.id-generator-header {
+    padding-left: 1.5vw;
 }
 
 .id-generator-header h1 {
     color: var(--cli-fg);
     margin-bottom: 0.5vw;
     font-size: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.8vw;
 }
 
 .id-generator-header h1::before {
-    content: '# ';
-    color: var(--cli-fg-dim);
+    content: '';
+    display: inline-block;
+    width: 24px;
+    height: 24px;
+    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2300D1FF' stroke-width='2'%3E%3Crect x='2' y='4' width='20' height='16' rx='2'/%3E%3Cline x1='6' y1='9' x2='18' y2='9'/%3E%3Cline x1='6' y1='13' x2='12' y2='13'/%3E%3C/svg%3E") no-repeat center;
+    background-size: contain;
+    filter: drop-shadow(0 0 4px rgba(0, 209, 255, 0.5));
 }
 
 .id-generator-header p {
@@ -40,6 +64,12 @@
     border: 1px dashed var(--cli-border);
     padding: 1.5vw;
     margin-bottom: 2vw;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.options:hover {
+    border-color: var(--cli-fg-dim);
 }
 
 .option-group {
@@ -69,6 +99,8 @@
     color: var(--cli-fg);
     font-family: inherit;
     font-size: 0.9rem;
+    border-radius: 6px;
+    transition: all 0.2s ease;
 }
 
 .option-group input[type="number"] {
@@ -79,7 +111,13 @@
 .option-group select:focus,
 .option-group input:focus {
     outline: none;
-    border-color: var(--cli-fg);
+    border-color: var(--cli-info);
+    box-shadow: 0 0 8px rgba(0, 209, 255, 0.3);
+}
+
+.option-group select:hover,
+.option-group input:hover {
+    border-color: var(--cli-fg-dim);
 }
 
 .controls {
@@ -96,16 +134,48 @@
     font-size: 0.9rem;
     font-family: inherit;
     cursor: pointer;
-    transition: all 0.15s;
+    transition: all 0.2s ease;
     background: transparent;
     border: 1px solid var(--cli-fg);
     color: var(--cli-fg);
+    border-radius: 6px;
+    position: relative;
+    overflow: hidden;
 }
 
-.generate-btn:hover,
-.copy-json-btn:hover {
+.generate-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(0, 209, 255, 0.2), transparent);
+    transition: left 0.5s ease;
+}
+
+.generate-btn:hover::before {
+    left: 100%;
+}
+
+.generate-btn:hover {
     background: var(--cli-fg);
     color: var(--cli-bg);
+    box-shadow: 0 0 15px rgba(0, 209, 255, 0.4);
+    border-color: var(--cli-info);
+}
+
+.copy-json-btn {
+    background: linear-gradient(135deg, var(--cli-info), #0099CC);
+    border: none;
+    color: #000;
+    font-weight: bold;
+}
+
+.copy-json-btn:hover {
+    background: linear-gradient(135deg, #00E5FF, var(--cli-info));
+    box-shadow: 0 0 15px rgba(0, 209, 255, 0.5);
+    transform: translateY(-2px);
 }
 
 .copy-json-btn {
@@ -118,21 +188,46 @@
     padding: 1.5vw;
     margin-bottom: 2vw;
     display: none;
+    border-radius: 8px;
+    animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .id-field {
     display: flex;
     margin-bottom: 1vw;
+    padding: 0.5vw 0;
+    border-bottom: 1px solid rgba(0, 255, 0, 0.05);
 }
 
 .id-field:last-child {
     margin-bottom: 0;
+    border-bottom: none;
 }
 
 .id-label {
     font-weight: normal;
     min-width: 8vw;
     color: var(--cli-fg-dim);
+    display: flex;
+    align-items: center;
+    gap: 0.5vw;
+}
+
+.id-label::before {
+    content: '›';
+    color: var(--cli-info);
+    font-weight: bold;
 }
 
 .id-value {
@@ -140,22 +235,30 @@
     color: var(--cli-fg);
     font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
     word-break: break-all;
+    display: flex;
+    align-items: center;
+    gap: 1vw;
 }
 
 .copy-btn {
     background: transparent;
-    color: var(--cli-fg);
+    color: var(--cli-fg-dim);
     border: 1px solid var(--cli-border);
     padding: 0.2vw 0.6vw;
     cursor: pointer;
     margin-left: 0.8vw;
     font-family: inherit;
     font-size: 0.8rem;
-    transition: all 0.15s;
+    transition: all 0.2s ease;
+    border-radius: 4px;
+    opacity: 0.7;
 }
 
 .copy-btn:hover {
-    border-color: var(--cli-fg);
+    border-color: var(--cli-info);
+    color: var(--cli-info);
+    opacity: 1;
+    box-shadow: 0 0 8px rgba(0, 209, 255, 0.3);
 }
 
 .disclaimer {
@@ -178,11 +281,13 @@
     cursor: pointer;
     padding: 0.2vw 0.6vw;
     font-size: 0.8rem;
-    transition: all 0.15s;
+    transition: all 0.2s ease;
+    border-radius: 4px;
 }
 
 .toggle-btn:hover {
-    border-color: var(--cli-fg);
+    border-color: var(--cli-info);
+    color: var(--cli-info);
 }
 
 .toggle-btn.collapsed {
@@ -200,6 +305,12 @@
     z-index: 10000;
     justify-content: center;
     align-items: center;
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
 }
 
 .disclaimer-modal.show {
@@ -213,6 +324,8 @@
     width: 90%;
     max-height: 80vh;
     overflow-y: auto;
+    border-radius: 8px;
+    box-shadow: 0 0 20px rgba(0, 209, 255, 0.2);
 }
 
 .disclaimer-modal-header {
@@ -260,19 +373,41 @@
 }
 
 .disclaimer-modal-confirm {
-    background: transparent;
-    border: 1px solid var(--cli-fg);
-    color: var(--cli-fg);
+    background: linear-gradient(135deg, var(--cli-info), #0099CC);
+    border: none;
+    color: #000;
     padding: 0.5vw 1.5vw;
     cursor: pointer;
     font-family: inherit;
     font-size: 0.9rem;
-    transition: all 0.15s;
+    transition: all 0.2s ease;
+    border-radius: 6px;
+    font-weight: bold;
 }
 
 .disclaimer-modal-confirm:hover {
-    background: var(--cli-fg);
-    color: var(--cli-bg);
+    box-shadow: 0 0 15px rgba(0, 209, 255, 0.5);
+    transform: translateY(-2px);
+}
+
+.loading-spinner {
+    display: none;
+    width: 20px;
+    height: 20px;
+    border: 2px solid var(--cli-border);
+    border-top-color: var(--cli-info);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-right: 0.5vw;
+    vertical-align: middle;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+.generate-btn.loading .loading-spinner {
+    display: inline-block;
 }
 
 @media (max-width: 768px) {

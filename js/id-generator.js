@@ -179,6 +179,12 @@ function createToast(message) {
         existingToast.remove();
     }
     
+    // 移除已存在的style
+    const existingStyle = document.getElementById('toastStyle');
+    if (existingStyle) {
+        existingStyle.remove();
+    }
+    
     // 创建新的气泡提示
     const toast = document.createElement('div');
     toast.id = 'copyToast';
@@ -187,17 +193,20 @@ function createToast(message) {
         position: fixed;
         top: 20px;
         right: 20px;
-        background: rgba(0, 0, 0, 0.8);
-        color: white;
+        background: linear-gradient(135deg, rgba(0, 209, 255, 0.9), rgba(0, 153, 204, 0.9));
+        color: #000;
         padding: 12px 20px;
-        border-radius: 4px;
+        border-radius: 6px;
         z-index: 10000;
         font-size: 14px;
+        font-weight: bold;
+        box-shadow: 0 0 15px rgba(0, 209, 255, 0.5);
         animation: fadeInOut 2s ease-in-out forwards;
     `;
     
     // 添加淡入淡出动画
     const style = document.createElement('style');
+    style.id = 'toastStyle';
     style.textContent = `
         @keyframes fadeInOut {
             0% { opacity: 0; transform: translateY(-20px); }
@@ -214,9 +223,9 @@ function createToast(message) {
     setTimeout(() => {
         if (toast.parentNode) {
             toast.parentNode.removeChild(toast);
-            if (style.parentNode) {
-                style.parentNode.removeChild(style);
-            }
+        }
+        if (style.parentNode) {
+            style.parentNode.removeChild(style);
         }
     }, 2000);
 }
@@ -315,27 +324,35 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // 生成按钮点击事件
     generateBtn.addEventListener('click', function() {
-        const info = generateIDInfo();
+        generateBtn.classList.add('loading');
+        generateBtn.disabled = true;
         
-        if (info) {
-            currentInfo = info;
+        setTimeout(() => {
+            const info = generateIDInfo();
             
-            // 填充信息到页面
-            document.getElementById('idNumber').textContent = info.idNumber;
-            document.getElementById('fullName').textContent = info.fullName;
-            document.getElementById('gender').textContent = info.gender;
-            document.getElementById('birthDate').textContent = info.birthDate;
-            document.getElementById('age').textContent = info.age;
-            document.getElementById('address').textContent = info.address;
+            if (info) {
+                currentInfo = info;
+                
+                // 填充信息到页面
+                document.getElementById('idNumber').textContent = info.idNumber;
+                document.getElementById('fullName').textContent = info.fullName;
+                document.getElementById('gender').textContent = info.gender;
+                document.getElementById('birthDate').textContent = info.birthDate;
+                document.getElementById('age').textContent = info.age;
+                document.getElementById('address').textContent = info.address;
+                
+                // 显示信息区域和复制JSON按钮
+                idInfo.style.display = 'block';
+                copyJsonBtn.style.display = 'inline-block';
+                
+                // 收起选项面板
+                optionsPanel.style.display = 'none';
+                toggleOptionsBtn.classList.add('collapsed');
+            }
             
-            // 显示信息区域和复制JSON按钮
-            idInfo.style.display = 'block';
-            copyJsonBtn.style.display = 'inline-block';
-            
-            // 收起选项面板
-            optionsPanel.style.display = 'none';
-            toggleOptionsBtn.classList.add('collapsed');
-        }
+            generateBtn.classList.remove('loading');
+            generateBtn.disabled = false;
+        }, 300);
     });
     
     // 复制JSON按钮点击事件
