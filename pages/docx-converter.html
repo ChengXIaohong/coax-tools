@@ -10,66 +10,274 @@
     <link rel="stylesheet" href="../styles/theme-base.css">
     <link rel="stylesheet" href="../styles/theme-cli.css">
     <link rel="stylesheet" href="../css/docx-converter.css">
-    <!-- 添加favicon图标 -->
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔧</text></svg>">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📄</text></svg>">
 </head>
 <body data-theme="cli">
     <div class="container">
-        <main>
-            <div class="converter-container">
-                <div class="converter-header">
-                    <h1>Docx转文本工具</h1>
-                    <p>使用Mammoth.js将Word文档(.docx)转换为纯文本格式</p>
+        <main class="docx-main">
+            <!-- 导航区 -->
+            <div class="nav-zone">
+                <div class="nav-breadcrumb">
+                    <span class="nav-item"><span class="material-icons">home</span></span>
+                    <span class="nav-separator">/</span>
+                    <span class="nav-item nav-item-current">Docx转文本</span>
                 </div>
-                
-                <div class="upload-area" id="uploadArea">
-                    <div class="upload-icon">📁</div>
-                    <p>拖拽文件到这里或点击选择文件</p>
-                    <input type="file" id="fileInput" class="file-input" accept=".docx">
-                    <label for="fileInput" class="file-label" id="fileLabel">选择Docx文件</label>
-                    <p style="font-size: 12px; color: #666; margin-top: 10px;">仅支持.docx格式文件</p>
+                <div class="nav-actions">
+                    <button class="nav-btn" id="historyBtn" title="历史记录">
+                        <span class="material-icons">history</span>
+                        <span class="nav-btn-text">历史</span>
+                    </button>
+                    <button class="nav-btn" id="helpBtn" title="使用帮助">
+                        <span class="material-icons">help_outline</span>
+                    </button>
                 </div>
-                
-                <div class="file-info" id="fileInfo"></div>
-                
-                <div class="progress-container" id="progressContainer">
-                    <div class="progress-bar">
-                        <div class="progress-fill" id="progressFill"></div>
+            </div>
+
+            <!-- 内容区 -->
+            <div class="content-zone">
+                <!-- 标题区 -->
+                <header class="content-header">
+                    <div class="header-icon">
+                        <span class="material-icons">description</span>
                     </div>
-                    <div class="progress-text" id="progressText">正在处理...</div>
+                    <div class="header-text">
+                        <h1>Docx转文本工具</h1>
+                        <p class="header-desc">使用Mammoth.js将Word文档(.docx)转换为纯文本格式，支持批量处理</p>
+                    </div>
+                </header>
+
+                <!-- 操作区 -->
+                <div class="operation-zone">
+                    <!-- 上传区 -->
+                    <section class="upload-section">
+                        <div class="section-header">
+                            <span class="material-icons section-icon">upload_file</span>
+                            <h2>文件上传</h2>
+                        </div>
+                        <div class="upload-area" id="uploadArea">
+                            <input type="file" id="fileInput" class="file-input" accept=".docx" multiple>
+                            <div class="upload-content">
+                                <div class="upload-icon-wrapper">
+                                    <span class="material-icons upload-icon">cloud_upload</span>
+                                </div>
+                                <p class="upload-text-primary">拖拽文件到这里或点击选择文件</p>
+                                <p class="upload-text-secondary">支持多选 (.docx)</p>
+                                <label for="fileInput" class="upload-btn" id="fileLabel">
+                                    <span class="material-icons">folder_open</span>
+                                    选择文件
+                                </label>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- 选项区 -->
+                    <section class="options-section">
+                        <div class="section-header">
+                            <span class="material-icons section-icon">settings</span>
+                            <h2>转换选项</h2>
+                        </div>
+                        <div class="options-grid">
+                            <div class="option-group">
+                                <label class="option-label">
+                                    <span class="material-icons">style</span>
+                                    格式保留
+                                </label>
+                                <select id="formatOption" class="option-select">
+                                    <option value="plain">纯文本（去除所有格式）</option>
+                                    <option value="preserve">保留原始排版（段落、换行）</option>
+                                    <option value="markdown">Markdown格式</option>
+                                </select>
+                            </div>
+                            <div class="option-group">
+                                <label class="option-label">
+                                    <span class="material-icons">text_fields</span>
+                                    编码格式
+                                </label>
+                                <select id="encodingOption" class="option-select">
+                                    <option value="utf8">UTF-8</option>
+                                    <option value="gbk">GBK</option>
+                                    <option value="gb2312">GB2312</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="options-toggle">
+                            <label class="toggle-label">
+                                <input type="checkbox" id="batchMode" class="toggle-input">
+                                <span class="toggle-switch"></span>
+                                <span class="toggle-text">批量转换模式</span>
+                            </label>
+                        </div>
+                    </section>
                 </div>
-                
-                <div class="loading" id="loading">
-                    <div class="spinner"></div>
-                    <p>正在转换文件，请稍候...</p>
+
+                <!-- 文件列表区 -->
+                <div class="file-list-section" id="fileListSection" style="display: none;">
+                    <div class="section-header">
+                        <span class="material-icons section-icon">list</span>
+                        <h2>待处理文件</h2>
+                        <span class="file-count" id="fileCount">0 个文件</span>
+                    </div>
+                    <div class="file-list" id="fileList"></div>
+                    <div class="file-list-actions">
+                        <button class="action-btn action-btn-secondary" id="clearAllBtn">
+                            <span class="material-icons">clear_all</span>
+                            清空列表
+                        </button>
+                        <button class="action-btn action-btn-primary" id="startConvertBtn">
+                            <span class="material-icons">play_arrow</span>
+                            开始转换
+                        </button>
+                    </div>
                 </div>
-                
+
+                <!-- 进度区 -->
+                <div class="progress-section" id="progressSection" style="display: none;">
+                    <div class="progress-header">
+                        <span class="material-icons">sync</span>
+                        <span class="progress-title" id="progressTitle">正在处理...</span>
+                    </div>
+                    <div class="progress-bar-wrapper">
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="progressFill"></div>
+                        </div>
+                        <span class="progress-percent" id="progressPercent">0%</span>
+                    </div>
+                    <div class="progress-detail" id="progressDetail"></div>
+                </div>
+
+                <!-- 结果区 -->
+                <div class="result-section" id="resultSection" style="display: none;">
+                    <div class="section-header">
+                        <span class="material-icons section-icon">check_circle</span>
+                        <h2>转换结果</h2>
+                    </div>
+                    <div class="result-meta" id="resultMeta"></div>
+                    <div class="result-tabs">
+                        <button class="result-tab result-tab-active" data-tab="preview">预览</button>
+                        <button class="result-tab" data-tab="details">详细信息</button>
+                    </div>
+                    <div class="result-content-wrapper">
+                        <div class="result-content result-preview" id="previewContent"></div>
+                        <div class="result-content result-details" id="detailsContent" style="display: none;"></div>
+                    </div>
+                    <div class="result-actions">
+                        <button class="action-btn" id="copyBtn">
+                            <span class="material-icons">content_copy</span>
+                            复制文本
+                        </button>
+                        <button class="action-btn" id="downloadBtn">
+                            <span class="material-icons">download</span>
+                            下载文件
+                        </button>
+                        <button class="action-btn" id="saveHistoryBtn">
+                            <span class="material-icons">save</span>
+                            保存记录
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 消息区 -->
+            <div class="message-zone">
                 <div class="message error-message" id="errorMessage"></div>
                 <div class="message success-message" id="successMessage"></div>
-                
-                <div class="preview-container" id="previewContainer">
-                    <div class="preview-header">
-                        <div class="preview-title">转换结果预览</div>
-                        <button class="copy-btn" id="copyBtn">复制文本</button>
-                    </div>
-                    <div class="preview-content" id="previewContent"></div>
-                </div>
+                <div class="message warning-message" id="warningMessage"></div>
+                <div class="message info-message" id="infoMessage"></div>
             </div>
         </main>
 
-        <!-- 自定义模态框 -->
-        <div id="copyModal" class="modal">
+        <!-- 复制确认模态框 -->
+        <div class="modal-overlay" id="copyModal">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h2>复制选项</h2>
+                    <span class="material-icons modal-icon">warning</span>
+                    <h2>复制确认</h2>
                 </div>
                 <div class="modal-body" id="modalBody">
                     文本大小超过64KB，直接复制可能会导致浏览器卡顿。
                 </div>
                 <div class="modal-footer">
-                    <button id="downloadBtn" class="modal-btn modal-btn-confirm">下载文本文件</button>
-                    <button id="copyAnywayBtn" class="modal-btn modal-btn-cancel">仍然复制</button>
-                    <button id="cancelBtn" class="modal-btn modal-btn-cancel">取消</button>
+                    <button class="modal-btn modal-btn-primary" id="downloadBtnModal">
+                        <span class="material-icons">download</span>
+                        下载文本文件
+                    </button>
+                    <button class="modal-btn" id="copyAnywayBtn">
+                        <span class="material-icons">content_copy</span>
+                        仍然复制
+                    </button>
+                    <button class="modal-btn modal-btn-cancel" id="cancelBtn">
+                        取消
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 历史记录模态框 -->
+        <div class="modal-overlay" id="historyModal">
+            <div class="modal-content modal-content-large">
+                <div class="modal-header">
+                    <span class="material-icons modal-icon">history</span>
+                    <h2>转换历史</h2>
+                    <button class="modal-close" id="closeHistoryBtn">
+                        <span class="material-icons">close</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="history-list" id="historyList"></div>
+                    <div class="history-empty" id="historyEmpty">
+                        <span class="material-icons">inbox</span>
+                        <p>暂无历史记录</p>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="modal-btn modal-btn-secondary" id="clearHistoryBtn">
+                        <span class="material-icons">delete_sweep</span>
+                        清空历史
+                    </button>
+                    <button class="modal-btn" id="exportHistoryBtn">
+                        <span class="material-icons">download</span>
+                        导出全部
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 帮助模态框 -->
+        <div class="modal-overlay" id="helpModal">
+            <div class="modal-content modal-content-large">
+                <div class="modal-header">
+                    <span class="material-icons modal-icon">help</span>
+                    <h2>使用帮助</h2>
+                    <button class="modal-close" id="closeHelpBtn">
+                        <span class="material-icons">close</span>
+                    </button>
+                </div>
+                <div class="modal-body help-content">
+                    <section class="help-section">
+                        <h3><span class="material-icons">upload_file</span> 文件上传</h3>
+                        <p>支持拖拽上传或点击选择文件，可同时选择多个.docx文件进行批量转换。</p>
+                    </section>
+                    <section class="help-section">
+                        <h3><span class="material-icons">settings</span> 转换选项</h3>
+                        <ul>
+                            <li><strong>格式保留：</strong>选择是否保留原始排版或转换为Markdown格式</li>
+                            <li><strong>编码格式：</strong>选择输出文本的编码格式</li>
+                            <li><strong>批量模式：</strong>开启后可一次性转换多个文件</li>
+                        </ul>
+                    </section>
+                    <section class="help-section">
+                        <h3><span class="material-icons">history</span> 历史记录</h3>
+                        <p>转换记录会自动保存在浏览器本地存储中，方便查看历史转换结果。</p>
+                    </section>
+                    <section class="help-section">
+                        <h3><span class="material-icons">error</span> 常见问题</h3>
+                        <ul>
+                            <li><strong>文件格式错误：</strong>请确保上传的是.docx格式的Word文档</li>
+                            <li><strong>文件过大：</strong>建议单文件大小不超过10MB</li>
+                            <li><strong>复制失败：</strong>大文本建议使用下载功能</li>
+                        </ul>
+                    </section>
                 </div>
             </div>
         </div>
@@ -82,7 +290,6 @@
         </footer>
     </div>
 
-    <!-- 引入Mammoth.js -->
     <script src="https://unpkg.com/mammoth@1.4.2/mammoth.browser.min.js"></script>
     <script src="../js/docx-converter.js"></script>
     <script src="../js/theme-switcher.js"></script>
