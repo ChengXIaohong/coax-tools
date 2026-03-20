@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="../styles/theme-base.css">
     <link rel="stylesheet" href="../styles/theme-cli.css">
     <link rel="stylesheet" href="../css/json-formatter.css">
+    <link rel="stylesheet" href="../css/json-graph.css">
 </head>
 <body data-theme="cli">
     <div class="container">
@@ -23,17 +24,12 @@
                     <div class="panel" id="outputPanel">
                         <div class="output-actions">
                             <button class="action-btn" id="actionToggle" title="操作">☰</button>
+                            <button class="action-btn" id="graphToggle" title="图谱视图">🔗</button>
                             <div class="action-menu" id="actionMenu">
-                                <div class="action-item jsonpath-item">
-                                    <input type="text" id="jsonPathInput" placeholder="JSON Path (如: $.name)">
-                                    <button class="jsonpath-btn" id="jsonPathSearch">查询</button>
-                                </div>
                                 <button class="action-item" id="yamlConvert">转YAML</button>
                                 <button class="action-item" id="toonConvert">转TOON</button>
                                 <button class="action-item" id="extractStructure">提取结构</button>
                                 <button class="action-item" id="compressJson">压缩JSON</button>
-                                <button class="action-item" id="sortKeys">键值排序</button>
-                                <button class="action-item" id="copyOutput">复制</button>
                             </div>
                         </div>
                         <div id="outputJson" contenteditable="true" spellcheck="false"></div>
@@ -44,7 +40,9 @@
         </main>
     </div>
 
+    <script src="https://d3js.org/d3.v7.min.js"></script>
     <script src="../js/theme-switcher.js"></script>
     <script src="../js/json-formatter.js"></script>
+    <script src="../js/json-graph.js"></script>
 </body>
 </html>

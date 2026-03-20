@@ -2,9 +2,167 @@
 const DEFAULT_INDENT = 2;
 
 // DOM 元素
-let inputJson, outputJson, outputJsonData, actionToggle, actionMenu;
+let inputJson, outputJson, outputJsonData, actionToggle, actionMenu, graphToggle;
 let yamlConvertBtn, toonConvertBtn, extractStructureBtn, compressJsonBtn;
-let sortKeysBtn, copyOutputBtn, jsonPathInput, jsonPathSearchBtn;
+let isGraphView = false;
+
+// 图谱按钮状态管理
+const GraphButtonManager = {
+    consecutiveFailures: 0,
+    isLoading: false,
+    lastError: null,
+    errorLogs: [],
+    lastGraphState: null,
+    failureThreshold: 3,
+    loadingTimeout: null,
+
+    reset() {
+        this.consecutiveFailures = 0;
+        this.isLoading = false;
+        this.lastError = null;
+        if (this.loadingTimeout) {
+            clearTimeout(this.loadingTimeout);
+            this.loadingTimeout = null;
+        }
+    },
+
+    recordFailure(error) {
+        this.consecutiveFailures++;
+        this.lastError = error;
+        this.logError(error);
+
+        if (this.consecutiveFailures >= this.failureThreshold) {
+            this.triggerCircuitBreaker();
+        }
+    },
+
+    recordSuccess() {
+        this.consecutiveFailures = 0;
+        this.lastError = null;
+    },
+
+    logError(error) {
+        const logEntry = {
+            timestamp: new Date().toISOString(),
+            message: error.message,
+            stack: error.stack,
+            graphState: this.lastGraphState
+        };
+        this.errorLogs.push(logEntry);
+        console.error('[Graph Error]', logEntry);
+    },
+
+    triggerCircuitBreaker() {
+        console.warn('[Graph Circuit Breaker] Triggered - clearing cache and resetting state');
+        this.clearCache();
+        this.showRestartPrompt();
+    },
+
+    clearCache() {
+        try {
+            graphCache.cache.clear();
+            graphCache.order = [];
+            if (typeof JsonGraph !== 'undefined' && JsonGraph.clearCache) {
+                JsonGraph.clearCache();
+            }
+        } catch (e) {
+            console.error('[Graph Circuit Breaker] Cache clear failed:', e);
+        }
+    },
+
+    showRestartPrompt() {
+        const confirmed = confirm('图谱连续无响应，已自动清理缓存。是否重启图谱服务？');
+        if (confirmed) {
+            this.reset();
+            if (typeof JsonGraph !== 'undefined' && JsonGraph.reset) {
+                JsonGraph.reset();
+            }
+        }
+    },
+
+    exportErrorLogs() {
+        const logs = this.errorLogs.map(log => 
+            `[${log.timestamp}]\n${log.message}\n${log.stack || 'No stack trace'}\n`
+        ).join('\n---\n\n');
+
+        const blob = new Blob([logs], { type: 'text/plain' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `graph-error-logs-${Date.now()}.txt`;
+        a.click();
+        URL.revokeObjectURL(url);
+    },
+
+    setLoading(loading) {
+        this.isLoading = loading;
+        const icon = graphToggle.querySelector('.graph-icon') || graphToggle;
+        if (loading) {
+            icon.textContent = '⏳';
+            graphToggle.classList.add('loading');
+        } else {
+            icon.textContent = '🔗';
+            graphToggle.classList.remove('loading');
+        }
+    },
+
+    validateJsonData() {
+        const jsonString = outputJsonData.value.trim();
+        
+        if (!jsonString) {
+            return { valid: false, error: 'EMPTY', message: 'JSON数据为空，请先输入数据', action: 'jumpToInput' };
+        }
+
+        try {
+            const parsed = JSON.parse(jsonString);
+            
+            if (typeof parsed !== 'object' || parsed === null) {
+                return { valid: false, error: 'INVALID_STRUCTURE', message: 'JSON结构无效，必须为对象或数组', action: null };
+            }
+
+            const keys = Object.keys(parsed);
+            if (keys.length === 0 && Array.isArray(parsed)) {
+                return { valid: false, error: 'EMPTY_ARRAY', message: 'JSON数据为空数组，请添加有效数据', action: 'jumpToInput' };
+            }
+
+            return { valid: true, data: parsed };
+        } catch (e) {
+            let errorType = 'SYNTAX_ERROR';
+            let errorMessage = 'JSON语法错误';
+
+            if (e instanceof SyntaxError) {
+                const match = e.message.match(/position (\d+)/);
+                if (match) {
+                    errorMessage = `JSON语法错误，位置: ${match[1]}`;
+                }
+            }
+
+            return { valid: false, error: errorType, message: errorMessage, action: 'jumpToInput', parseError: e };
+        }
+    },
+
+    saveGraphState(state) {
+        this.lastGraphState = state;
+    }
+};
+
+// 示例JSON数据
+const SAMPLE_JSON_DATA = {
+    "name": "示例数据",
+    "version": "1.0.0",
+    "description": "这是一个示例JSON数据结构",
+    "features": ["格式化", "验证", "图谱可视化"],
+    "config": {
+        "theme": "dark",
+        "language": "zh-CN",
+        "autoFormat": true
+    },
+    "stats": {
+        "users": 1234,
+        "active": true,
+        "rating": 4.8
+    }
+};
 
 // 复制策略 - 重新设计的JSON数据复制功能
 const CopyStrategy = {
@@ -522,15 +680,11 @@ document.addEventListener('DOMContentLoaded', function() {
     outputJsonData = document.getElementById('outputJsonData');
     actionToggle = document.getElementById('actionToggle');
     actionMenu = document.getElementById('actionMenu');
+    graphToggle = document.getElementById('graphToggle');
     yamlConvertBtn = document.getElementById('yamlConvert');
     toonConvertBtn = document.getElementById('toonConvert');
     extractStructureBtn = document.getElementById('extractStructure');
     compressJsonBtn = document.getElementById('compressJson');
-    sortKeysBtn = document.getElementById('sortKeys');
-    copyOutputBtn = document.getElementById('copyOutput');
-    jsonPathInput = document.getElementById('jsonPathInput');
-    jsonPathSearchBtn = document.getElementById('jsonPathSearch');
-    
     // 自动格式化
     inputJson.addEventListener('input', autoFormat);
     inputJson.addEventListener('paste', () => setTimeout(autoFormat, 0));
@@ -539,20 +693,24 @@ document.addEventListener('DOMContentLoaded', function() {
     actionToggle.addEventListener('click', toggleActionMenu);
     document.addEventListener('click', closeActionMenu);
     
+    // 图谱视图切换
+    graphToggle.addEventListener('click', toggleGraphView);
+    
+    // Ctrl+G 快捷键打开图谱
+    document.addEventListener('keydown', (e) => {
+        if ((e.ctrlKey || e.metaKey) && e.key === 'g') {
+            e.preventDefault();
+            if (document.activeElement === inputJson || document.activeElement === outputJsonData) {
+                toggleGraphView();
+            }
+        }
+    });
+    
     // 操作按钮
     yamlConvertBtn.addEventListener('click', () => convertFromOutput('yaml'));
     toonConvertBtn.addEventListener('click', () => convertFromOutput('toon'));
     extractStructureBtn.addEventListener('click', () => convertFromOutput('structure'));
     compressJsonBtn.addEventListener('click', compressJson);
-    sortKeysBtn.addEventListener('click', sortJsonKeys);
-    copyOutputBtn.addEventListener('click', copyOutput);
-    
-    // JSON Path 查询
-    jsonPathSearchBtn.addEventListener('click', jsonPathQuery);
-    jsonPathInput.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') jsonPathQuery();
-    });
-    
     // 括号匹配高亮
     outputJson.addEventListener('click', highlightBracketMatch);
     outputJson.addEventListener('keyup', highlightBracketMatch);
@@ -574,58 +732,6 @@ document.addEventListener('DOMContentLoaded', function() {
     // 加载示例数据
     loadSampleData();
 });
-
-// JSON Path 查询
-function jsonPathQuery() {
-    const path = jsonPathInput.value.trim();
-    if (!path) return;
-    
-    const jsonString = outputJsonData.value.trim();
-    if (!jsonString) return;
-    
-    try {
-        const parsed = JSON.parse(jsonString);
-        const result = getValueByPath(parsed, path);
-        
-        if (result !== undefined) {
-            inputJson.value = JSON.stringify(result, null, DEFAULT_INDENT);
-            autoFormat();
-        } else {
-            showMessage('路径未找到匹配结果', 'warning');
-        }
-    } catch (e) {
-        showMessage('JSON Path 查询失败', 'error');
-    }
-}
-
-function getValueByPath(obj, path) {
-    const cleanPath = path.replace(/^\$\.?/, '');
-    if (!cleanPath) return obj;
-    
-    const parts = cleanPath.split(/\.|\[|\]/).filter(p => p !== '');
-    let current = obj;
-    
-    for (const part of parts) {
-        if (current === null || current === undefined) {
-            return undefined;
-        }
-        
-        if (Array.isArray(current)) {
-            const index = parseInt(part, 10);
-            if (!isNaN(index)) {
-                current = current[index];
-            } else {
-                current = current[part];
-            }
-        } else if (typeof current === 'object') {
-            current = current[part];
-        } else {
-            return undefined;
-        }
-    }
-    
-    return current;
-}
 
 function showMessage(text, type) {
     const messageDiv = document.getElementById('message') || createMessageDiv();
@@ -662,30 +768,133 @@ function autoFormat() {
     }
 }
 
-function sortJsonKeys() {
-    const jsonString = outputJsonData.value.trim();
-    if (!jsonString) return;
-    
+function toggleGraphView() {
+    if (GraphButtonManager.isLoading) {
+        showMessage('图谱正在加载中，请稍候...', 'warning');
+        return;
+    }
+
+    GraphButtonManager.setLoading(true);
+
+    const validation = GraphButtonManager.validateJsonData();
+
+    if (!validation.valid) {
+        GraphButtonManager.setLoading(false);
+        showGraphValidationError(validation);
+        return;
+    }
+
     try {
-        const parsedJson = JSON.parse(jsonString);
-        const sorted = sortKeysRecursive(parsedJson);
-        outputJsonData.value = JSON.stringify(sorted, null, DEFAULT_INDENT);
-        outputJson.innerHTML = highlightJson(outputJsonData.value);
-    } catch (e) {}
+        GraphButtonManager.saveGraphState({
+            timestamp: Date.now(),
+            dataSize: outputJsonData.value.length,
+            dataHash: hashCode(outputJsonData.value)
+        });
+
+        if (JsonGraph.isOpen()) {
+            JsonGraph.close();
+            GraphButtonManager.reset();
+            return;
+        }
+
+        const parsedJson = validation.data;
+        JsonGraph.open(parsedJson);
+        GraphButtonManager.recordSuccess();
+
+        GraphButtonManager.loadingTimeout = setTimeout(() => {
+            GraphButtonManager.setLoading(false);
+        }, 1000);
+
+    } catch (e) {
+        GraphButtonManager.recordFailure(e);
+        GraphButtonManager.setLoading(false);
+        showMessage('图谱渲染失败: ' + e.message, 'error');
+    }
 }
 
-function sortKeysRecursive(obj) {
-    if (Array.isArray(obj)) {
-        return obj.map(item => sortKeysRecursive(item));
-    }
-    if (obj !== null && typeof obj === 'object') {
-        const sorted = {};
-        Object.keys(obj).sort().forEach(key => {
-            sorted[key] = sortKeysRecursive(obj[key]);
+function showGraphValidationError(validation) {
+    const errorMessages = {
+        'EMPTY': { text: 'JSON数据为空', hint: '请在左侧输入有效的JSON数据' },
+        'INVALID_STRUCTURE': { text: 'JSON结构无效', hint: '数据必须是有效的对象或数组' },
+        'SYNTAX_ERROR': { text: 'JSON语法错误', hint: '请检查JSON格式是否正确' },
+        'EMPTY_ARRAY': { text: 'JSON为空数组', hint: '数组中没有任何元素' }
+    };
+
+    const error = errorMessages[validation.error] || { text: '未知错误', hint: '' };
+
+    const modal = createErrorModal({
+        title: '⚠️ 无法打开图谱',
+        type: validation.error,
+        message: error.text,
+        hint: error.hint,
+        parseError: validation.parseError,
+        actions: [
+            { label: '跳转到数据编辑区', action: 'jumpToInput', primary: true },
+            { label: '导入示例数据', action: 'loadSample', secondary: true },
+            { label: '复制错误日志', action: 'exportLogs', secondary: true }
+        ]
+    });
+
+    document.body.appendChild(modal);
+
+    modal.querySelectorAll('.error-action-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const action = btn.dataset.action;
+            modal.remove();
+
+            switch (action) {
+                case 'jumpToInput':
+                    inputJson.focus();
+                    inputJson.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    break;
+                case 'loadSample':
+                    loadSampleData();
+                    setTimeout(() => toggleGraphView(), 100);
+                    break;
+                case 'exportLogs':
+                    GraphButtonManager.exportErrorLogs();
+                    break;
+            }
         });
-        return sorted;
+    });
+}
+
+function createErrorModal(options) {
+    const modal = document.createElement('div');
+    modal.className = 'graph-error-modal';
+    modal.innerHTML = `
+        <div class="error-modal-content">
+            <div class="error-modal-header">
+                <span class="error-icon">${options.title.includes('语法') ? '📝' : '⚠️'}</span>
+                <span class="error-title">${options.title}</span>
+            </div>
+            <div class="error-modal-body">
+                <div class="error-type">错误类型: ${options.type}</div>
+                <div class="error-message">${options.message}</div>
+                <div class="error-hint">${options.hint}</div>
+                ${options.parseError ? `<div class="error-detail"><details><summary>查看详细错误</summary><pre>${options.parseError.message}</pre></details></div>` : ''}
+            </div>
+            <div class="error-modal-actions">
+                ${options.actions.map(a => `<button class="error-action-btn ${a.primary ? 'primary' : ''} ${a.secondary ? 'secondary' : ''}" data-action="${a.action}">${a.label}</button>`).join('')}
+            </div>
+        </div>
+    `;
+
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) modal.remove();
+    });
+
+    return modal;
+}
+
+function hashCode(str) {
+    let hash = 0;
+    for (let i = 0; i < Math.min(str.length, 100); i++) {
+        const char = str.charCodeAt(i);
+        hash = ((hash << 5) - hash) + char;
+        hash = hash & hash;
     }
-    return obj;
+    return hash;
 }
 
 // JSON 语法高亮
@@ -1147,14 +1356,6 @@ function convertFromOutput(type) {
     } catch (e) {
         // 转换失败不处理
     }
-    actionMenu.classList.remove('show');
-}
-
-// 复制输出
-function copyOutput() {
-    if (!outputJsonData.value) return;
-    
-    navigator.clipboard.writeText(outputJsonData.value);
     actionMenu.classList.remove('show');
 }
 
