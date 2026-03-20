@@ -19,6 +19,10 @@ const resetBtn = document.getElementById('resetBtn');
 const messageDiv = document.getElementById('message');
 const progressContainer = document.getElementById('progressContainer');
 const progressFill = document.getElementById('progressFill');
+const progressText = document.getElementById('progressText');
+const progressPercent = document.getElementById('progressPercent');
+const loadingOverlay = document.getElementById('loadingOverlay');
+const originalPlaceholder = document.getElementById('originalPlaceholder');
 const currentYearSpan = document.getElementById('currentYear');
 
 let originalImage = null;
@@ -112,6 +116,7 @@ function processImageFile(file) {
             
             originalPreview.src = e.target.result;
             originalPreview.classList.add('visible');
+            originalPlaceholder.classList.add('hidden');
             compressedPreview.classList.remove('visible');
             compressedPlaceholder.classList.remove('hidden');
 
@@ -282,8 +287,9 @@ async function compressImage() {
         return;
     }
 
-    progressContainer.style.display = 'block';
-    setProgress(0);
+    progressContainer.classList.add('active');
+    loadingOverlay.classList.add('active');
+    setProgress(0, '正在准备图片...');
 
     try {
         const canvas = document.createElement('canvas');
@@ -296,22 +302,25 @@ async function compressImage() {
         canvas.height = height;
         ctx.drawImage(originalImage, 0, 0, width, height);
 
-        setProgress(30);
+        setProgress(20, '正在调整尺寸...');
 
         const quality = parseInt(qualitySlider.value) / 100;
         const formatsToTry = determineBestFormats(originalFileType);
 
-        setProgress(40);
+        setProgress(30, '正在尝试不同格式...');
 
         let bestBlob = null;
         let bestSize = Infinity;
         bestFormat = '';
         
         const step = 40 / formatsToTry.length;
-        let progressOffset = 40;
+        let progressOffset = 30;
 
-        for (const format of formatsToTry) {
+        for (let i = 0; i < formatsToTry.length; i++) {
+            const format = formatsToTry[i];
             const testQuality = format.quality || quality;
+            
+            setProgress(progressOffset, `正在转换${format.extension}格式...`);
             
             const testBlob = await canvasToBlob(canvas, format.mimeType, testQuality);
             
@@ -322,10 +331,10 @@ async function compressImage() {
             }
             
             progressOffset += step;
-            setProgress(Math.min(progressOffset, 79));
+            setProgress(Math.min(progressOffset, 69), '正在优化图片质量...');
         }
 
-        setProgress(80);
+        setProgress(75, '正在完成压缩...');
 
         if (bestBlob) {
             revokeAllObjectUrls();
@@ -345,25 +354,30 @@ async function compressImage() {
             `;
             compressedTooltip.classList.add('visible');
 
+            setProgress(100, '压缩完成!');
+            
             if (bestBlob.size >= originalFile.size) {
                 showMessage('注意：压缩后文件未减小，可能已是优化格式', 'warning');
             } else {
-                showMessage('图片压缩完成!', 'success');
+                showMessage('图片压缩完成! 节省了 ' + ratio, 'success');
             }
 
             downloadBtn.href = compressedUrl;
             downloadBtn.download = 'compressed-image' + bestFormat;
             downloadBtn.classList.add('visible');
-            compressBtn.textContent = '重新压缩';
+            compressBtn.textContent = '🔄 重新压缩';
             isCompressed = true;
         } else {
             showMessage('图片压缩失败: 无法生成压缩后的图片', 'error');
         }
 
-        setProgress(100);
-        setTimeout(() => { progressContainer.style.display = 'none'; }, 500);
+        setTimeout(() => { 
+            progressContainer.classList.remove('active');
+            loadingOverlay.classList.remove('active');
+        }, 800);
     } catch (error) {
-        progressContainer.style.display = 'none';
+        progressContainer.classList.remove('active');
+        loadingOverlay.classList.remove('active');
         showMessage('图片压缩失败: ' + error.message, 'error');
     }
 }
@@ -378,8 +392,10 @@ function canvasToBlob(canvas, mimeType, quality) {
     });
 }
 
-function setProgress(percent) {
+function setProgress(percent, text) {
     progressFill.style.width = percent + '%';
+    if (text) progressText.textContent = text;
+    if (progressPercent) progressPercent.textContent = percent + '%';
 }
 
 function calculateDimensions(originalWidth, originalHeight, maxWidth) {
@@ -470,14 +486,16 @@ function downloadImage() {
 function resetAll() {
     imageInput.value = '';
     originalPreview.classList.remove('visible');
+    originalPlaceholder.classList.remove('hidden');
     compressedPreview.classList.remove('visible');
     compressedPlaceholder.classList.remove('hidden');
     originalTooltip.classList.remove('visible');
     compressedTooltip.classList.remove('visible');
     downloadBtn.classList.remove('visible');
     downloadBtn.href = '#';
-    progressContainer.style.display = 'none';
-    compressBtn.textContent = '压缩图片';
+    progressContainer.classList.remove('active');
+    loadingOverlay.classList.remove('active');
+    compressBtn.textContent = '🗜️ 压缩图片';
     isCompressed = false;
     controlsPanel.classList.add('collapsed');
     

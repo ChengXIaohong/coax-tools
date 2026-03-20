@@ -24,9 +24,15 @@
 
             <div class="upload-section" id="uploadSection">
                 <div class="upload-area" id="uploadArea">
-                    <i>📁</i>
+                    <i class="cloud-icon">☁️</i>
                     <h3>拖拽图片到此处或点击上传</h3>
-                    <p>支持 JPG, PNG, WEBP 格式</p>
+                    <p>将您的图片文件拖放到此处，或点击下方按钮选择文件</p>
+                    <div class="format-hint">
+                        <span class="format-tag">JPG</span>
+                        <span class="format-tag">PNG</span>
+                        <span class="format-tag">WEBP</span>
+                        <span class="format-tag">最大 10MB</span>
+                    </div>
                     <div class="file-input-wrapper">
                         <button class="file-input-button">选择图片</button>
                         <input type="file" id="imageInput" accept=".jpg,.jpeg,.png,.webp">
@@ -41,6 +47,10 @@
                         <h3>原始图片</h3>
                         <div class="preview-wrapper">
                             <img id="originalPreview" class="image-preview" alt="原始图片预览">
+                            <div class="preview-placeholder" id="originalPlaceholder">
+                                <span class="icon">🖼️</span>
+                                <span>原始图片预览</span>
+                            </div>
                             <div class="preview-tooltip" id="originalTooltip"></div>
                         </div>
                     </div>
@@ -50,6 +60,7 @@
                         <div class="preview-wrapper">
                             <img id="compressedPreview" class="image-preview" alt="压缩后图片预览">
                             <div class="preview-placeholder" id="compressedPlaceholder">
+                                <span class="icon">📦</span>
                                 <span>压缩后预览</span>
                             </div>
                             <div class="preview-tooltip" id="compressedTooltip"></div>
@@ -65,7 +76,7 @@
                     <div class="controls-body">
                         <div class="control-group">
                             <label for="quality">
-                                <span>压缩质量</span>
+                                <span>压缩质量 <span class="hint">(值越高文件越大)</span></span>
                                 <span id="qualityValue" class="slider-value">80%</span>
                             </label>
                             <input type="range" id="quality" min="10" max="100" value="80">
@@ -73,7 +84,7 @@
                         
                         <div class="control-group">
                             <label for="maxWidth">
-                                <span>最大宽度</span>
+                                <span>最大宽度 <span class="hint">(超过此宽度将缩放)</span></span>
                                 <span id="widthValue" class="slider-value">1920px</span>
                             </label>
                             <input type="range" id="maxWidth" min="100" max="4000" step="100" value="1920">
@@ -82,15 +93,22 @@
                 </div>
                 
                 <div class="progress-container" id="progressContainer">
+                    <div class="progress-header">
+                        <span class="progress-status">
+                            <span class="progress-spinner"></span>
+                            <span id="progressText">压缩中...</span>
+                        </span>
+                        <span id="progressPercent">0%</span>
+                    </div>
                     <div class="progress-bar">
                         <div class="progress-fill" id="progressFill"></div>
                     </div>
                 </div>
                 
                 <div class="action-buttons">
-                    <button id="compressBtn" class="btn btn-primary">压缩图片</button>
-                    <a id="downloadBtn" class="btn btn-download" download="compressed-image.jpg">下载图片</a>
-                    <button id="resetBtn" class="btn btn-ghost">重新选择</button>
+                    <button id="compressBtn" class="btn btn-primary">🗜️ 压缩图片</button>
+                    <a id="downloadBtn" class="btn btn-download" download="compressed-image.jpg">⬇️ 下载图片</a>
+                    <button id="resetBtn" class="btn btn-ghost">🔄 重新选择</button>
                 </div>
             </div>
             </div>
@@ -102,6 +120,14 @@
                 <p>渝ICP备2025071398号</p>
             </div>
         </footer>
+    </div>
+
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-content">
+            <div class="loading-spinner-large"></div>
+            <p class="loading-text">图片压缩中...</p>
+            <p class="loading-detail">正在优化您的图片，请稍候</p>
+        </div>
     </div>
 
     <script src="../js/image-compressor.js"></script>
