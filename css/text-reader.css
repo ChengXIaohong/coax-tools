@@ -3,6 +3,64 @@
  * 适配 CLI 主题
  */
 
+/* ========================================
+   导航区
+   ======================================== */
+
+.nav-zone {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1vw 0;
+    margin-bottom: 2vw;
+    border-bottom: 1px dashed var(--cli-border);
+}
+
+.nav-breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 0.5vw;
+    color: var(--cli-fg-dim);
+    font-size: 0.9rem;
+}
+
+.nav-breadcrumb .material-icons {
+    font-size: 1.2rem;
+}
+
+.nav-separator {
+    opacity: 0.5;
+}
+
+.nav-item-current {
+    color: var(--cli-fg);
+}
+
+.nav-title-icon {
+    font-size: 1rem !important;
+    color: var(--cli-fg-dim);
+}
+
+/* ========================================
+   内容区
+   ======================================== */
+
+.content-zone {
+    display: flex;
+    flex-direction: column;
+    gap: 2.5vw;
+}
+
+.tool-desc {
+    margin-bottom: 0.5vw;
+}
+
+.tool-desc p {
+    margin: 0;
+    color: var(--cli-fg-dim);
+    font-size: 0.9rem;
+}
+
 .reader-container {
     padding: 0;
     margin: 0;
@@ -18,8 +76,6 @@
     min-height: 80vh;
 }
 
-.reader-container.reading-mode .reader-header h1,
-.reader-container.reading-mode .reader-header p,
 .reader-container.reading-mode .upload-area,
 .reader-container.reading-mode .reader-controls {
     display: none;
@@ -31,23 +87,6 @@
     padding-bottom: 1vw;
     border-bottom: 1px dashed var(--cli-border);
     position: relative;
-}
-
-.reader-header h1 {
-    color: var(--cli-fg);
-    margin-bottom: 0.5vw;
-    font-size: 1.5rem;
-}
-
-.reader-header h1::before {
-    content: '# ';
-    color: var(--cli-fg-dim);
-}
-
-.reader-header p {
-    color: var(--cli-fg-dim);
-    margin: 0;
-    font-size: 0.9rem;
 }
 
 .reader-header .reset-btn-top {
@@ -340,26 +379,26 @@
         flex-direction: column;
         align-items: stretch;
     }
-    
+
     .control-group {
         width: 100%;
     }
-    
+
     .control-group select,
     .control-group input {
         flex: 1;
     }
-    
+
     .reader-footer {
         flex-direction: column;
         gap: 1vw;
         align-items: stretch;
     }
-    
+
     .navigation {
         justify-content: center;
     }
-    
+
     .line-numbers {
         width: 10vw;
         min-width: 40px;

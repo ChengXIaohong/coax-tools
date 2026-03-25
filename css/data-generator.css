@@ -3,6 +3,64 @@
  * 适配 CLI 主题
  */
 
+/* ========================================
+   导航区
+   ======================================== */
+
+.nav-zone {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1vw 0;
+    margin-bottom: 2vw;
+    border-bottom: 1px dashed var(--cli-border);
+}
+
+.nav-breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 0.5vw;
+    color: var(--cli-fg-dim);
+    font-size: 0.9rem;
+}
+
+.nav-breadcrumb .material-icons {
+    font-size: 1.2rem;
+}
+
+.nav-separator {
+    opacity: 0.5;
+}
+
+.nav-item-current {
+    color: var(--cli-fg);
+}
+
+.nav-title-icon {
+    font-size: 1rem !important;
+    color: var(--cli-fg-dim);
+}
+
+/* ========================================
+   内容区
+   ======================================== */
+
+.content-zone {
+    display: flex;
+    flex-direction: column;
+    gap: 2.5vw;
+}
+
+.tool-desc {
+    margin-bottom: 0.5vw;
+}
+
+.tool-desc p {
+    margin: 0;
+    color: var(--cli-fg-dim);
+    font-size: 0.9rem;
+}
+
 body {
     font-family: inherit;
     max-width: none;
@@ -16,28 +74,6 @@ body {
     display: flex;
     flex-direction: column;
     gap: 2vw;
-}
-
-.header {
-    text-align: left;
-    padding: 2vw 0;
-    border-bottom: 1px dashed var(--cli-border);
-}
-
-.header h1 {
-    color: var(--cli-fg);
-    margin-bottom: 0.5vw;
-    font-size: 1.5rem;
-}
-
-.header h1::before {
-    content: '# ';
-    color: var(--cli-fg-dim);
-}
-
-.header p {
-    color: var(--cli-fg-dim);
-    margin: 0;
 }
 
 .options-container {
@@ -358,16 +394,16 @@ tr:nth-child(even) {
     .options-grid {
         grid-template-columns: 1fr;
     }
-    
+
     .controls {
         flex-direction: column;
     }
-    
+
     .controls button {
         width: 100%;
         text-align: center;
     }
-    
+
     .modal-content {
         width: 95%;
         margin: 10% auto;

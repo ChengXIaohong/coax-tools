@@ -3,6 +3,64 @@
  * 适配 CLI 主题，渐进式展示
  */
 
+/* ========================================
+   导航区
+   ======================================== */
+
+.nav-zone {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1vw 0;
+    margin-bottom: 2vw;
+    border-bottom: 1px dashed var(--cli-border);
+}
+
+.nav-breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 0.5vw;
+    color: var(--cli-fg-dim);
+    font-size: 0.9rem;
+}
+
+.nav-breadcrumb .material-icons {
+    font-size: 1.2rem;
+}
+
+.nav-separator {
+    opacity: 0.5;
+}
+
+.nav-item-current {
+    color: var(--cli-fg);
+}
+
+.nav-title-icon {
+    font-size: 1rem !important;
+    color: var(--cli-fg-dim);
+}
+
+/* ========================================
+   内容区
+   ======================================== */
+
+.content-zone {
+    display: flex;
+    flex-direction: column;
+    gap: 2.5vw;
+}
+
+.tool-desc {
+    margin-bottom: 0.5vw;
+}
+
+.tool-desc p {
+    margin: 0;
+    color: var(--cli-fg-dim);
+    font-size: 0.9rem;
+}
+
 :root {
     --primary-color: #00d26a;
     --primary-hover: #00b85c;
@@ -21,33 +79,6 @@
     background: transparent;
     box-shadow: none;
     border-radius: 0;
-}
-
-.compressor-header {
-    text-align: center;
-    margin-bottom: 2rem;
-    padding: 1.5rem;
-    background: linear-gradient(135deg, var(--cli-bg) 0%, rgba(0, 210, 106, 0.08) 100%);
-    border-radius: var(--border-radius);
-    border: 1px solid var(--cli-border);
-}
-
-.compressor-header h1 {
-    font-size: 2rem;
-    font-weight: 700;
-    color: var(--cli-fg);
-    margin: 0 0 0.5rem;
-    text-shadow: 0 2px 10px var(--primary-glow);
-    background: linear-gradient(135deg, var(--cli-fg) 0%, var(--primary-color) 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-}
-
-.compressor-header p {
-    color: var(--cli-fg-dim);
-    margin: 0;
-    font-size: 0.9rem;
 }
 
 .upload-section {
@@ -201,15 +232,11 @@
     .preview-container {
         grid-template-columns: 1fr;
     }
-    
-    .compressor-header h1 {
-        font-size: 1.5rem;
-    }
-    
+
     .upload-area {
         padding: 2rem 1rem;
     }
-    
+
     .upload-area .cloud-icon {
         font-size: 2.5rem;
     }
@@ -676,11 +703,11 @@
     .action-buttons {
         flex-direction: column;
     }
-    
+
     .btn {
         width: 100%;
     }
-    
+
     .controls-body {
         padding: 1rem;
     }

@@ -3,60 +3,70 @@
  * 适配 CLI 主题 + 科技感风格
  */
 
+/* ========================================
+   导航区
+   ======================================== */
+
+.nav-zone {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1vw 0;
+    margin-bottom: 2vw;
+    border-bottom: 1px dashed var(--cli-border);
+}
+
+.nav-breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 0.5vw;
+    color: var(--cli-fg-dim);
+    font-size: 0.9rem;
+}
+
+.nav-breadcrumb .material-icons {
+    font-size: 1.2rem;
+}
+
+.nav-separator {
+    opacity: 0.5;
+}
+
+.nav-item-current {
+    color: var(--cli-fg);
+}
+
+.nav-title-icon {
+    font-size: 1rem !important;
+    color: var(--cli-fg-dim);
+}
+
+/* ========================================
+   内容区
+   ======================================== */
+
+.content-zone {
+    display: flex;
+    flex-direction: column;
+    gap: 2.5vw;
+}
+
+.tool-desc {
+    margin-bottom: 0.5vw;
+}
+
+.tool-desc p {
+    margin: 0;
+    color: var(--cli-fg-dim);
+    font-size: 0.9rem;
+}
+
 .id-generator-container {
     padding: 0;
     margin: 0;
     background: transparent;
     box-shadow: none;
     border-radius: 0;
-}
-
-.id-generator-header {
-    text-align: left;
-    margin-bottom: 2vw;
-    padding-bottom: 1.5vw;
-    border-bottom: 1px dashed var(--cli-border);
-    position: relative;
-}
-
-.id-generator-header::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: 0;
-    bottom: 0;
-    width: 4px;
-    background: linear-gradient(180deg, var(--cli-info), transparent);
-    border-radius: 2px;
-}
-
-.id-generator-header {
-    padding-left: 1.5vw;
-}
-
-.id-generator-header h1 {
-    color: var(--cli-fg);
-    margin-bottom: 0.5vw;
-    font-size: 1.5rem;
-    display: flex;
-    align-items: center;
-    gap: 0.8vw;
-}
-
-.id-generator-header h1::before {
-    content: '';
-    display: inline-block;
-    width: 24px;
-    height: 24px;
-    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2300D1FF' stroke-width='2'%3E%3Crect x='2' y='4' width='20' height='16' rx='2'/%3E%3Cline x1='6' y1='9' x2='18' y2='9'/%3E%3Cline x1='6' y1='13' x2='12' y2='13'/%3E%3C/svg%3E") no-repeat center;
-    background-size: contain;
-    filter: drop-shadow(0 0 4px rgba(0, 209, 255, 0.5));
-}
-
-.id-generator-header p {
-    color: var(--cli-fg-dim);
-    margin: 0;
-    font-size: 0.9rem;
 }
 
 .options {
@@ -414,43 +424,43 @@
     .controls {
         flex-direction: column;
     }
-    
+
     .controls .btn {
         width: 100%;
     }
-    
+
     .id-field {
         flex-direction: column;
         gap: 0.4vw;
     }
-    
+
     .id-label {
         min-width: auto;
     }
-    
+
     .copy-btn {
         margin-left: 0;
         align-self: flex-start;
     }
-    
+
     .option-group {
         flex-direction: column;
         align-items: flex-start;
     }
-    
+
     .option-label {
         min-width: auto;
     }
-    
+
     .disclaimer-modal-content {
         width: 95%;
     }
-    
+
     .disclaimer-modal-footer {
         flex-direction: column;
         gap: 1vw;
     }
-    
+
     .disclaimer-modal-confirm {
         width: 100%;
     }

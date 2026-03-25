@@ -10,66 +10,82 @@
     <link rel="stylesheet" href="../styles/theme-base.css">
     <link rel="stylesheet" href="../styles/theme-cli.css">
     <link rel="stylesheet" href="../css/text-file-merger.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <!-- 添加favicon图标 -->
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔧</text></svg>">
 </head>
 <body data-theme="cli">
     <div class="container">
-        <main>
-            <div class="converter-container">
-                <div class="converter-header">
-                    <h1>文本文件合成器</h1>
-                    <p>将多个纯文本文件合并成一个大文件并提供下载</p>
+        <main class="docx-main">
+            <!-- 导航区 -->
+            <div class="nav-zone">
+                <div class="nav-breadcrumb">
+                    <span class="nav-item"><span class="material-icons">home</span></span>
+                    <span class="nav-separator">/</span>
+                    <span class="nav-item"><span class="material-icons nav-title-icon">merge_type</span></span>
+                    <span class="nav-separator">/</span>
+                    <span class="nav-item nav-item-current">文本文件合并</span>
                 </div>
-                
-                <div class="upload-area" id="uploadArea">
-                    <div class="upload-icon">📁</div>
-                    <p>拖拽文件到这里或点击选择文件</p>
-                    <input type="file" id="fileInput" class="file-input" accept=".txt,.json,.log,.yaml,.yml,.ini,.toml,.csv,.md,.xml,.conf,.cfg,.properties,.env,.sql,.sh,.bat,.cmd,.ps1" multiple>
-                    <label for="fileInput" class="file-label" id="fileLabel">选择文本文件</label>
-                    <p style="font-size: 12px; color: #666; margin-top: 10px;">支持多种文本格式: txt, json, log, yaml, yml, ini, toml, csv, md, xml 等</p>
+            </div>
+
+            <!-- 内容区 -->
+            <div class="content-zone">
+                <!-- 描述区 -->
+                <div class="tool-desc">
+                    <p>合并多个文本文件</p>
                 </div>
-                
-                <div class="file-list-container" id="fileListContainer">
-                    <h3>已选择的文件 (<span id="fileCount">0</span>)</h3>
-                    <ul class="file-list" id="fileList"></ul>
-                    <button id="clearAllBtn" class="clear-btn">清空所有</button>
-                </div>
-                
-                <div class="merge-options">
-                    <h3>合并选项</h3>
-                    <div class="option-group">
-                        <label for="separator">文件间分隔符:</label>
-                        <select id="separator">
-                            <option value="\n">换行 (\n)</option>
-                            <option value="\n---\n">带标记的分隔符</option>
-                            <option value="">无分隔符</option>
-                            <option value=",">逗号 (,)</option>
-                            <option value=";">分号 (;)</option>
-                        </select>
+
+                <!-- 操作区 -->
+                <div class="converter-container">
+                    <div class="upload-area" id="uploadArea">
+                        <div class="upload-icon">📁</div>
+                        <p>拖拽文件到这里或点击选择文件</p>
+                        <input type="file" id="fileInput" class="file-input" accept=".txt,.json,.log,.yaml,.yml,.ini,.toml,.csv,.md,.xml,.conf,.cfg,.properties,.env,.sql,.sh,.bat,.cmd,.ps1" multiple>
+                        <label for="fileInput" class="file-label" id="fileLabel">选择文本文件</label>
+                        <p style="font-size: 12px; color: #666; margin-top: 10px;">支持多种文本格式: txt, json, log, yaml, yml, ini, toml, csv, md, xml 等</p>
                     </div>
-                    <div class="option-group">
-                        <label for="fileName">输出文件名:</label>
-                        <input type="text" id="fileName" value="merged-text-file.txt">
+
+                    <div class="file-list-container" id="fileListContainer">
+                        <h3>已选择的文件 (<span id="fileCount">0</span>)</h3>
+                        <ul class="file-list" id="fileList"></ul>
+                        <button id="clearAllBtn" class="clear-btn">清空所有</button>
                     </div>
-                </div>
-                
-                <button id="mergeBtn" class="merge-btn">合并并下载</button>
-                
-                <div class="progress-container" id="progressContainer">
-                    <div class="progress-bar">
-                        <div class="progress-fill" id="progressFill"></div>
+
+                    <div class="merge-options">
+                        <h3>合并选项</h3>
+                        <div class="option-group">
+                            <label for="separator">文件间分隔符:</label>
+                            <select id="separator">
+                                <option value="\n">换行 (\n)</option>
+                                <option value="\n---\n">带标记的分隔符</option>
+                                <option value="">无分隔符</option>
+                                <option value=",">逗号 (,)</option>
+                                <option value=";">分号 (;)</option>
+                            </select>
+                        </div>
+                        <div class="option-group">
+                            <label for="fileName">输出文件名:</label>
+                            <input type="text" id="fileName" value="merged-text-file.txt">
+                        </div>
                     </div>
-                    <div class="progress-text" id="progressText">准备就绪</div>
+
+                    <button id="mergeBtn" class="merge-btn">合并并下载</button>
+
+                    <div class="progress-container" id="progressContainer">
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="progressFill"></div>
+                        </div>
+                        <div class="progress-text" id="progressText">准备就绪</div>
+                    </div>
+
+                    <div class="loading" id="loading">
+                        <div class="spinner"></div>
+                        <p>正在处理文件，请稍候...</p>
+                    </div>
+
+                    <div class="message error-message" id="errorMessage"></div>
+                    <div class="message success-message" id="successMessage"></div>
                 </div>
-                
-                <div class="loading" id="loading">
-                    <div class="spinner"></div>
-                    <p>正在处理文件，请稍候...</p>
-                </div>
-                
-                <div class="message error-message" id="errorMessage"></div>
-                <div class="message success-message" id="successMessage"></div>
             </div>
         </main>
 

@@ -10,107 +10,123 @@
     <link rel="stylesheet" href="../styles/theme-base.css">
     <link rel="stylesheet" href="../styles/theme-cli.css">
     <link rel="stylesheet" href="../css/image-compressor.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 </head>
 <body data-theme="cli">
     <div class="container">
-        <main>
-            <div class="compressor-container">
-                <div class="compressor-header">
-                    <h1>图片压缩工具</h1>
-                    <p>支持JPG、PNG、WEBP等格式的图片压缩</p>
-                </div>
-                
-                <div class="message" id="message"></div>
-
-            <div class="upload-section" id="uploadSection">
-                <div class="upload-area" id="uploadArea">
-                    <i class="cloud-icon">☁️</i>
-                    <h3>拖拽图片到此处或点击上传</h3>
-                    <p>将您的图片文件拖放到此处，或点击下方按钮选择文件</p>
-                    <div class="format-hint">
-                        <span class="format-tag">JPG</span>
-                        <span class="format-tag">PNG</span>
-                        <span class="format-tag">WEBP</span>
-                        <span class="format-tag">最大 10MB</span>
-                    </div>
-                    <div class="file-input-wrapper">
-                        <button class="file-input-button">选择图片</button>
-                        <input type="file" id="imageInput" accept=".jpg,.jpeg,.png,.webp">
-                    </div>
-                    <p id="fileInfo"></p>
+        <main class="docx-main">
+            <!-- 导航区 -->
+            <div class="nav-zone">
+                <div class="nav-breadcrumb">
+                    <span class="nav-item"><span class="material-icons">home</span></span>
+                    <span class="nav-separator">/</span>
+                    <span class="nav-item"><span class="material-icons nav-title-icon">photo</span></span>
+                    <span class="nav-separator">/</span>
+                    <span class="nav-item nav-item-current">图片压缩工具</span>
                 </div>
             </div>
 
-            <div class="editor-section" id="editorSection">
-                <div class="preview-container">
-                    <div class="preview-panel original">
-                        <h3>原始图片</h3>
-                        <div class="preview-wrapper">
-                            <img id="originalPreview" class="image-preview" alt="原始图片预览">
-                            <div class="preview-placeholder" id="originalPlaceholder">
-                                <span class="icon">🖼️</span>
-                                <span>原始图片预览</span>
+            <!-- 内容区 -->
+            <div class="content-zone">
+                <!-- 描述区 -->
+                <div class="tool-desc">
+                    <p>压缩图片文件大小</p>
+                </div>
+
+                <!-- 操作区 -->
+                <div class="compressor-container">
+                    <div class="message" id="message"></div>
+
+                    <div class="upload-section" id="uploadSection">
+                        <div class="upload-area" id="uploadArea">
+                            <i class="cloud-icon">☁️</i>
+                            <h3>拖拽图片到此处或点击上传</h3>
+                            <p>将您的图片文件拖放到此处，或点击下方按钮选择文件</p>
+                            <div class="format-hint">
+                                <span class="format-tag">JPG</span>
+                                <span class="format-tag">PNG</span>
+                                <span class="format-tag">WEBP</span>
+                                <span class="format-tag">最大 10MB</span>
                             </div>
-                            <div class="preview-tooltip" id="originalTooltip"></div>
-                        </div>
-                    </div>
-                    
-                    <div class="preview-panel compressed">
-                        <h3>压缩结果</h3>
-                        <div class="preview-wrapper">
-                            <img id="compressedPreview" class="image-preview" alt="压缩后图片预览">
-                            <div class="preview-placeholder" id="compressedPlaceholder">
-                                <span class="icon">📦</span>
-                                <span>压缩后预览</span>
+                            <div class="file-input-wrapper">
+                                <button class="file-input-button">选择图片</button>
+                                <input type="file" id="imageInput" accept=".jpg,.jpeg,.png,.webp">
                             </div>
-                            <div class="preview-tooltip" id="compressedTooltip"></div>
+                            <p id="fileInfo"></p>
+                        </div>
+                    </div>
+
+                    <div class="editor-section" id="editorSection">
+                        <div class="preview-container">
+                            <div class="preview-panel original">
+                                <h3>原始图片</h3>
+                                <div class="preview-wrapper">
+                                    <img id="originalPreview" class="image-preview" alt="原始图片预览">
+                                    <div class="preview-placeholder" id="originalPlaceholder">
+                                        <span class="icon">🖼️</span>
+                                        <span>原始图片预览</span>
+                                    </div>
+                                    <div class="preview-tooltip" id="originalTooltip"></div>
+                                </div>
+                            </div>
+
+                            <div class="preview-panel compressed">
+                                <h3>压缩结果</h3>
+                                <div class="preview-wrapper">
+                                    <img id="compressedPreview" class="image-preview" alt="压缩后图片预览">
+                                    <div class="preview-placeholder" id="compressedPlaceholder">
+                                        <span class="icon">📦</span>
+                                        <span>压缩后预览</span>
+                                    </div>
+                                    <div class="preview-tooltip" id="compressedTooltip"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="controls-panel collapsed" id="controlsPanel">
+                            <button class="controls-toggle" id="controlsToggle">
+                                <span>高级设置</span>
+                                <span class="toggle-icon">▸</span>
+                            </button>
+                            <div class="controls-body">
+                                <div class="control-group">
+                                    <label for="quality">
+                                        <span>压缩质量 <span class="hint">(值越高文件越大)</span></span>
+                                        <span id="qualityValue" class="slider-value">80%</span>
+                                    </label>
+                                    <input type="range" id="quality" min="10" max="100" value="80">
+                                </div>
+
+                                <div class="control-group">
+                                    <label for="maxWidth">
+                                        <span>最大宽度 <span class="hint">(超过此宽度将缩放)</span></span>
+                                        <span id="widthValue" class="slider-value">1920px</span>
+                                    </label>
+                                    <input type="range" id="maxWidth" min="100" max="4000" step="100" value="1920">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="progress-container" id="progressContainer">
+                            <div class="progress-header">
+                                <span class="progress-status">
+                                    <span class="progress-spinner"></span>
+                                    <span id="progressText">压缩中...</span>
+                                </span>
+                                <span id="progressPercent">0%</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="progressFill"></div>
+                            </div>
+                        </div>
+
+                        <div class="action-buttons">
+                            <button id="compressBtn" class="btn btn-primary">🗜️ 压缩图片</button>
+                            <a id="downloadBtn" class="btn btn-download" download="compressed-image.jpg">⬇️ 下载图片</a>
+                            <button id="resetBtn" class="btn btn-ghost">🔄 重新选择</button>
                         </div>
                     </div>
                 </div>
-                
-                <div class="controls-panel collapsed" id="controlsPanel">
-                    <button class="controls-toggle" id="controlsToggle">
-                        <span>高级设置</span>
-                        <span class="toggle-icon">▸</span>
-                    </button>
-                    <div class="controls-body">
-                        <div class="control-group">
-                            <label for="quality">
-                                <span>压缩质量 <span class="hint">(值越高文件越大)</span></span>
-                                <span id="qualityValue" class="slider-value">80%</span>
-                            </label>
-                            <input type="range" id="quality" min="10" max="100" value="80">
-                        </div>
-                        
-                        <div class="control-group">
-                            <label for="maxWidth">
-                                <span>最大宽度 <span class="hint">(超过此宽度将缩放)</span></span>
-                                <span id="widthValue" class="slider-value">1920px</span>
-                            </label>
-                            <input type="range" id="maxWidth" min="100" max="4000" step="100" value="1920">
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="progress-container" id="progressContainer">
-                    <div class="progress-header">
-                        <span class="progress-status">
-                            <span class="progress-spinner"></span>
-                            <span id="progressText">压缩中...</span>
-                        </span>
-                        <span id="progressPercent">0%</span>
-                    </div>
-                    <div class="progress-bar">
-                        <div class="progress-fill" id="progressFill"></div>
-                    </div>
-                </div>
-                
-                <div class="action-buttons">
-                    <button id="compressBtn" class="btn btn-primary">🗜️ 压缩图片</button>
-                    <a id="downloadBtn" class="btn btn-download" download="compressed-image.jpg">⬇️ 下载图片</a>
-                    <button id="resetBtn" class="btn btn-ghost">🔄 重新选择</button>
-                </div>
-            </div>
             </div>
         </main>
 
