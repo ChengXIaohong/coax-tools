@@ -10,75 +10,140 @@
     <link rel="stylesheet" href="../styles/theme-base.css">
     <link rel="stylesheet" href="../styles/theme-cli.css">
     <link rel="stylesheet" href="../css/text-slicer.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>✂️</text></svg>">
 </head>
 <body data-theme="cli">
     <div class="container">
-        <main>
-            <div class="slicer-container">
-                <div class="slicer-header">
-                    <h1>文本文件切片工具</h1>
+        <main class="docx-main">
+            <!-- 导航区 -->
+            <div class="nav-zone">
+                <div class="nav-breadcrumb">
+                    <span class="nav-item"><span class="material-icons">home</span></span>
+                    <span class="nav-separator">/</span>
+                    <span class="nav-item"><span class="material-icons nav-title-icon">content_cut</span></span>
+                    <span class="nav-separator">/</span>
+                    <span class="nav-item nav-item-current">文本文件切片工具</span>
+                </div>
+            </div>
+
+            <!-- 内容区 -->
+            <div class="content-zone">
+                <!-- 描述区 -->
+                <div class="tool-desc">
                     <p>将大文本文件按行数或文件大小进行分割</p>
                 </div>
-                
-                <div class="message" id="message"></div>
-                
-                <div class="upload-area" id="uploadArea">
-                    <i>📄</i>
-                    <h3>拖拽文本文件到此处或点击上传</h3>
-                    <p>支持 TXT, LOG, CSV 等文本格式</p>
-                    <div class="file-input-wrapper">
-                        <button class="file-input-button">选择文件</button>
-                        <input type="file" id="fileInput" accept=".txt,.log,.csv,text/*">
-                    </div>
-                    <p id="fileInfo"></p>
-                </div>
-                
-                <div class="options-container">
-                    <h3>切片选项</h3>
-                    <div class="options-grid">
-                        <div class="option-item">
-                            <input type="radio" id="sliceByLines" name="sliceMethod" value="lines" checked>
-                            <label for="sliceByLines">按行数分割</label>
+
+                <!-- 操作区 -->
+                <div class="operation-zone">
+                    <!-- 上传区 -->
+                    <section class="upload-section">
+                        <div class="section-header">
+                            <span class="material-icons section-icon">upload_file</span>
+                            <h2>文件上传</h2>
                         </div>
-                        <div class="option-item">
-                            <input type="radio" id="sliceBySize" name="sliceMethod" value="size">
-                            <label for="sliceBySize">按文件大小分割</label>
+                        <div class="upload-area" id="uploadArea">
+                            <input type="file" id="fileInput" class="file-input" accept=".txt,.log,.csv,text/*">
+                            <div class="upload-content">
+                                <div class="upload-icon-wrapper">
+                                    <span class="material-icons upload-icon">cloud_upload</span>
+                                </div>
+                                <p class="upload-text-primary">拖拽文本文件到此处或点击选择</p>
+                                <p class="upload-text-secondary">支持 TXT, LOG, CSV 等文本格式</p>
+                                <label for="fileInput" class="upload-btn" id="fileLabel">
+                                    <span class="material-icons">folder_open</span>
+                                    选择文件
+                                </label>
+                            </div>
                         </div>
-                    </div>
-                    
-                    <div class="slice-options active" id="linesOptions">
-                        <div class="input-group">
-                            <label for="linesPerFile">每文件行数:</label>
-                            <input type="number" id="linesPerFile" min="1" max="100000" value="1000">
+                        <div class="file-info-display" id="fileInfo"></div>
+                    </section>
+
+                    <!-- 选项区 -->
+                    <section class="options-section">
+                        <div class="section-header">
+                            <span class="material-icons section-icon">settings</span>
+                            <h2>切片选项</h2>
                         </div>
-                    </div>
-                    
-                    <div class="slice-options" id="sizeOptions">
-                        <div class="input-group">
-                            <label for="maxFileSize">最大文件大小 (KB):</label>
-                            <input type="number" id="maxFileSize" min="1" max="102400" value="1024">
+                        <div class="options-grid">
+                            <div class="slice-type-grid">
+                                <label class="slice-type-item">
+                                    <input type="radio" id="sliceByLines" name="sliceMethod" value="lines" checked>
+                                    <span class="material-icons" style="font-size:1rem;">format_list_numbered</span>
+                                    <span>按行数分割</span>
+                                </label>
+                                <label class="slice-type-item">
+                                    <input type="radio" id="sliceBySize" name="sliceMethod" value="size">
+                                    <span class="material-icons" style="font-size:1rem;">sd_storage</span>
+                                    <span>按文件大小分割</span>
+                                </label>
+                            </div>
+
+                            <div class="slice-options active" id="linesOptions">
+                                <div class="input-group">
+                                    <label for="linesPerFile">每文件行数</label>
+                                    <input type="number" id="linesPerFile" min="1" max="100000" value="1000">
+                                </div>
+                            </div>
+
+                            <div class="slice-options" id="sizeOptions">
+                                <div class="input-group">
+                                    <label for="maxFileSize">最大文件大小 (KB)</label>
+                                    <input type="number" id="maxFileSize" min="1" max="102400" value="1024">
+                                </div>
+                            </div>
                         </div>
+                    </section>
+                </div>
+
+                <!-- 控制按钮区 -->
+                <div class="controls-zone">
+                    <button class="action-btn action-btn-primary" id="sliceBtn">
+                        <span class="material-icons">play_arrow</span>
+                        开始切片
+                    </button>
+                    <button class="action-btn action-btn-secondary" id="resetBtn">
+                        <span class="material-icons">refresh</span>
+                        重置
+                    </button>
+                </div>
+
+                <!-- 进度区 -->
+                <div class="progress-section" id="progressSection" style="display: none;">
+                    <div class="progress-header">
+                        <span class="material-icons">sync</span>
+                        <span class="progress-title">正在处理文件...</span>
+                    </div>
+                    <div class="progress-bar-wrapper">
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="progressFill"></div>
+                        </div>
+                        <span class="progress-percent" id="progressPercent">0%</span>
                     </div>
                 </div>
-                
-                <div class="controls">
-                    <button id="sliceBtn" class="btn slice-btn">开始切片</button>
-                    <button id="resetBtn" class="btn reset-btn">重置</button>
-                </div>
-                
-                <div class="progress-container" id="progressContainer">
-                    <h3>处理进度</h3>
-                    <div class="progress-bar">
-                        <div class="progress-fill" id="progressFill"></div>
+
+                <!-- 结果区 -->
+                <div class="result-section" id="resultSection" style="display: none;">
+                    <div class="result-header">
+                        <span class="material-icons">check_circle</span>
+                        <h2>切片结果</h2>
                     </div>
-                </div>
-                
-                <div class="result-container">
-                    <h3>切片结果</h3>
-                    <div class="file-list" id="fileList">
-                        <p>切片完成后，文件列表将显示在此处</p>
+                    <div class="result-summary" id="resultSummary"></div>
+                    <div class="select-controls" id="selectControls">
+                        <button id="selectAllBtn">全选</button>
+                        <button id="deselectAllBtn">取消全选</button>
+                        <button id="downloadSelectedBtn">下载选中</button>
                     </div>
+                    <div class="result-file-list" id="fileList"></div>
                 </div>
+            </div>
+
+            <!-- 消息区 -->
+            <div class="message-zone">
+                <div class="message error-message" id="errorMessage"></div>
+                <div class="message success-message" id="successMessage"></div>
+                <div class="message warning-message" id="warningMessage"></div>
+                <div class="message info-message" id="infoMessage"></div>
             </div>
         </main>
 

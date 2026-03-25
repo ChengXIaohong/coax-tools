@@ -578,12 +578,12 @@ const JsonGraph = (function() {
             windowEl.style.height = newHeight + 'px';
 
             isCompactMode = newWidth < 500;
-            if (svg) layout();
         }
 
         function onUp() {
             document.removeEventListener('mousemove', onMove);
             document.removeEventListener('mouseup', onUp);
+            if (svg) render();
         }
 
         document.addEventListener('mousemove', onMove);
@@ -728,11 +728,10 @@ const JsonGraph = (function() {
         createGradients();
         createFilters();
 
-        linksGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-        svg.appendChild(linksGroup);
-
         mainGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
         svg.appendChild(mainGroup);
+
+        linksGroup = null;
 
         setupSVGEvents();
         createContextMenu();
@@ -1241,7 +1240,6 @@ const JsonGraph = (function() {
         if (nodes.length === 0 || !svg) return;
 
         mainGroup.innerHTML = '';
-        linksGroup.innerHTML = '';
 
         paginateNodes();
 
@@ -1252,8 +1250,10 @@ const JsonGraph = (function() {
         }
 
         links.forEach((link, idx) => {
-            const source = nodes.find(n => n.id === (link.source.id || link.source));
-            const target = nodes.find(n => n.id === (link.target.id || link.target));
+            const sourceId = link.source.id || link.source;
+            const targetId = link.target.id || link.target;
+            const source = nodes.find(n => n.id === sourceId);
+            const target = nodes.find(n => n.id === targetId);
             if (!source || !target) return;
 
             const isHighlighted = highlightedNodes.has(source.id) && highlightedNodes.has(target.id);
@@ -1266,7 +1266,9 @@ const JsonGraph = (function() {
             line.setAttribute('stroke', isHighlighted ? 'var(--graph-selected, #58a6ff)' : 'var(--graph-border, #30363d)');
             line.setAttribute('stroke-width', isHighlighted ? 2 : 1);
             line.setAttribute('stroke-opacity', isHighlighted ? 0.8 : 0.4);
-            linksGroup.appendChild(line);
+            line.dataset.sourceId = sourceId;
+            line.dataset.targetId = targetId;
+            mainGroup.insertBefore(line, mainGroup.firstChild);
         });
 
         highlightedNodes.clear();
@@ -1439,15 +1441,15 @@ const JsonGraph = (function() {
             group.setAttribute('transform', `translate(${node.x}, ${node.y})`);
         }
 
-        links.forEach((link, idx) => {
-            const sourceId = link.source.id || link.source;
-            const targetId = link.target.id || link.target;
+        const lineEls = mainGroup.querySelectorAll('line');
+        lineEls.forEach(line => {
+            const sourceId = line.dataset.sourceId;
+            const targetId = line.dataset.targetId;
             
             if (sourceId === node.id || targetId === node.id) {
                 const source = nodes.find(n => n.id === sourceId);
                 const target = nodes.find(n => n.id === targetId);
-                const line = linksGroup.childNodes[idx];
-                if (line && source && target) {
+                if (source && target) {
                     line.setAttribute('x1', source.x);
                     line.setAttribute('y1', source.y);
                     line.setAttribute('x2', target.x);
