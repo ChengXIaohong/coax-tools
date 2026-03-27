@@ -126,6 +126,10 @@ function processImageFile(file) {
             `;
             originalTooltip.classList.add('visible');
 
+            // 自动设置宽度输入框为图片宽度
+            widthSlider.value = originalImage.width;
+            updateWidthValue();
+
             compressedTooltip.innerHTML = `
                 <span>-</span>
                 <span>-</span>
@@ -250,25 +254,6 @@ function getOrientationFromArrayBuffer(arrayBuffer) {
     }
     
     return -1;
-}
-
-function preCompressionCheck(image, file) {
-    const fileSizeMB = file.size / (1024 * 1024);
-    const pixels = image.width * image.height;
-    
-    if (file.size < 100 * 1024) {
-        return { message: '提示：文件较小，压缩效果可能不明显', type: 'info' };
-    }
-    
-    if (fileSizeMB > 10) {
-        return { message: '提示：文件较大，处理可能需要一些时间', type: 'info' };
-    }
-    
-    if (file.type === 'image/jpeg' && file.size < pixels * 0.3) {
-        return { message: '提示：原始JPEG文件可能已经过高度优化', type: 'info' };
-    }
-    
-    return { message: '', type: '' };
 }
 
 function formatFileSize(bytes) {

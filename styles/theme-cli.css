@@ -268,6 +268,51 @@ body[data-theme="cli"] .terminal-line.warning::before {
    工具网格 - 终端风格
    ======================================== */
 
+/* ========================================
+   分类区块 - CLI 风格
+   ======================================== */
+
+body[data-theme="cli"] .tool-category {
+    margin-bottom: 2vw;
+}
+
+body[data-theme="cli"] .category-header {
+    color: var(--cli-fg-dim);
+    font-size: 0.85rem;
+    padding: 0.5vw 0;
+    margin-bottom: 1vw;
+    display: flex;
+    align-items: center;
+    gap: 0.5vw;
+    border-bottom: 1px dashed var(--cli-border);
+}
+
+body[data-theme="cli"] .category-header::before {
+    content: '// ';
+}
+
+body[data-theme="cli"] .category-icon {
+    opacity: 0.7;
+}
+
+body[data-theme="cli"] .category-name {
+    color: var(--cli-fg-dim);
+    font-weight: normal;
+}
+
+body[data-theme="cli"] .category-count {
+    opacity: 0.5;
+    font-size: 0.8rem;
+}
+
+/* 分类内工具网格 - 自动填充列 */
+body[data-theme="cli"] .category-tools-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 0.8vw;
+    margin: 0;
+}
+
 body[data-theme="cli"] .tools-grid {
     display: block;
     margin: 0;
@@ -279,12 +324,13 @@ body[data-theme="cli"] .tool-card {
     border: 1px dashed var(--cli-border);
     border-radius: 0;
     padding: 1.2vw 1.5vw;
-    margin-bottom: 0.8vw;
     cursor: pointer;
     display: flex;
-    align-items: center;
-    gap: 1.5vw;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5vw;
     transition: all 0.15s;
+    position: relative;
 }
 
 body[data-theme="cli"] .tool-card:hover,
@@ -316,34 +362,45 @@ body[data-theme="cli"] .type-cursor {
 body[data-theme="cli"] .tool-card p {
     color: var(--cli-fg-dim);
     margin: 0;
-    flex: 1;
-    font-size: 0.85rem;
-    max-height: 0;
-    overflow: hidden;
-    opacity: 0;
-    transition: all 0.3s ease;
+    font-size: 0.8rem;
+    line-height: 1.4;
+    max-height: none;
+    overflow: visible;
+    opacity: 0.8;
+    transition: none;
     animation: none;
 }
 
 body[data-theme="cli"] .tool-card:hover p {
-    max-height: 3vw;
+    max-height: none;
     opacity: 0.8;
 }
 
-body[data-theme="cli"] .tool-card p {
-    color: var(--cli-fg-dim);
-    margin: 0;
-    flex: 1;
-    font-size: 0.85rem;
-    max-height: 0;
-    overflow: hidden;
+/* 卡片图标 */
+body[data-theme="cli"] .tool-card .card-icon {
+    font-size: 1.6rem;
+    margin-bottom: 0.3vw;
+    display: block;
+    line-height: 1;
+}
+
+/* 卡片箭头 */
+body[data-theme="cli"] .tool-card .card-arrow {
+    position: absolute;
+    bottom: 1vw;
+    right: 1.2vw;
     opacity: 0;
-    transition: all 0.3s ease;
+    transition: opacity 0.15s;
 }
 
-body[data-theme="cli"] .tool-card:hover p {
-    max-height: 3vw;
-    opacity: 0.8;
+body[data-theme="cli"] .tool-card .card-arrow::after {
+    content: '→';
+    color: var(--cli-fg-dim);
+    font-size: 0.9rem;
+}
+
+body[data-theme="cli"] .tool-card:hover .card-arrow {
+    opacity: 1;
 }
 
 /* ========================================
@@ -808,5 +865,9 @@ body[data-theme="cli"] .result::before {
         flex-direction: column;
         align-items: flex-start;
         gap: 1vw;
+    }
+    
+    body[data-theme="cli"] .category-tools-grid {
+        grid-template-columns: 1fr;
     }
 }

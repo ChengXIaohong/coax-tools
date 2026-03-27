@@ -230,6 +230,47 @@ select:focus {
     border-bottom: 1px solid #ddd;
 }
 
+/* ========================================
+   分类区块样式（通用）
+   ======================================== */
+
+.tool-category {
+    margin-bottom: 2.5vw;
+}
+
+.tool-category:last-child {
+    margin-bottom: 0;
+}
+
+/* 分类小标题 */
+.category-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5vw;
+    padding: 0.6vw 0;
+    margin-bottom: 1vw;
+    font-size: 0.9rem;
+}
+
+.category-icon {
+    opacity: 0.7;
+}
+
+.category-name {
+    font-weight: 500;
+}
+
+.category-count {
+    opacity: 0.5;
+    font-size: 0.8rem;
+}
+
+/* 分类内工具网格 */
+.category-tools-grid {
+    display: grid;
+    gap: 1vw;
+}
+
 /* 工具卡片加载动画 - 打字机风格 */
 .tool-card {
     opacity: 0;

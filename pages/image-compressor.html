@@ -46,7 +46,7 @@
                                 <span class="format-tag">JPG</span>
                                 <span class="format-tag">PNG</span>
                                 <span class="format-tag">WEBP</span>
-                                <span class="format-tag">最大 10MB</span>
+                                <span class="format-tag">建议小于 10MB（更大文件也能处理）</span>
                             </div>
                             <div class="file-input-wrapper">
                                 <button class="file-input-button">选择图片</button>
@@ -100,7 +100,7 @@
                                 <div class="control-group">
                                     <label for="maxWidth">
                                         <span>最大宽度 <span class="hint">(超过此宽度将缩放)</span></span>
-                                        <span id="widthValue" class="slider-value">1920px</span>
+                                        <output id="widthValue" class="slider-value" for="maxWidth">1920px</output>
                                     </label>
                                     <input type="range" id="maxWidth" min="100" max="4000" step="100" value="1920">
                                 </div>
