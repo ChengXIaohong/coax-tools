@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Markdown 编辑器，支持实时预览和语法高亮，轻松编写 Markdown 文档。">
+    <meta name="keywords" content="Markdown, 编辑器, MD, 实时预览, 写作工具">
+    <meta name="author" content="coax">
+    <title>Markdown 编辑器 - coax的小工具</title>
+    <!-- 主题初始化：防止 FOUC（Flash of Unstyled Content）闪烁 -->
+    <script>
+    (function() {
+        var saved = localStorage.getItem('coax-tools-mode');
+        if (saved === 'light') {
+            document.body.setAttribute('data-mode', 'light');
+        }
+    })();
+    </script>
+    <link rel="stylesheet" href="../styles/theme-base.css">
+    <link rel="stylesheet" href="../styles/theme-cli.css">
+    <link rel="stylesheet" href="../css/markdown-editor.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+</head>
+<body data-theme="cli">
+    <div class="container">
+        <main class="formatter-container">
+            <div class="editor-panels">
+                <!-- 编辑面板 -->
+                <div class="panel input-panel">
+                    <div class="panel-header">
+                        <div class="panel-header-left">
+                            <span class="panel-title">编辑</span>
+                            <span class="word-count" id="editCount">0 字</span>
+                        </div>
+                        <div class="panel-header-right">
+                            <button class="action-btn" id="clearBtn" title="清空内容">
+                                <span class="material-icons">delete_outline</span>
+                            </button>
+                        </div>
+                    </div>
+                    <textarea id="mdInput" placeholder="在此输入 Markdown 内容...
+
+常用快捷键：
+• Ctrl+B  粗体
+• Ctrl+I  斜体
+• Ctrl+K  插入链接"></textarea>
+                </div>
+
+                <!-- 预览面板 -->
+                <div class="panel output-panel">
+                    <div class="panel-header">
+                        <div class="panel-header-left">
+                            <span class="panel-title">预览</span>
+                            <span class="word-count" id="previewCount">0 字</span>
+                        </div>
+                        <div class="panel-header-right">
+                            <button class="action-btn" id="formatToggle" title="格式化工具">
+                                <span class="material-icons">format_size</span>
+                            </button>
+                            <button class="action-btn" id="copyHtmlBtn" title="复制 HTML">
+                                <span class="material-icons">content_copy</span>
+                            </button>
+                            <button class="action-btn" id="fullscreenBtn" title="全屏模式">
+                                <span class="material-icons">fullscreen</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="output-actions">
+                        <div class="action-menu" id="formatMenu">
+                            <button class="action-item" data-action="bold"><strong>B</strong> 粗体</button>
+                            <button class="action-item" data-action="italic"><em>I</em> 斜体</button>
+                            <button class="action-item" data-action="strikethrough"><s>S</s> 删除线</button>
+                            <div class="action-separator"></div>
+                            <button class="action-item" data-action="heading">H 标题</button>
+                            <button class="action-item" data-action="quote">" 引用</button>
+                            <button class="action-item" data-action="code">&lt;/&gt; 代码</button>
+                            <div class="action-separator"></div>
+                            <button class="action-item" data-action="link">🔗 链接</button>
+                            <button class="action-item" data-action="image">🖼️ 图片</button>
+                            <button class="action-item" data-action="list-ul">• 无序列表</button>
+                            <button class="action-item" data-action="list-ol">1. 有序列表</button>
+                            <div class="action-separator"></div>
+                            <button class="action-item" data-action="hr">— 水平线</button>
+                            <button class="action-item" data-action="table">⊞ 表格</button>
+                        </div>
+                    </div>
+                    <div id="mdPreview" class="markdown-body"></div>
+                    
+                    <!-- 快捷键提示 -->
+                    <div class="shortcuts-hint">
+                        <span class="shortcut-item"><span class="shortcut-key">Ctrl+B</span> 粗体</span>
+                        <span class="shortcut-item"><span class="shortcut-key">Ctrl+I</span> 斜体</span>
+                        <span class="shortcut-item"><span class="shortcut-key">Ctrl+K</span> 链接</span>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- 消息提示 -->
+    <div class="message" id="message"></div>
+
+    <script src="../js/markdown-editor.js"></script>
+    <script src="../js/theme-switcher.js"></script>
+</body>
+</html>

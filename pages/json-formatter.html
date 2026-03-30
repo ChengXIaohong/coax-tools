@@ -7,6 +7,15 @@
     <meta name="keywords" content="JSON格式化, JSON验证, JSON工具, JSON美化, Web开发">
     <meta name="author" content="coax">
     <title>JSON格式化工具 - coax的小工具</title>
+    <!-- 主题初始化：防止 FOUC（Flash of Unstyled Content）闪烁 -->
+    <script>
+    (function() {
+        var saved = localStorage.getItem('coax-tools-mode');
+        if (saved === 'light') {
+            document.body.setAttribute('data-mode', 'light');
+        }
+    })();
+    </script>
     <link rel="stylesheet" href="../styles/theme-base.css">
     <link rel="stylesheet" href="../styles/theme-cli.css">
     <link rel="stylesheet" href="../css/json-formatter.css">

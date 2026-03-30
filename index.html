@@ -12,6 +12,16 @@
     <meta name="keywords" content="在线工具, 文本转换, 图片压缩, 密码生成, 单位换算, 时间戳转换, JSON格式化, 身份证生成">
     <meta name="author" content="coax">
     <title>root@coax</title>
+    <!-- 主题初始化：防止 FOUC（Flash of Unstyled Content）闪烁 -->
+    <script>
+    (function() {
+        var saved = localStorage.getItem('coax-tools-mode');
+        if (saved === 'light') {
+            // 优先设置在 html 元素上（head 中 body 尚不存在）
+            document.documentElement.setAttribute('data-mode', 'light');
+        }
+    })();
+    </script>
     <link rel="stylesheet" href="styles/theme-base.css">
     <link rel="stylesheet" href="styles/theme-cli.css">
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔧</text></svg>">

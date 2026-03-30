@@ -7,6 +7,15 @@
     <meta name="keywords" content="文本分割, 文件切片, 文本处理, 文件分割, 大文件处理">
     <meta name="author" content="coax">
     <title>文本文件切片工具 - coax的小工具</title>
+    <!-- 主题初始化：防止 FOUC（Flash of Unstyled Content）闪烁 -->
+    <script>
+    (function() {
+        var saved = localStorage.getItem('coax-tools-mode');
+        if (saved === 'light') {
+            document.body.setAttribute('data-mode', 'light');
+        }
+    })();
+    </script>
     <link rel="stylesheet" href="../styles/theme-base.css">
     <link rel="stylesheet" href="../styles/theme-cli.css">
     <link rel="stylesheet" href="../css/text-slicer.css">

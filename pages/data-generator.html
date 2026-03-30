@@ -13,6 +13,16 @@
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 </head>
 <body data-theme="cli">
+    <!-- 主题初始化：防止 FOUC（Flash of Unstyled Content）闪烁 -->
+    <script>
+    (function() {
+        var saved = localStorage.getItem('coax-tools-mode');
+        if (saved === 'light' || saved === 'dark') {
+            document.body.setAttribute('data-mode', saved);
+        }
+        // 如果没有保存任何值，保持默认的 dark 模式（body 上没有 data-mode）
+    })();
+    </script>
     <div class="container">
         <main class="docx-main">
             <!-- 导航区 -->

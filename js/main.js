@@ -88,6 +88,14 @@ const tools = [
         icon: "📋",
         category: "text"
     },
+    {
+        id: 11,
+        title: "Markdown",
+        description: "实时预览 Markdown 内容，支持语法高亮和常用编辑功能。",
+        link: "pages/markdown-editor.html",
+        icon: "📝",
+        category: "text"
+    },
 ];
 
 // 分类配置

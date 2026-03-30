@@ -1,0 +1,709 @@
+/*
+ * Markdown 编辑器样式
+ * 适配 CLI 主题，优化布局与交互
+ */
+
+/* ========================================
+   页面整体布局 - 全屏沉浸式编辑
+   ======================================== */
+
+body[data-theme="cli"] .container {
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+/* ========================================
+   全屏编辑器容器
+   ======================================== */
+
+body[data-theme="cli"] .formatter-container {
+    padding: 0;
+    margin: 0;
+    background: transparent;
+    box-shadow: none;
+    border-radius: 0;
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    top: 1vw;
+    left: 2vw;
+    right: 2vw;
+    bottom: 1vw;
+}
+
+/* ========================================
+   编辑预览面板
+   ======================================== */
+
+.editor-panels {
+    display: flex;
+    gap: 0.8vw;
+    flex: 1;
+    min-height: 0;
+}
+
+.panel {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid var(--cli-border);
+    min-width: 0;
+    overflow: hidden;
+    position: relative;
+    transition: flex 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s ease;
+    background: var(--cli-bg);
+}
+
+/* 聚焦时自动扩展面板 - 更明显的视觉反馈 */
+.input-panel:focus-within,
+.output-panel:focus-within {
+    flex: 1.2;
+    box-shadow: 0 0 20px rgba(0, 255, 0, 0.05);
+}
+
+body[data-theme="cli"][data-mode="light"] .input-panel:focus-within,
+body[data-theme="cli"][data-mode="light"] .output-panel:focus-within {
+    box-shadow: 0 0 20px rgba(0, 100, 0, 0.05);
+}
+
+/* ========================================
+   面板头部 - 优化视觉层次
+   ======================================== */
+
+.panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 0.6vw;
+    background: linear-gradient(to bottom, rgba(0, 255, 0, 0.04), transparent);
+    border-bottom: 1px solid var(--cli-border);
+    height: 2.4vw;
+    min-height: 36px;
+    flex-shrink: 0;
+}
+
+body[data-theme="cli"][data-mode="light"] .panel-header {
+    background: linear-gradient(to bottom, rgba(0, 100, 0, 0.04), transparent);
+}
+
+.panel-header-left {
+    display: flex;
+    align-items: center;
+    gap: 0.5vw;
+}
+
+.panel-header-right {
+    display: flex;
+    align-items: center;
+    gap: 0.3vw;
+}
+
+.panel-title {
+    color: var(--cli-fg-dim);
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    opacity: 0.8;
+}
+
+.panel-title::before {
+    content: '//';
+    margin-right: 0.4vw;
+    opacity: 0.5;
+}
+
+/* 字数统计 */
+.word-count {
+    font-size: 0.65rem;
+    color: var(--cli-fg-dim);
+    opacity: 0.6;
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    background: rgba(0, 255, 0, 0.03);
+    padding: 0.2vw 0.5vw;
+    border-radius: 2px;
+}
+
+/* ========================================
+   悬浮操作按钮 - 优化尺寸和交互
+   ======================================== */
+
+.action-btn {
+    width: 1.8vw;
+    height: 1.8vw;
+    min-width: 28px;
+    min-height: 28px;
+    background: transparent;
+    border: 1px solid var(--cli-border);
+    color: var(--cli-fg-dim);
+    cursor: pointer;
+    font-size: 0.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s ease;
+    padding: 0;
+    border-radius: 2px;
+}
+
+.action-btn:hover {
+    border-color: var(--cli-fg);
+    color: var(--cli-fg);
+    background: rgba(0, 255, 0, 0.05);
+}
+
+.action-btn:active {
+    transform: scale(0.95);
+}
+
+.action-btn.active {
+    border-color: var(--cli-fg);
+    color: var(--cli-fg);
+    background: rgba(0, 255, 0, 0.1);
+}
+
+.action-btn .material-icons {
+    font-size: 0.95rem;
+}
+
+/* 工具提示 */
+.action-btn[title]::after {
+    content: attr(title);
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 4px 8px;
+    background: var(--cli-fg);
+    color: var(--cli-bg);
+    font-size: 0.7rem;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.15s;
+    border-radius: 2px;
+    margin-bottom: 4px;
+}
+
+.action-btn:hover[title]::after {
+    opacity: 1;
+}
+
+/* 悬浮操作区 */
+.output-actions {
+    position: absolute;
+    top: 0.4vw;
+    right: 0.4vw;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    gap: 0.25vw;
+}
+
+/* 弹出菜单 */
+.action-menu {
+    display: none;
+    position: absolute;
+    top: 100%;
+    right: 0;
+    margin-top: 0.4vw;
+    background: var(--cli-bg);
+    border: 1px solid var(--cli-fg);
+    min-width: 150px;
+    z-index: 100;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.action-menu.show {
+    display: block;
+    animation: menuFadeIn 0.15s ease;
+}
+
+@keyframes menuFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-4px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.action-item {
+    display: flex;
+    align-items: center;
+    gap: 0.6vw;
+    width: 100%;
+    padding: 0.5vw 1vw;
+    background: transparent;
+    border: none;
+    border-bottom: 1px dashed var(--cli-border);
+    color: var(--cli-fg);
+    text-align: left;
+    cursor: pointer;
+    font-size: 0.75rem;
+    font-family: inherit;
+    transition: background 0.1s;
+}
+
+.action-item:last-child {
+    border-bottom: none;
+}
+
+.action-item:hover {
+    background: rgba(0, 255, 0, 0.1);
+}
+
+.action-item:active {
+    background: rgba(0, 255, 0, 0.15);
+}
+
+body[data-theme="cli"][data-mode="light"] .action-item:hover {
+    background: rgba(0, 100, 0, 0.1);
+}
+
+.action-separator {
+    height: 1px;
+    background: var(--cli-border);
+    margin: 2px 0;
+}
+
+/* ========================================
+   输入区域
+   ======================================== */
+
+textarea {
+    flex: 1;
+    width: 100%;
+    padding: 1vw 1.2vw;
+    border: none;
+    background: transparent;
+    color: var(--cli-fg);
+    font-family: 'SF Mono', 'Fira Code', 'Consolas', 'Monaco', monospace;
+    font-size: 0.9rem;
+    resize: none;
+    line-height: 1.7;
+    tab-size: 4;
+}
+
+textarea:focus {
+    outline: none;
+}
+
+textarea::placeholder {
+    color: var(--cli-fg-dim);
+    opacity: 0.4;
+}
+
+/* 行号高亮 */
+textarea::-webkit-scrollbar {
+    width: 6px;
+}
+
+textarea::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+textarea::-webkit-scrollbar-thumb {
+    background: var(--cli-border);
+    border-radius: 3px;
+}
+
+textarea::-webkit-scrollbar-thumb:hover {
+    background: var(--cli-fg-dim);
+}
+
+/* ========================================
+   预览区 Markdown 样式
+   ======================================== */
+
+.markdown-body {
+    flex: 1;
+    padding: 1vw 1.2vw;
+    overflow-y: auto;
+    color: var(--cli-fg);
+    font-size: 0.95rem;
+    line-height: 1.8;
+}
+
+/* 预览区滚动条 */
+.markdown-body::-webkit-scrollbar {
+    width: 6px;
+}
+
+.markdown-body::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.markdown-body::-webkit-scrollbar-thumb {
+    background: var(--cli-border);
+    border-radius: 3px;
+}
+
+.markdown-body::-webkit-scrollbar-thumb:hover {
+    background: var(--cli-fg-dim);
+}
+
+/* 标题样式优化 */
+.markdown-body h1,
+.markdown-body h2,
+.markdown-body h3,
+.markdown-body h4,
+.markdown-body h5,
+.markdown-body h6 {
+    color: var(--cli-fg);
+    margin: 1.5em 0 0.8em;
+    font-weight: 600;
+    line-height: 1.3;
+}
+
+.markdown-body h1:first-child,
+.markdown-body h2:first-child,
+.markdown-body h3:first-child {
+    margin-top: 0;
+}
+
+.markdown-body h1 {
+    font-size: 1.8rem;
+    border-bottom: 1px dashed var(--cli-border);
+    padding-bottom: 0.5vw;
+}
+
+.markdown-body h2 {
+    font-size: 1.5rem;
+    border-bottom: 1px dashed var(--cli-border);
+    padding-bottom: 0.4vw;
+}
+
+.markdown-body h3 {
+    font-size: 1.25rem;
+}
+
+.markdown-body h4 {
+    font-size: 1.1rem;
+}
+
+/* 段落 */
+.markdown-body p {
+    margin: 1em 0;
+}
+
+/* 链接 */
+.markdown-body a {
+    color: var(--cli-info);
+    text-decoration: none;
+    border-bottom: 1px dashed var(--cli-info);
+    transition: border-color 0.15s;
+}
+
+.markdown-body a:hover {
+    border-bottom-style: solid;
+    border-bottom-color: var(--cli-fg);
+}
+
+.markdown-body strong {
+    color: var(--cli-fg);
+    font-weight: 600;
+}
+
+.markdown-body em {
+    font-style: italic;
+}
+
+.markdown-body del {
+    opacity: 0.5;
+}
+
+/* 引用块 */
+.markdown-body blockquote {
+    margin: 1em 0;
+    padding: 0.8em 1.2em;
+    border-left: 3px solid var(--cli-fg-dim);
+    color: var(--cli-fg-dim);
+    background: rgba(0, 255, 0, 0.02);
+    border-radius: 0 2px 2px 0;
+}
+
+body[data-theme="cli"][data-mode="light"] .markdown-body blockquote {
+    background: rgba(0, 100, 0, 0.02);
+}
+
+/* 代码 */
+.markdown-body code {
+    font-family: 'SF Mono', 'Fira Code', 'Consolas', 'Monaco', monospace;
+    background: rgba(0, 255, 0, 0.05);
+    padding: 0.15em 0.4em;
+    font-size: 0.9em;
+    border-radius: 2px;
+}
+
+body[data-theme="cli"][data-mode="light"] .markdown-body code {
+    background: rgba(0, 100, 0, 0.05);
+}
+
+/* 代码块 */
+.markdown-body pre {
+    background: rgba(0, 255, 0, 0.03);
+    border: 1px solid var(--cli-border);
+    padding: 1em;
+    overflow-x: auto;
+    margin: 1em 0;
+    border-radius: 2px;
+}
+
+body[data-theme="cli"][data-mode="light"] .markdown-body pre {
+    background: rgba(0, 100, 0, 0.03);
+}
+
+.markdown-body pre code {
+    background: transparent;
+    padding: 0;
+    font-size: 0.85rem;
+}
+
+/* 列表 */
+.markdown-body ul,
+.markdown-body ol {
+    margin: 1em 0;
+    padding-left: 2em;
+}
+
+.markdown-body li {
+    margin: 0.4em 0;
+}
+
+.markdown-body ul {
+    list-style-type: disc;
+}
+
+.markdown-body ol {
+    list-style-type: decimal;
+}
+
+/* 水平线 */
+.markdown-body hr {
+    border: none;
+    border-top: 1px dashed var(--cli-border);
+    margin: 2em 0;
+}
+
+/* 表格 */
+.markdown-body table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1em 0;
+    font-size: 0.9em;
+}
+
+.markdown-body th,
+.markdown-body td {
+    border: 1px solid var(--cli-border);
+    padding: 0.5em 1em;
+    text-align: left;
+}
+
+.markdown-body th {
+    background: rgba(0, 255, 0, 0.05);
+    font-weight: 600;
+}
+
+body[data-theme="cli"][data-mode="light"] .markdown-body th {
+    background: rgba(0, 100, 0, 0.05);
+}
+
+.markdown-body tr:hover {
+    background: rgba(0, 255, 0, 0.02);
+}
+
+body[data-theme="cli"][data-mode="light"] .markdown-body tr:hover {
+    background: rgba(0, 100, 0, 0.02);
+}
+
+/* 图片 */
+.markdown-body img {
+    max-width: 100%;
+    height: auto;
+    border: 1px solid var(--cli-border);
+    border-radius: 2px;
+}
+
+/* ========================================
+   消息提示
+   ======================================== */
+
+.message {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 10px 20px;
+    background: var(--cli-bg);
+    color: var(--cli-fg);
+    border: 1px solid var(--cli-border);
+    z-index: 1000;
+    font-size: 0.8rem;
+    display: none;
+    animation: msgSlideIn 0.2s ease;
+}
+
+@keyframes msgSlideIn {
+    from {
+        opacity: 0;
+        transform: translateX(-50%) translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+    }
+}
+
+.message::before {
+    content: '[MSG] ';
+    color: var(--cli-fg-dim);
+}
+
+.success-message {
+    border-color: var(--cli-success, #4EC9B0);
+    color: var(--cli-success, #4EC9B0);
+}
+
+.error-message {
+    border-color: var(--cli-error, #F44747);
+    color: var(--cli-error, #F44747);
+}
+
+/* ========================================
+   快捷键提示浮层
+   ======================================== */
+
+.shortcuts-hint {
+    position: absolute;
+    bottom: 0.8vw;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 1vw;
+    opacity: 0.5;
+    transition: opacity 0.2s;
+    pointer-events: none;
+}
+
+.shortcuts-hint:hover {
+    opacity: 1;
+}
+
+.shortcut-item {
+    display: flex;
+    align-items: center;
+    gap: 0.3vw;
+    font-size: 0.65rem;
+    color: var(--cli-fg-dim);
+}
+
+.shortcut-key {
+    background: rgba(0, 255, 0, 0.05);
+    border: 1px solid var(--cli-border);
+    padding: 0.15vw 0.4vw;
+    border-radius: 2px;
+    font-family: monospace;
+    font-size: 0.6rem;
+}
+
+/* ========================================
+   响应式
+   ======================================== */
+
+@media (max-width: 768px) {
+    body[data-theme="cli"] .formatter-container {
+        position: relative;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+    }
+
+    .editor-panels {
+        flex-direction: column;
+        gap: 1vh;
+    }
+
+    .panel {
+        flex: none;
+        min-height: 40vh;
+    }
+
+    .panel-header {
+        height: 36px;
+        padding: 0 12px;
+    }
+
+    .panel-title {
+        font-size: 0.7rem;
+    }
+
+    .action-btn {
+        width: 32px;
+        height: 32px;
+    }
+
+    .action-btn .material-icons {
+        font-size: 1rem;
+    }
+
+    .action-menu {
+        right: 0;
+        min-width: 130px;
+    }
+
+    .action-item {
+        padding: 10px 12px;
+        font-size: 0.8rem;
+    }
+
+    textarea {
+        font-size: 0.9rem;
+        padding: 4vw;
+    }
+
+    .markdown-body {
+        padding: 4vw;
+        font-size: 0.95rem;
+    }
+
+    .shortcuts-hint {
+        display: none;
+    }
+
+    .word-count {
+        font-size: 0.6rem;
+        padding: 4px 6px;
+    }
+}
+
+/* ========================================
+   打印样式
+   ======================================== */
+
+@media print {
+    .panel-header,
+    .output-actions,
+    .message,
+    .shortcuts-hint {
+        display: none !important;
+    }
+
+    .editor-panels {
+        display: block;
+    }
+
+    .panel {
+        border: none;
+        box-shadow: none;
+    }
+
+    .markdown-body {
+        overflow: visible;
+    }
+}

@@ -64,8 +64,10 @@ const ThemeSwitcher = (function() {
         
         if (mode === 'light') {
             document.body.setAttribute('data-mode', 'light');
-        } else {
-            document.body.removeAttribute('data-mode');
+        } else if (mode === 'dark') {
+            // dark 模式时设置 data-mode="dark"，而不是移除属性
+            // 这样可以避免 FOUC 闪烁，并保持与内联脚本的一致性
+            document.body.setAttribute('data-mode', 'dark');
         }
         
         const switcher = document.querySelector('.theme-switcher');
