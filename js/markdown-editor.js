@@ -13,8 +13,8 @@
     const clearBtn = document.getElementById('clearBtn');
     const copyHtmlBtn = document.getElementById('copyHtmlBtn');
     const messageEl = document.getElementById('message');
-    const formatToggle = document.getElementById('formatToggle');
-    const formatMenu = document.getElementById('formatMenu');
+    const formatBtn = document.getElementById('formatBtn');
+    const formatDropdown = document.getElementById('formatDropdown');
     const menuItems = document.querySelectorAll('.action-item');
     const editCount = document.getElementById('editCount');
     const previewCount = document.getElementById('previewCount');
@@ -281,7 +281,7 @@
             } else if (container.msRequestFullscreen) {
                 container.msRequestFullscreen();
             }
-            fullscreenBtn.innerHTML = '<span class="material-icons">fullscreen_exit</span>';
+            fullscreenBtn.innerHTML = '<span class="material-icons">fullscreen_exit</span><span class="toolbar-label">退出</span>';
             fullscreenBtn.title = '退出全屏';
             isFullscreen = true;
         } else {
@@ -293,7 +293,7 @@
             } else if (document.msExitFullscreen) {
                 document.msExitFullscreen();
             }
-            fullscreenBtn.innerHTML = '<span class="material-icons">fullscreen</span>';
+            fullscreenBtn.innerHTML = '<span class="material-icons">fullscreen</span><span class="toolbar-label">全屏</span>';
             fullscreenBtn.title = '全屏模式';
             isFullscreen = false;
         }
@@ -302,7 +302,7 @@
     // 监听全屏状态变化
     document.addEventListener('fullscreenchange', () => {
         if (!document.fullscreenElement && isFullscreen) {
-            fullscreenBtn.innerHTML = '<span class="material-icons">fullscreen</span>';
+            fullscreenBtn.innerHTML = '<span class="material-icons">fullscreen</span><span class="toolbar-label">全屏</span>';
             fullscreenBtn.title = '全屏模式';
             isFullscreen = false;
         }
@@ -355,10 +355,10 @@
         mdInput.addEventListener('input', updatePreview);
 
         // 悬浮菜单切换
-        formatToggle.addEventListener('click', (e) => {
+        formatBtn.addEventListener('click', (e) => {
             e.stopPropagation();
-            formatMenu.classList.toggle('show');
-            formatToggle.classList.toggle('active');
+            formatDropdown.classList.toggle('show');
+            formatBtn.classList.toggle('active');
         });
 
         // 点击菜单项
@@ -366,16 +366,16 @@
             item.addEventListener('click', () => {
                 const action = item.dataset.action;
                 handleToolbarAction(action);
-                formatMenu.classList.remove('show');
-                formatToggle.classList.remove('active');
+                formatDropdown.classList.remove('show');
+                formatBtn.classList.remove('active');
             });
         });
 
         // 点击其他区域关闭菜单
         document.addEventListener('click', (e) => {
-            if (!formatMenu.contains(e.target) && e.target !== formatToggle && !formatToggle.contains(e.target)) {
-                formatMenu.classList.remove('show');
-                formatToggle.classList.remove('active');
+            if (!formatDropdown.contains(e.target) && e.target !== formatBtn && !formatBtn.contains(e.target)) {
+                formatDropdown.classList.remove('show');
+                formatBtn.classList.remove('active');
             }
         });
 

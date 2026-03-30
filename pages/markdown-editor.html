@@ -29,16 +29,37 @@
                 <div class="panel input-panel">
                     <div class="panel-header">
                         <div class="panel-header-left">
-                            <span class="panel-title">编辑</span>
                             <span class="word-count" id="editCount">0 字</span>
                         </div>
                         <div class="panel-header-right">
-                            <button class="action-btn" id="clearBtn" title="清空内容">
+                            <div class="format-wrapper">
+                                <button class="action-btn" id="formatBtn" title="格式化">
+                                    <span class="material-icons">format_size</span>
+                                </button>
+                                <div class="format-dropdown" id="formatDropdown">
+                                    <button class="action-item" data-action="bold"><strong>B</strong> 粗体</button>
+                                    <button class="action-item" data-action="italic"><em>I</em> 斜体</button>
+                                    <button class="action-item" data-action="strikethrough"><s>S</s> 删除线</button>
+                                    <div class="action-separator"></div>
+                                    <button class="action-item" data-action="heading">H 标题</button>
+                                    <button class="action-item" data-action="quote">" 引用</button>
+                                    <button class="action-item" data-action="code">&lt;/&gt; 代码</button>
+                                    <div class="action-separator"></div>
+                                    <button class="action-item" data-action="link">🔗 链接</button>
+                                    <button class="action-item" data-action="image">🖼️ 图片</button>
+                                    <button class="action-item" data-action="list-ul">• 无序列表</button>
+                                    <button class="action-item" data-action="list-ol">1. 有序列表</button>
+                                    <div class="action-separator"></div>
+                                    <button class="action-item" data-action="hr">— 水平线</button>
+                                    <button class="action-item" data-action="table">⊞ 表格</button>
+                                </div>
+                            </div>
+                            <button class="action-btn" id="clearBtn" title="清空">
                                 <span class="material-icons">delete_outline</span>
                             </button>
                         </div>
                     </div>
-                    <textarea id="mdInput" placeholder="在此输入 Markdown 内容...
+                    <textarea id="mdInput" placeholder="在此输入 Markdown 内容..."
 
 常用快捷键：
 • Ctrl+B  粗体
@@ -50,38 +71,15 @@
                 <div class="panel output-panel">
                     <div class="panel-header">
                         <div class="panel-header-left">
-                            <span class="panel-title">预览</span>
                             <span class="word-count" id="previewCount">0 字</span>
                         </div>
                         <div class="panel-header-right">
-                            <button class="action-btn" id="formatToggle" title="格式化工具">
-                                <span class="material-icons">format_size</span>
-                            </button>
-                            <button class="action-btn" id="copyHtmlBtn" title="复制 HTML">
+                            <button class="action-btn" id="copyHtmlBtn" title="复制HTML">
                                 <span class="material-icons">content_copy</span>
                             </button>
-                            <button class="action-btn" id="fullscreenBtn" title="全屏模式">
+                            <button class="action-btn" id="fullscreenBtn" title="全屏">
                                 <span class="material-icons">fullscreen</span>
                             </button>
-                        </div>
-                    </div>
-                    <div class="output-actions">
-                        <div class="action-menu" id="formatMenu">
-                            <button class="action-item" data-action="bold"><strong>B</strong> 粗体</button>
-                            <button class="action-item" data-action="italic"><em>I</em> 斜体</button>
-                            <button class="action-item" data-action="strikethrough"><s>S</s> 删除线</button>
-                            <div class="action-separator"></div>
-                            <button class="action-item" data-action="heading">H 标题</button>
-                            <button class="action-item" data-action="quote">" 引用</button>
-                            <button class="action-item" data-action="code">&lt;/&gt; 代码</button>
-                            <div class="action-separator"></div>
-                            <button class="action-item" data-action="link">🔗 链接</button>
-                            <button class="action-item" data-action="image">🖼️ 图片</button>
-                            <button class="action-item" data-action="list-ul">• 无序列表</button>
-                            <button class="action-item" data-action="list-ol">1. 有序列表</button>
-                            <div class="action-separator"></div>
-                            <button class="action-item" data-action="hr">— 水平线</button>
-                            <button class="action-item" data-action="table">⊞ 表格</button>
                         </div>
                     </div>
                     <div id="mdPreview" class="markdown-body"></div>

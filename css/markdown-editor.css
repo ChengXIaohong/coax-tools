@@ -9,7 +9,7 @@
 
 body[data-theme="cli"] .container {
     height: 100vh;
-    overflow: hidden;
+    overflow: visible;
     display: flex;
     flex-direction: column;
 }
@@ -34,6 +34,44 @@ body[data-theme="cli"] .formatter-container {
 }
 
 /* ========================================
+   编辑预览面板容器
+   ======================================== */
+
+body[data-theme="cli"] .editor-panels {
+    display: flex;
+    gap: 0.8vw;
+    flex: 1;
+    min-height: 0;
+    align-items: stretch;
+}
+
+/* ========================================
+    background: transparent;
+    border: none;
+    border-bottom: 1px dashed var(--cli-border);
+    color: var(--cli-fg);
+    text-align: left;
+    cursor: pointer;
+    font-size: 0.8rem;
+    font-family: inherit;
+    transition: background 0.1s;
+}
+
+body[data-theme="cli"] .format-dropdown .action-item:last-child {
+    border-bottom: none;
+}
+
+body[data-theme="cli"] .format-dropdown .action-item:hover {
+    background: rgba(0, 255, 0, 0.1);
+}
+
+body[data-theme="cli"] .format-dropdown .action-separator {
+    height: 1px;
+    background: var(--cli-border);
+    margin: 2px 0;
+}
+
+/* ========================================
    编辑预览面板
    ======================================== */
 
@@ -50,7 +88,7 @@ body[data-theme="cli"] .formatter-container {
     flex-direction: column;
     border: 1px solid var(--cli-border);
     min-width: 0;
-    overflow: hidden;
+    overflow: visible;
     position: relative;
     transition: flex 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s ease;
     background: var(--cli-bg);
@@ -112,6 +150,61 @@ body[data-theme="cli"][data-mode="light"] .panel-header {
     content: '//';
     margin-right: 0.4vw;
     opacity: 0.5;
+}
+
+/* 格式化下拉包装器 */
+.format-wrapper {
+    position: relative;
+}
+
+/* 格式化下拉菜单 */
+body[data-theme="cli"] .format-dropdown {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    margin-top: 0.4vw;
+    background: var(--cli-bg);
+    border: 1px solid var(--cli-fg);
+    min-width: 160px;
+    z-index: 100;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+}
+
+body[data-theme="cli"] .format-dropdown.show {
+    display: block;
+    animation: menuFadeIn 0.15s ease;
+}
+
+body[data-theme="cli"] .format-dropdown .action-item {
+    display: flex;
+    align-items: center;
+    gap: 0.6vw;
+    width: 100%;
+    padding: 0.6vw 1vw;
+    background: transparent;
+    border: none;
+    border-bottom: 1px dashed var(--cli-border);
+    color: var(--cli-fg);
+    text-align: left;
+    cursor: pointer;
+    font-size: 0.8rem;
+    font-family: inherit;
+    transition: background 0.1s;
+}
+
+body[data-theme="cli"] .format-dropdown .action-item:last-child {
+    border-bottom: none;
+}
+
+body[data-theme="cli"] .format-dropdown .action-item:hover {
+    background: rgba(0, 255, 0, 0.1);
+}
+
+body[data-theme="cli"] .format-dropdown .action-separator {
+    height: 1px;
+    background: var(--cli-border);
+    margin: 2px 0;
 }
 
 /* 字数统计 */
@@ -527,6 +620,13 @@ body[data-theme="cli"][data-mode="light"] .markdown-body tr:hover {
     height: auto;
     border: 1px solid var(--cli-border);
     border-radius: 2px;
+    display: block;
+    margin: 1em 0;
+}
+
+/* 多张图片时保持间距 */
+.markdown-body img + img {
+    margin-top: 0.5em;
 }
 
 /* ========================================
@@ -623,15 +723,18 @@ body[data-theme="cli"][data-mode="light"] .markdown-body tr:hover {
         right: 0;
         bottom: 0;
     }
+    body[data-theme="cli"] .toolbar-spacer {
+        display: none;
+    }
 
     .editor-panels {
         flex-direction: column;
-        gap: 1vh;
+        gap: 0;
     }
 
     .panel {
         flex: none;
-        min-height: 40vh;
+        min-height: 35vh;
     }
 
     .panel-header {
@@ -652,9 +755,18 @@ body[data-theme="cli"][data-mode="light"] .markdown-body tr:hover {
         font-size: 1rem;
     }
 
-    .action-menu {
+    .format-dropdown {
+        position: fixed;
+        top: auto;
+        bottom: 0;
+        left: 0;
         right: 0;
-        min-width: 130px;
+        margin: 0;
+        border-left: none;
+        border-right: none;
+        border-bottom: none;
+        max-height: 60vh;
+        overflow-y: auto;
     }
 
     .action-item {
