@@ -1,0 +1,492 @@
+/*
+ * Editorial 极简杂志风主题
+ * 大留白、精致衬线字体、信息层级分明、艺术感排版
+ */
+
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Inter:wght@300;400;500&display=swap');
+
+/* ========================================
+   配色系统
+   ======================================== */
+
+body[data-theme="editorial"] {
+    --edit-bg: #faf9f7;
+    --edit-bg-alt: #f5f4f2;
+    --edit-fg: #1a1a1a;
+    --edit-fg-muted: #6b6b6b;
+    --edit-fg-subtle: #9a9a9a;
+    --edit-accent: #c9453e;
+    --edit-border: #e5e4e2;
+    --edit-border-light: #f0efed;
+    --edit-card-hover: #fff;
+    --edit-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    --edit-shadow-hover: 0 8px 24px rgba(0, 0, 0, 0.08);
+    --edit-font-serif: 'Cormorant Garamond', 'Georgia', 'Times New Roman', serif;
+    --edit-font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+/* ========================================
+   基础排版
+   ======================================== */
+
+body[data-theme="editorial"] {
+    font-family: var(--edit-font-sans);
+    font-size: 15px;
+    line-height: 1.7;
+    background: var(--edit-bg);
+    color: var(--edit-fg);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* ========================================
+   容器
+   ======================================== */
+
+body[data-theme="editorial"] .container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 32px;
+}
+
+/* ========================================
+   头部
+   ======================================== */
+
+body[data-theme="editorial"] header {
+    padding: 40px 0 24px;
+    border-bottom: 1px solid var(--edit-border);
+    margin-bottom: 64px;
+}
+
+body[data-theme="editorial"] .header-search {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+}
+
+/* 标题区 */
+body[data-theme="editorial"] .header-content {
+    flex: 1;
+}
+
+body[data-theme="editorial"] header h1,
+body[data-theme="editorial"] header .title-text {
+    font-family: var(--edit-font-serif);
+    font-size: 2.4rem;
+    font-weight: 400;
+    letter-spacing: -0.02em;
+    color: var(--edit-fg);
+    margin: 0;
+    border: none;
+    padding: 0;
+    cursor: default;
+}
+
+body[data-theme="editorial"] header h1::before,
+body[data-theme="editorial"] .title-text::before {
+    display: none;
+}
+
+body[data-theme="editorial"] header h1::after,
+body[data-theme="editorial"] .title-text::after {
+    display: none;
+}
+
+body[data-theme="editorial"] header .header-subtitle {
+    font-family: var(--edit-font-serif);
+    font-size: 1.1rem;
+    font-style: italic;
+    color: var(--edit-fg-muted);
+    margin-top: 8px;
+    font-weight: 400;
+}
+
+body[data-theme="editorial"] .title-edit-btn {
+    display: none;
+}
+
+/* 搜索框 */
+body[data-theme="editorial"] .search-box {
+    position: relative;
+    width: 280px;
+    border-bottom: 1px solid var(--edit-border);
+    background: transparent;
+    padding: 0;
+    transition: border-color 0.2s;
+}
+
+body[data-theme="editorial"] .search-box:focus-within {
+    border-color: var(--edit-fg);
+}
+
+body[data-theme="editorial"] .search-box input {
+    width: 100%;
+    padding: 12px 0;
+    border: none;
+    background: transparent;
+    font-family: var(--edit-font-sans);
+    font-size: 0.9rem;
+    color: var(--edit-fg);
+}
+
+body[data-theme="editorial"] .search-box input:focus {
+    outline: none;
+    box-shadow: none;
+}
+
+body[data-theme="editorial"] .search-box input::placeholder {
+    color: var(--edit-fg-subtle);
+}
+
+body[data-theme="editorial"] .search-hint {
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 0.75rem;
+    color: var(--edit-fg-subtle);
+    border: 1px solid var(--edit-border);
+    padding: 2px 6px;
+    border-radius: 3px;
+}
+
+/* ========================================
+   主内容区
+   ======================================== */
+
+body[data-theme="editorial"] main {
+    padding-bottom: 40px;
+}
+
+/* ========================================
+   分类区块
+   ======================================== */
+
+body[data-theme="editorial"] .tool-category {
+    margin-bottom: 32px;
+}
+
+body[data-theme="editorial"] .tool-category:last-child {
+    margin-bottom: 0;
+}
+
+body[data-theme="editorial"] .category-header {
+    display: flex;
+    align-items: baseline;
+    gap: 16px;
+    margin-bottom: 16px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--edit-border-light);
+}
+
+body[data-theme="editorial"] .category-header::before {
+    display: none;
+}
+
+body[data-theme="editorial"] .category-icon {
+    font-size: 1rem;
+    opacity: 0.6;
+}
+
+body[data-theme="editorial"] .category-name {
+    font-family: var(--edit-font-serif);
+    font-size: 1.25rem;
+    font-weight: 500;
+    color: var(--edit-fg);
+    letter-spacing: -0.01em;
+}
+
+body[data-theme="editorial"] .category-count {
+    font-size: 0.8rem;
+    color: var(--edit-fg-subtle);
+    font-weight: 300;
+}
+
+/* ========================================
+   工具网格
+   ======================================== */
+
+body[data-theme="editorial"] .category-tools-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 12px;
+}
+
+/* ========================================
+   工具卡片
+   ======================================== */
+
+body[data-theme="editorial"] .tool-card {
+    background: transparent;
+    border: 1px solid var(--edit-border-light);
+    padding: 16px 14px;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    transition: all 0.25s ease;
+    position: relative;
+    border-radius: 2px;
+}
+
+body[data-theme="editorial"] .tool-card:hover,
+body[data-theme="editorial"] .tool-card:focus {
+    background: var(--edit-card-hover);
+    border-color: var(--edit-border);
+    box-shadow: var(--edit-shadow-hover);
+    transform: translateY(-2px);
+}
+
+body[data-theme="editorial"] .tool-card:active {
+    transform: translateY(0);
+}
+
+/* 卡片图标 */
+body[data-theme="editorial"] .tool-card .card-icon {
+    font-size: 1.4rem;
+    line-height: 1;
+    display: block;
+    margin-bottom: 4px;
+}
+
+/* 卡片标题 */
+body[data-theme="editorial"] .tool-card h3 {
+    font-family: var(--edit-font-serif);
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--edit-fg);
+    margin: 0;
+    letter-spacing: -0.01em;
+    line-height: 1.3;
+}
+
+/* 卡片描述 */
+body[data-theme="editorial"] .tool-card p {
+    font-size: 0.8rem;
+    color: var(--edit-fg-muted);
+    line-height: 1.6;
+    margin: 0;
+    flex: 1;
+}
+
+body[data-theme="editorial"] .tool-card:hover p {
+    color: var(--edit-fg);
+}
+
+/* 卡片箭头 */
+body[data-theme="editorial"] .tool-card .card-arrow {
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    opacity: 0;
+    transform: translateX(-4px);
+    transition: all 0.2s ease;
+}
+
+body[data-theme="editorial"] .tool-card .card-arrow::after {
+    content: '→';
+    font-size: 1rem;
+    color: var(--edit-accent);
+}
+
+body[data-theme="editorial"] .tool-card:hover .card-arrow {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+/* ========================================
+   无搜索结果
+   ======================================== */
+
+body[data-theme="editorial"] .no-results {
+    text-align: center;
+    padding: 80px 32px;
+}
+
+body[data-theme="editorial"] .no-results p {
+    font-family: var(--edit-font-serif);
+    font-size: 1.2rem;
+    font-style: italic;
+    color: var(--edit-fg-muted);
+}
+
+body[data-theme="editorial"] .no-results p::before {
+    content: '"';
+}
+
+body[data-theme="editorial"] .no-results p::after {
+    content: '"';
+}
+
+/* ========================================
+   页脚
+   ======================================== */
+
+body[data-theme="editorial"] footer {
+    border-top: 1px solid var(--edit-border);
+    padding: 24px 0;
+    margin-top: 40px;
+}
+
+body[data-theme="editorial"] .footer-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+body[data-theme="editorial"] .footer-content p {
+    font-size: 0.8rem;
+    color: var(--edit-fg-subtle);
+    margin: 0;
+}
+
+body[data-theme="editorial"] .footer-content p::before {
+    display: none;
+}
+
+/* ========================================
+   按钮
+   ======================================== */
+
+body[data-theme="editorial"] .btn {
+    font-family: var(--edit-font-sans);
+    font-size: 0.85rem;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+    padding: 10px 20px;
+    border-radius: 2px;
+    transition: all 0.2s ease;
+}
+
+body[data-theme="editorial"] .btn-primary {
+    background: var(--edit-fg);
+    color: var(--edit-bg);
+    border: 1px solid var(--edit-fg);
+}
+
+body[data-theme="editorial"] .btn-primary:hover {
+    background: transparent;
+    color: var(--edit-fg);
+}
+
+body[data-theme="editorial"] .btn-secondary {
+    background: transparent;
+    color: var(--edit-fg);
+    border: 1px solid var(--edit-border);
+}
+
+body[data-theme="editorial"] .btn-secondary:hover {
+    border-color: var(--edit-fg);
+}
+
+/* ========================================
+   滚动条
+   ======================================== */
+
+body[data-theme="editorial"] ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+body[data-theme="editorial"] ::-webkit-scrollbar-track {
+    background: var(--edit-bg);
+}
+
+body[data-theme="editorial"] ::-webkit-scrollbar-thumb {
+    background: var(--edit-border);
+    border-radius: 3px;
+}
+
+body[data-theme="editorial"] ::-webkit-scrollbar-thumb:hover {
+    background: var(--edit-fg-subtle);
+}
+
+/* ========================================
+   选中效果
+   ======================================== */
+
+body[data-theme="editorial"] ::selection {
+    background: var(--edit-accent);
+    color: white;
+}
+
+/* ========================================
+   响应式
+   ======================================== */
+
+@media (max-width: 768px) {
+    body[data-theme="editorial"] .container {
+        padding: 0 20px;
+    }
+
+    body[data-theme="editorial"] header {
+        padding: 48px 0 32px;
+        margin-bottom: 40px;
+    }
+
+    body[data-theme="editorial"] header h1,
+    body[data-theme="editorial"] header .title-text {
+        font-size: 1.8rem;
+    }
+
+    body[data-theme="editorial"] header .header-subtitle {
+        font-size: 0.95rem;
+    }
+
+    body[data-theme="editorial"] .header-search {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 20px;
+    }
+
+    body[data-theme="editorial"] .search-box {
+        width: 100%;
+    }
+
+    body[data-theme="editorial"] .category-tools-grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+
+    body[data-theme="editorial"] .tool-card {
+        padding: 20px;
+    }
+
+    body[data-theme="editorial"] main {
+        padding-bottom: 48px;
+    }
+
+    body[data-theme="editorial"] footer {
+        padding: 32px 0;
+        margin-top: 48px;
+    }
+
+    body[data-theme="editorial"] .footer-content {
+        flex-direction: column;
+        text-align: center;
+    }
+}
+
+/* ========================================
+   入场动画
+   ======================================== */
+
+body[data-theme="editorial"] .tool-card {
+    opacity: 0;
+    transform: translateY(8px);
+}
+
+body[data-theme="editorial"] .tool-card.animate {
+    animation: editFadeIn 0.4s ease forwards;
+}
+
+@keyframes editFadeIn {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

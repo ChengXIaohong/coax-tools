@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="小霸王游戏机模拟器，支持上传 NES/FC 格式 ROM 文件，重温经典红白机游戏。支持键盘和手柄操作。">
+    <meta name="keywords" content="小霸王, FC, NES, 模拟器, 红白机, 游戏模拟, 复古游戏">
+    <meta name="author" content="coax">
+    <title>小霸王游戏机 - coax的小工具</title>
+    <!-- 主题初始化：防止 FOUC（Flash of Unstyled Content）闪烁 -->
+    <script>
+    (function() {
+        var saved = localStorage.getItem('coax-tools-mode');
+        if (saved === 'light') {
+            document.documentElement.setAttribute('data-mode', 'light');
+        }
+    })();
+    </script>
+    <link rel="stylesheet" href="../styles/theme-base.css">
+    <link rel="stylesheet" href="../styles/theme-editorial.css">
+    <link rel="stylesheet" href="../css/nes-emulator.css">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎮</text></svg>">
+</head>
+<body data-theme="editorial">
+    <div class="container">
+        <header>
+            <div class="header-content">
+                <h1>小霸王游戏机</h1>
+                <p class="header-subtitle">上传 NES/FC 格式 ROM 文件，重温经典游戏</p>
+            </div>
+        </header>
+
+        <main>
+            <!-- 上传区域 -->
+            <div class="upload-zone" id="uploadZone">
+                <div class="upload-prompt" id="uploadPrompt">
+                    <span class="upload-icon">📂</span>
+                    <p class="upload-text">请上传 ROM 文件</p>
+                    <p class="upload-hint">支持 .nes 格式文件</p>
+                    <input type="file" id="fileInput" accept=".nes" class="file-input">
+                    <button class="btn btn-primary upload-btn" id="selectFileBtn">选择文件</button>
+                </div>
+            </div>
+
+            <!-- 模拟器容器 -->
+            <div class="emulator-container hidden" id="emulatorContainer">
+                <div class="emulator-header">
+                    <div class="rom-info" id="romInfo"></div>
+                    <div class="emulator-actions">
+                        <button class="btn btn-secondary" id="resetBtn">重置</button>
+                        <button class="btn btn-secondary" id="pauseBtn">暂停</button>
+                        <button class="btn btn-secondary" id="fullscreenBtn">全屏</button>
+                        <button class="btn btn-secondary" id="loadNewBtn">加载新ROM</button>
+                    </div>
+                </div>
+                <div class="screen-wrapper" id="screenWrapper">
+                    <canvas id="nesScreen" width="256" height="240"></canvas>
+                </div>
+            </div>
+
+            <!-- 状态栏 -->
+            <div class="status-bar hidden" id="statusBar">
+                <span id="statusText">就绪</span>
+            </div>
+
+            <!-- 键盘映射说明 -->
+            <div class="controls-info">
+                <div class="controls-title">键盘控制</div>
+                <div class="controls-grid">
+                    <div class="control-item">
+                        <span class="key">↑ ↓ ← →</span>
+                        <span class="desc">方向键</span>
+                    </div>
+                    <div class="control-item">
+                        <span class="key">Z</span>
+                        <span class="desc">B 按钮</span>
+                    </div>
+                    <div class="control-item">
+                        <span class="key">X</span>
+                        <span class="desc">A 按钮</span>
+                    </div>
+                    <div class="control-item">
+                        <span class="key">Enter</span>
+                        <span class="desc">开始键</span>
+                    </div>
+                    <div class="control-item">
+                        <span class="key">Shift</span>
+                        <span class="desc">选择键</span>
+                    </div>
+                </div>
+                <div class="gamepad-hint" id="gamepadHint">
+                    <span class="gamepad-icon">🎮</span>
+                    <span>检测到手柄，支持即插即用</span>
+                </div>
+            </div>
+        </main>
+
+        <footer>
+            <div class="footer-content">
+                <p>&copy; <span id="currentYear"></span> coax. 保留所有权利。</p>
+                <p>渝ICP备2025071398号</p>
+            </div>
+        </footer>
+    </div>
+
+    <script src="https://unpkg.com/jsnes@1/dist/jsnes.min.js"></script>
+    <script src="../js/theme-switcher.js"></script>
+    <script src="../js/nes-emulator.js"></script>
+</body>
+</html>

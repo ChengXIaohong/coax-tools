@@ -1,0 +1,352 @@
+/*
+ * 小霸王游戏机 - NES 模拟器样式
+ * 使用 Linux CLI 绿字风格
+ */
+
+/* ========================================
+   Tool Header 终端风格
+   ======================================== */
+
+body[data-theme="cli"] .tool-header h1::before {
+    content: "# ";
+    color: var(--cli-fg-dim);
+}
+
+body[data-theme="cli"] .tool-header p::before {
+    content: "// ";
+    color: var(--cli-fg-dim);
+}
+
+/* ========================================
+   上传区域
+   ======================================== */
+
+body[data-theme="cli"] .upload-zone {
+    border: 2px dashed var(--cli-border);
+    padding: 4vw 2vw;
+    text-align: center;
+    margin: 2vw 0;
+    position: relative;
+    transition: border-color 0.2s, background 0.2s;
+}
+
+body[data-theme="cli"] .upload-zone:hover,
+body[data-theme="cli"] .upload-zone.drag-over {
+    border-color: var(--cli-fg);
+    background: var(--cli-hover-bg);
+}
+
+body[data-theme="cli"] .upload-prompt {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1vw;
+}
+
+body[data-theme="cli"] .upload-icon {
+    font-size: 3rem;
+    line-height: 1;
+    opacity: 0.7;
+}
+
+body[data-theme="cli"] .upload-text {
+    color: var(--cli-fg);
+    font-size: 1.2rem;
+    margin: 0;
+}
+
+body[data-theme="cli"] .upload-text::before {
+    content: '> ';
+    color: var(--cli-fg-dim);
+}
+
+body[data-theme="cli"] .upload-hint {
+    color: var(--cli-fg-dim);
+    font-size: 0.85rem;
+    margin: 0;
+    opacity: 0.6;
+}
+
+body[data-theme="cli"] .upload-hint::before {
+    content: '// ';
+}
+
+body[data-theme="cli"] .file-input {
+    position: absolute;
+    width: 0;
+    height: 0;
+    opacity: 0;
+    pointer-events: none;
+}
+
+body[data-theme="cli"] .upload-btn {
+    margin-top: 1vw;
+}
+
+/* ========================================
+   模拟器容器
+   ======================================== */
+
+body[data-theme="cli"] .emulator-container {
+    margin: 2vw 0;
+}
+
+body[data-theme="cli"] .emulator-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1vw;
+    margin-bottom: 1.5vw;
+    padding-bottom: 1vw;
+    border-bottom: 1px dashed var(--cli-border);
+}
+
+body[data-theme="cli"] .rom-info {
+    color: var(--cli-fg-dim);
+    font-size: 0.9rem;
+}
+
+body[data-theme="cli"] .rom-info::before {
+    content: '[ROM] ';
+    color: var(--cli-fg);
+}
+
+body[data-theme="cli"] .emulator-actions {
+    display: flex;
+    gap: 0.8vw;
+    flex-wrap: wrap;
+}
+
+/* ========================================
+   屏幕区域
+   ======================================== */
+
+body[data-theme="cli"] .screen-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: #000;
+    border: 2px solid var(--cli-border);
+    padding: 1vw;
+    position: relative;
+    overflow: hidden;
+}
+
+body[data-theme="cli"] .screen-wrapper canvas {
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+    max-width: 100%;
+    height: auto;
+    display: block;
+    background: #000;
+}
+
+/* 屏幕扫描线效果 */
+body[data-theme="cli"] .screen-wrapper::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: repeating-linear-gradient(
+        0deg,
+        rgba(0, 0, 0, 0.1) 0px,
+        rgba(0, 0, 0, 0.1) 1px,
+        transparent 1px,
+        transparent 3px
+    );
+    pointer-events: none;
+}
+
+/* 全屏状态 */
+body[data-theme="cli"] .screen-wrapper.fullscreen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 9999;
+    border: none;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+body[data-theme="cli"] .screen-wrapper.fullscreen canvas {
+    max-width: 100vw;
+    max-height: 100vh;
+    width: auto;
+    height: auto;
+}
+
+/* ========================================
+   状态栏
+   ======================================== */
+
+body[data-theme="cli"] .status-bar {
+    margin-top: 1vw;
+    padding: 0.8vw 1.2vw;
+    border: 1px dashed var(--cli-border);
+    color: var(--cli-fg-dim);
+    font-size: 0.85rem;
+}
+
+body[data-theme="cli"] .status-bar::before {
+    content: '[STATUS] ';
+    color: var(--cli-fg);
+}
+
+body[data-theme="cli"] .status-bar.running::before {
+    content: '[RUNNING] ';
+    color: var(--cli-fg);
+}
+
+body[data-theme="cli"] .status-bar.paused::before {
+    content: '[PAUSED] ';
+    color: var(--cli-warning);
+}
+
+body[data-theme="cli"] .status-bar.error::before {
+    content: '[ERROR] ';
+    color: var(--cli-error);
+}
+
+/* ========================================
+   键盘映射说明
+   ======================================== */
+
+body[data-theme="cli"] .controls-info {
+    margin-top: 3vw;
+    padding: 1.5vw;
+    border: 1px dashed var(--cli-border);
+}
+
+body[data-theme="cli"] .controls-title {
+    color: var(--cli-fg);
+    font-size: 1rem;
+    margin-bottom: 1.5vw;
+    padding-bottom: 0.8vw;
+    border-bottom: 1px dashed var(--cli-border);
+}
+
+body[data-theme="cli"] .controls-title::before {
+    content: '## ';
+    color: var(--cli-fg-dim);
+}
+
+body[data-theme="cli"] .controls-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 1vw;
+    margin-bottom: 1.5vw;
+}
+
+body[data-theme="cli"] .control-item {
+    display: flex;
+    align-items: center;
+    gap: 1vw;
+    padding: 0.5vw 0;
+}
+
+body[data-theme="cli"] .key {
+    display: inline-block;
+    background: var(--cli-input-bg);
+    border: 1px solid var(--cli-border);
+    color: var(--cli-fg);
+    padding: 0.3vw 0.8vw;
+    font-family: inherit;
+    font-size: 0.85rem;
+    min-width: 3vw;
+    text-align: center;
+    white-space: nowrap;
+}
+
+body[data-theme="cli"] .desc {
+    color: var(--cli-fg-dim);
+    font-size: 0.85rem;
+}
+
+body[data-theme="cli"] .gamepad-hint {
+    display: none;
+    align-items: center;
+    gap: 0.8vw;
+    color: var(--cli-fg-dim);
+    font-size: 0.85rem;
+    margin-top: 1vw;
+    padding-top: 1vw;
+    border-top: 1px dashed var(--cli-border);
+}
+
+body[data-theme="cli"] .gamepad-hint.visible {
+    display: flex;
+}
+
+body[data-theme="cli"] .gamepad-hint::before {
+    content: '🎮 ';
+}
+
+body[data-theme="cli"] .gamepad-icon {
+    font-size: 1.2rem;
+}
+
+/* ========================================
+   加载中动画
+   ======================================== */
+
+body[data-theme="cli"] .loading-indicator {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: var(--cli-fg);
+    font-size: 1rem;
+    display: none;
+}
+
+body[data-theme="cli"] .loading-indicator.active {
+    display: block;
+}
+
+body[data-theme="cli"] .loading-indicator::before {
+    content: 'Loading';
+    animation: loadingDots 1.5s infinite;
+}
+
+@keyframes loadingDots {
+    0% { content: 'Loading'; }
+    33% { content: 'Loading.'; }
+    66% { content: 'Loading..'; }
+}
+
+/* ========================================
+   响应式
+   ======================================== */
+
+@media (max-width: 576px) {
+    body[data-theme="cli"] .emulator-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    body[data-theme="cli"] .emulator-actions {
+        width: 100%;
+    }
+
+    body[data-theme="cli"] .emulator-actions .btn {
+        flex: 1;
+        padding: 0.8vw 1vw;
+        font-size: 0.85rem;
+    }
+
+    body[data-theme="cli"] .controls-grid {
+        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+        gap: 0.8vw;
+    }
+
+    body[data-theme="cli"] .screen-wrapper {
+        padding: 2vw;
+    }
+}

@@ -1,0 +1,270 @@
+/*
+ * 字符画生成器样式
+ */
+
+@import url('https://fonts.googleapis.com/icon?family=Material+Icons');
+
+.ascii-main {
+    padding: 0;
+}
+
+.nav-zone {
+    margin-bottom: 1.5vw;
+}
+
+.nav-breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 0.5vw;
+    font-size: 0.85rem;
+    color: var(--cli-fg-dim);
+}
+
+.nav-breadcrumb .material-icons {
+    font-size: 1rem;
+}
+
+.nav-item {
+    display: flex;
+    align-items: center;
+    gap: 0.3vw;
+    cursor: pointer;
+    transition: color 0.15s;
+}
+
+.nav-item:hover {
+    color: var(--cli-fg);
+}
+
+.nav-separator {
+    opacity: 0.5;
+}
+
+.nav-title-icon {
+    opacity: 0.7;
+}
+
+.nav-item-current {
+    color: var(--cli-fg);
+    opacity: 1;
+}
+
+.tool-desc {
+    margin-bottom: 2vw;
+    padding: 1vw 0;
+    border-bottom: 1px dashed var(--cli-border);
+}
+
+.tool-desc p {
+    color: var(--cli-fg-dim);
+    font-size: 1rem;
+    margin: 0;
+}
+
+.tool-desc p::before {
+    content: '// ';
+    color: var(--cli-fg-dim);
+    opacity: 0.5;
+}
+
+.operation-zone {
+    display: flex;
+    flex-direction: column;
+    gap: 2vw;
+}
+
+.section-header {
+    margin-bottom: 1vw;
+}
+
+.section-title {
+    color: var(--cli-fg-dim);
+    font-size: 0.9rem;
+}
+
+.section-body {
+    padding: 0;
+}
+
+.config-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1.5vw;
+}
+
+.form-group {
+    margin-bottom: 0;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5vw;
+    color: var(--cli-fg-dim);
+    font-size: 0.85rem;
+}
+
+.form-group label:first-child {
+    margin-top: 0;
+}
+
+.checkbox-group label {
+    display: flex;
+    align-items: center;
+    gap: 0.8vw;
+    cursor: pointer;
+}
+
+.form-group input[type="checkbox"] {
+    width: 1.2vw;
+    height: 1.2vw;
+    min-width: 18px;
+    min-height: 18px;
+    appearance: none;
+    border: 1px solid var(--cli-border);
+    background: transparent;
+    cursor: pointer;
+    position: relative;
+    transition: all 0.15s;
+}
+
+.form-group input[type="checkbox"]:checked {
+    border-color: var(--cli-fg);
+    background: var(--cli-fg);
+}
+
+.form-group input[type="checkbox"]:checked::after {
+    content: '✓';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: var(--cli-bg);
+    font-size: 0.8rem;
+    font-weight: bold;
+}
+
+.form-group input[type="checkbox"]:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(0, 230, 118, 0.3);
+}
+
+/* 预览区 */
+.ascii-preview {
+    border: 1px dashed var(--cli-border);
+    padding: 2vw;
+    min-height: 200px;
+    background: rgba(0, 0, 0, 0.2);
+    overflow-x: auto;
+}
+
+body[data-theme="cli"][data-mode="light"], html[data-mode="light"] .ascii-preview {
+    background: rgba(0, 0, 0, 0.05);
+}
+
+.ascii-preview #asciiOutput {
+    margin: 0;
+    padding: 0;
+    font-family: 'SF Mono', 'Fira Code', 'Consolas', 'Monaco', 'Courier New', monospace;
+    font-size: 0.85rem;
+    line-height: 1.2;
+    color: var(--cli-fg);
+    white-space: pre;
+    overflow-x: auto;
+}
+
+.ascii-preview .ascii-border {
+    border: 2px solid var(--cli-fg);
+    padding: 1vw;
+    display: inline-block;
+    margin: 0 auto;
+}
+
+.ascii-preview .ascii-border-top,
+.ascii-preview .ascii-border-bottom {
+    text-align: center;
+    color: var(--cli-fg-dim);
+    font-size: 0.8rem;
+}
+
+/* 导出按钮区 */
+.export-buttons {
+    display: flex;
+    gap: 1vw;
+    flex-wrap: wrap;
+}
+
+.export-buttons .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5vw;
+}
+
+.export-buttons .btn-icon {
+    font-size: 1rem;
+}
+
+.copy-status {
+    margin-top: 1vw;
+    padding: 0.8vw 1vw;
+    font-size: 0.85rem;
+    border: 1px dashed var(--cli-border);
+    color: var(--cli-fg);
+    animation: slideIn 0.3s ease-out;
+}
+
+.copy-status.success {
+    border-color: var(--cli-fg);
+    color: var(--cli-fg);
+}
+
+.copy-status.error {
+    border-color: var(--cli-error);
+    color: var(--cli-error);
+}
+
+/* 加载状态 */
+.ascii-preview.loading::after {
+    content: '正在加载字体...';
+    color: var(--cli-fg-dim);
+    font-size: 0.9rem;
+    display: block;
+    text-align: center;
+    padding: 2vw;
+}
+
+/* 隐藏占位符时的样式 */
+.ascii-preview:has(#asciiOutput:empty)::before {
+    content: '> 在上方输入文字即可预览 ASCII Art...';
+    color: var(--cli-fg-dim);
+    font-size: 0.85rem;
+    display: block;
+    padding: 1vw;
+    opacity: 0.5;
+    font-style: italic;
+}
+
+/* 响应式 */
+@media (max-width: 576px) {
+    .config-grid {
+        grid-template-columns: 1fr;
+        gap: 1.2vw;
+    }
+
+    .export-buttons {
+        flex-direction: column;
+    }
+
+    .export-buttons .btn {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .ascii-preview {
+        padding: 12px;
+        overflow-x: scroll;
+    }
+
+    .ascii-preview #asciiOutput {
+        font-size: 0.6rem;
+    }
+}

@@ -96,6 +96,30 @@ const tools = [
         icon: "📝",
         category: "text"
     },
+    {
+        id: 12,
+        title: "字符画",
+        description: "将文字转换为炫酷的 ASCII Art 效果，支持多种字体风格，可导出为图片。",
+        link: "pages/ascii-art.html",
+        icon: "🎨",
+        category: "text"
+    },
+    {
+        id: 13,
+        title: "小霸王游戏机",
+        description: "上传 NES/FC 格式 ROM 文件，重温经典红白机游戏，支持键盘和手柄操作。",
+        link: "pages/nes-emulator.html",
+        icon: "🎮",
+        category: "common"
+    },
+    {
+        id: 14,
+        title: "文字云",
+        description: "将文本或 CSV 数据生成漂亮的词云图片，支持多种形状和配色方案。",
+        link: "pages/word-cloud.html",
+        icon: "☁️",
+        category: "data"
+    },
 ];
 
 // 分类配置

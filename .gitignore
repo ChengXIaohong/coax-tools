@@ -48,3 +48,5 @@ test-results/
 # Vite related files
 .vite/
  vite.config.*.timestamp-*
+ .claude
+ AGENTS.md

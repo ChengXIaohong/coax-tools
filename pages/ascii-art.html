@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="字符画生成器 - 将文字转换为炫酷的 ASCII Art 效果，支持多种字体风格，可导出为图片。">
+    <meta name="keywords" content="字符画, ASCII Art, 文字艺术, figlet, 终端风格">
+    <meta name="author" content="coax">
+    <title>字符画生成器 - coax的小工具</title>
+    <!-- 主题初始化：防止 FOUC（Flash of Unstyled Content）闪烁 -->
+    <script>
+    (function() {
+        var saved = localStorage.getItem('coax-tools-mode');
+        if (saved === 'light') {
+            document.documentElement.setAttribute('data-mode', 'light');
+        }
+    })();
+    </script>
+    <link rel="stylesheet" href="../styles/theme-base.css">
+    <link rel="stylesheet" href="../styles/theme-editorial.css">
+    <link rel="stylesheet" href="../css/ascii-art.css">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎨</text></svg>">
+</head>
+<body data-theme="editorial">
+    <div class="container">
+        <header>
+            <div class="header-content">
+                <h1>字符画生成器</h1>
+                <p class="header-subtitle">将文字转换为炫酷的 ASCII Art 效果</p>
+            </div>
+        </header>
+
+        <main>
+            <!-- 输入区 -->
+            <div class="input-section">
+                <div class="panel">
+                    <div class="panel-header">
+                        <span class="panel-title">// 输入文字</span>
+                    </div>
+                    <div class="input-content">
+                        <input type="text" id="asciiInput" placeholder="输入要转换的文字（支持英文、数字、常用符号）..." maxlength="50" autocomplete="off">
+                    </div>
+                </div>
+
+                <!-- 配置区 -->
+                <div class="controls-panel collapsed" id="configPanel">
+                    <button class="controls-toggle" id="configToggle">
+                        <span>配置选项</span>
+                        <span class="toggle-icon">▸</span>
+                    </button>
+                    <div class="controls-body">
+                        <div class="config-grid">
+                            <div class="config-group">
+                                <label for="fontSelect">字体风格</label>
+                                <select id="fontSelect">
+                                    <option value="Banner">Banner</option>
+                                    <option value="Shadow">Shadow</option>
+                                    <option value="Lean">Lean</option>
+                                    <option value="Block">Block</option>
+                                    <option value="Standard">Standard</option>
+                                    <option value="Big">Big</option>
+                                    <option value="Bubble">Bubble</option>
+                                    <option value="Digital">Digital</option>
+                                    <option value="IVORY">Ivory</option>
+                                    <option value="Larry3d">Larry3d</option>
+                                    <option value="Nancyj">Nancyj</option>
+                                    <option value="O8">O8</option>
+                                    <option value="Rectangles">Rectangles</option>
+                                    <option value="Relief">Relief</option>
+                                    <option value="Slant">Slant</option>
+                                    <option value="Small">Small</option>
+                                    <option value="Soft">Soft</option>
+                                    <option value="Speed">Speed</option>
+                                    <option value="Varsity">Varsity</option>
+                                </select>
+                            </div>
+                            <div class="config-group">
+                                <label for="widthInput">输出宽度</label>
+                                <input type="number" id="widthInput" value="80" min="40" max="200" step="1">
+                            </div>
+                            <div class="config-group">
+                                <label>边框</label>
+                                <div class="checkbox-group">
+                                    <input type="checkbox" id="borderToggle" checked>
+                                    <label for="borderToggle">启用边框</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 预览区 -->
+                <div class="preview-section">
+                    <div class="panel">
+                        <div class="panel-header">
+                            <span class="panel-title">// 预览输出</span>
+                        </div>
+                        <div id="asciiPreview" class="ascii-preview">
+                            <pre id="asciiOutput"></pre>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 导出区 -->
+                <div class="panel">
+                    <div class="panel-header">
+                        <span class="panel-title">// 导出</span>
+                    </div>
+                    <div class="panel-body">
+                        <div class="export-buttons">
+                            <button class="btn btn-primary" id="copyBtn">
+                                📋 复制纯文本
+                            </button>
+                            <button class="btn btn-secondary" id="downloadBtn">
+                                📥 下载为图片
+                            </button>
+                        </div>
+                        <div id="copyStatus" class="copy-status" style="display:none;"></div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <footer>
+            <div class="footer-content">
+                <p>&copy; <span id="currentYear"></span> coax. 保留所有权利。</p>
+                <p>渝ICP备2025071398号</p>
+            </div>
+        </footer>
+    </div>
+
+    <!-- 加载遮罩 -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-content">
+            <div class="loading-spinner-large"></div>
+            <p class="loading-text">字符画生成中...</p>
+            <p class="loading-detail">正在渲染您的字符画，请稍候</p>
+        </div>
+    </div>
+
+    <!-- 加载 figlet.js 和 html2canvas -->
+    <script src="https://cdn.jsdelivr.net/npm/figlet@1.7.0/lib/figlet.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+    <script src="../js/theme-switcher.js"></script>
+    <script src="../js/ascii-art.js"></script>
+</body>
+</html>
