@@ -1,324 +1,1031 @@
 /*
  * 小霸王游戏机 - NES 模拟器样式
- * 使用 Linux CLI 绿字风格
+ * 沉浸式街机 + CRT 复古电视体验
  */
 
 /* ========================================
-   Tool Header 终端风格
+   基础变量与主题
    ======================================== */
 
-body[data-theme="cli"] .tool-header h1::before {
-    content: "# ";
-    color: var(--cli-fg-dim);
-}
+:root {
+    /* 霓虹色彩 */
+    --neon-blue: #00d4ff;
+    --neon-pink: #ff2d95;
+    --neon-purple: #b537f2;
+    --neon-green: #39ff14;
+    --neon-yellow: #ffe600;
 
-body[data-theme="cli"] .tool-header p::before {
-    content: "// ";
-    color: var(--cli-fg-dim);
+    /* 电视框架 */
+    --tv-plastic: #2a2a35;
+    --tv-plastic-dark: #1a1a22;
+    --tv-plastic-light: #3a3a45;
+    --tv-gray: #4a4a55;
+
+    /* 屏幕 */
+    --screen-bg: #0a0a0a;
+    --screen-glow: rgba(100, 200, 255, 0.15);
+
+    /* 文字 */
+    --text-primary: #ffffff;
+    --text-secondary: rgba(255, 255, 255, 0.7);
+    --text-dim: rgba(255, 255, 255, 0.4);
+
+    /* 间距 */
+    --space-xs: 0.25rem;
+    --space-sm: 0.5rem;
+    --space-md: 1rem;
+    --space-lg: 1.5rem;
+    --space-xl: 2rem;
+    --space-2xl: 3rem;
+
+    /* 过渡 */
+    --transition-fast: 150ms ease;
+    --transition-normal: 300ms ease;
+    --transition-slow: 500ms ease;
 }
 
 /* ========================================
-   上传区域
+   背景氛围层
    ======================================== */
 
-body[data-theme="cli"] .upload-zone {
-    border: 2px dashed var(--cli-border);
-    padding: 4vw 2vw;
-    text-align: center;
-    margin: 2vw 0;
-    position: relative;
-    transition: border-color 0.2s, background 0.2s;
+.arcade-bg {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    overflow: hidden;
+    background: linear-gradient(180deg, #0d0d12 0%, #1a1a25 50%, #0d0d12 100%);
 }
 
-body[data-theme="cli"] .upload-zone:hover,
-body[data-theme="cli"] .upload-zone.drag-over {
-    border-color: var(--cli-fg);
-    background: var(--cli-hover-bg);
-}
-
-body[data-theme="cli"] .upload-prompt {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 1vw;
-}
-
-body[data-theme="cli"] .upload-icon {
-    font-size: 3rem;
-    line-height: 1;
-    opacity: 0.7;
-}
-
-body[data-theme="cli"] .upload-text {
-    color: var(--cli-fg);
-    font-size: 1.2rem;
-    margin: 0;
-}
-
-body[data-theme="cli"] .upload-text::before {
-    content: '> ';
-    color: var(--cli-fg-dim);
-}
-
-body[data-theme="cli"] .upload-hint {
-    color: var(--cli-fg-dim);
-    font-size: 0.85rem;
-    margin: 0;
-    opacity: 0.6;
-}
-
-body[data-theme="cli"] .upload-hint::before {
-    content: '// ';
-}
-
-body[data-theme="cli"] .file-input {
+.arcade-glow {
     position: absolute;
-    width: 0;
-    height: 0;
-    opacity: 0;
-    pointer-events: none;
+    border-radius: 50%;
+    filter: blur(100px);
+    opacity: 0.4;
+    animation: glowPulse 4s ease-in-out infinite;
 }
 
-body[data-theme="cli"] .upload-btn {
-    margin-top: 1vw;
+.arcade-glow-1 {
+    width: 600px;
+    height: 600px;
+    background: var(--neon-blue);
+    top: -200px;
+    left: -200px;
+    animation-delay: 0s;
+}
+
+.arcade-glow-2 {
+    width: 500px;
+    height: 500px;
+    background: var(--neon-pink);
+    bottom: -150px;
+    right: -150px;
+    animation-delay: 2s;
+}
+
+@keyframes glowPulse {
+    0%, 100% { opacity: 0.3; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(1.1); }
+}
+
+.arcade-grid {
+    position: absolute;
+    inset: 0;
+    background-image:
+        linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+    background-size: 50px 50px;
+    mask-image: radial-gradient(ellipse at center, black 0%, transparent 70%);
 }
 
 /* ========================================
-   模拟器容器
+   顶部导航
    ======================================== */
 
-body[data-theme="cli"] .emulator-container {
-    margin: 2vw 0;
-}
-
-body[data-theme="cli"] .emulator-header {
+.top-nav {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    flex-wrap: wrap;
-    gap: 1vw;
-    margin-bottom: 1.5vw;
-    padding-bottom: 1vw;
-    border-bottom: 1px dashed var(--cli-border);
+    padding: var(--space-md) var(--space-xl);
+    position: relative;
+    z-index: 10;
 }
 
-body[data-theme="cli"] .rom-info {
-    color: var(--cli-fg-dim);
-    font-size: 0.9rem;
-}
-
-body[data-theme="cli"] .rom-info::before {
-    content: '[ROM] ';
-    color: var(--cli-fg);
-}
-
-body[data-theme="cli"] .emulator-actions {
+.back-btn {
     display: flex;
-    gap: 0.8vw;
-    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-sm);
+    color: var(--text-secondary);
+    text-decoration: none;
+    font-size: 0.875rem;
+    padding: var(--space-sm) var(--space-md);
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: var(--transition-fast);
+}
+
+.back-btn:hover {
+    color: var(--text-primary);
+    background: rgba(255, 255, 255, 0.1);
+    border-color: var(--neon-blue);
+    box-shadow: 0 0 20px rgba(0, 212, 255, 0.2);
+}
+
+.nav-brand {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+}
+
+.brand-icon {
+    font-size: 1.5rem;
+    filter: drop-shadow(0 0 10px var(--neon-pink));
+}
+
+.brand-text {
+    font-size: 1.25rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, var(--neon-blue), var(--neon-pink));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
 }
 
 /* ========================================
-   屏幕区域
+   主内容区
    ======================================== */
 
-body[data-theme="cli"] .screen-wrapper {
+.arcade-main {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-xl);
+    padding: var(--space-xl) var(--space-md);
+    min-height: calc(100vh - 200px);
+}
+
+/* ========================================
+   电视框架
+   ======================================== */
+
+.tv-frame {
+    position: relative;
+    background: linear-gradient(145deg, var(--tv-plastic-light), var(--tv-plastic-dark));
+    border-radius: 24px;
+    padding: var(--space-lg);
+    box-shadow:
+        0 25px 80px rgba(0, 0, 0, 0.5),
+        0 0 0 1px rgba(255, 255, 255, 0.1),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    max-width: 100%;
+}
+
+/* 电视顶部 */
+.tv-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-sm) var(--space-md);
+    margin-bottom: var(--space-md);
+}
+
+.tv-brand {
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    color: var(--text-dim);
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+.tv-leds {
+    display: flex;
+    gap: var(--space-md);
+}
+
+.led {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #333;
+    transition: var(--transition-normal);
+}
+
+.led-power[data-on="true"] {
+    background: var(--neon-green);
+    box-shadow:
+        0 0 10px var(--neon-green),
+        0 0 20px var(--neon-green),
+        0 0 30px var(--neon-green);
+}
+
+.led-activity {
+    background: var(--neon-blue);
+    box-shadow: 0 0 10px var(--neon-blue);
+    animation: activityPulse 1s ease-in-out infinite;
+}
+
+@keyframes activityPulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+/* 屏幕容器 */
+.tv-screen-container {
+    position: relative;
+    background: var(--screen-bg);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow:
+        inset 0 0 50px rgba(0, 0, 0, 0.8),
+        0 0 0 3px var(--tv-plastic-dark),
+        0 0 0 6px var(--tv-plastic-light);
+}
+
+.screen-content {
+    position: relative;
+    width: 560px;
+    height: 440px;
     display: flex;
     justify-content: center;
     align-items: center;
+}
+
+@media (max-width: 640px) {
+    .screen-content {
+        width: 320px;
+        height: 280px;
+    }
+}
+
+/* 屏幕反光 */
+.screen-glare {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+        135deg,
+        rgba(255, 255, 255, 0.08) 0%,
+        transparent 50%,
+        transparent 100%
+    );
+    pointer-events: none;
+    border-radius: 12px;
+}
+
+/* 电视底部 */
+.tv-bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-md);
+    margin-top: var(--space-md);
+}
+
+.tv-controls {
+    display: flex;
+    gap: var(--space-lg);
+}
+
+.channel-dial,
+.volume-dial {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-xs);
+}
+
+.dial-label {
+    font-size: 0.6rem;
+    color: var(--text-dim);
+    letter-spacing: 0.1em;
+}
+
+.dial-knob {
+    width: 24px;
+    height: 24px;
+    background: linear-gradient(145deg, #555, #333);
+    border-radius: 50%;
+    box-shadow:
+        inset 0 2px 4px rgba(255, 255, 255, 0.2),
+        0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.tv-vent {
+    display: flex;
+    gap: 4px;
+}
+
+.vent-slot {
+    width: 40px;
+    height: 3px;
+    background: var(--tv-plastic-dark);
+    border-radius: 2px;
+}
+
+/* ========================================
+   上传界面
+   ======================================== */
+
+.upload-arcade {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-xl);
+    padding: var(--space-xl);
+    width: 100%;
+    height: 100%;
+}
+
+/* 卡带插槽 */
+.upload-cartridge-slot {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-sm);
+    animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-8px); }
+}
+
+.slot-label {
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    color: var(--text-dim);
+}
+
+.slot-opening {
+    width: 100px;
+    height: 20px;
     background: #000;
-    border: 2px solid var(--cli-border);
-    padding: 1vw;
+    border-radius: 4px;
+    box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.8);
     position: relative;
+}
+
+.slot-inner {
+    position: absolute;
+    inset: 4px;
+    background: repeating-linear-gradient(
+        90deg,
+        #222 0px,
+        #222 4px,
+        #111 4px,
+        #111 8px
+    );
+    border-radius: 2px;
+}
+
+.slot-hint {
+    font-size: 0.7rem;
+    color: var(--neon-blue);
+    text-shadow: 0 0 10px var(--neon-blue);
+    animation: blink 1.5s ease-in-out infinite;
+}
+
+@keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+}
+
+/* 上传区域 */
+.upload-zone {
+    position: relative;
+    width: 100%;
+    max-width: 360px;
+    padding: var(--space-xl);
+    border: 2px dashed rgba(0, 212, 255, 0.3);
+    border-radius: 16px;
+    background: rgba(0, 212, 255, 0.03);
+    cursor: pointer;
+    transition: var(--transition-normal);
+}
+
+.upload-zone:hover,
+.upload-zone.drag-over {
+    border-color: var(--neon-blue);
+    background: rgba(0, 212, 255, 0.08);
+    box-shadow:
+        0 0 30px rgba(0, 212, 255, 0.2),
+        inset 0 0 30px rgba(0, 212, 255, 0.05);
+}
+
+.file-input {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    cursor: pointer;
+}
+
+.upload-prompt {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-md);
+    text-align: center;
+}
+
+.upload-icon-wrap {
+    width: 80px;
+    height: 80px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.upload-icon {
+    width: 64px;
+    height: 64px;
+    color: var(--neon-blue);
+    filter: drop-shadow(0 0 10px var(--neon-blue));
+    transition: var(--transition-normal);
+}
+
+.upload-zone:hover .upload-icon {
+    transform: scale(1.1);
+    filter: drop-shadow(0 0 20px var(--neon-blue));
+}
+
+.upload-text {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+.upload-subtext {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    margin: 0;
+}
+
+.upload-formats {
+    display: flex;
+    gap: var(--space-sm);
+}
+
+.format-tag {
+    font-size: 0.7rem;
+    font-weight: 600;
+    padding: var(--space-xs) var(--space-sm);
+    background: rgba(0, 212, 255, 0.15);
+    color: var(--neon-blue);
+    border-radius: 4px;
+    border: 1px solid rgba(0, 212, 255, 0.3);
+}
+
+/* 经典游戏提示 */
+.classic-hints {
+    text-align: center;
+}
+
+.hint-label {
+    font-size: 0.7rem;
+    color: var(--text-dim);
+    margin-bottom: var(--space-sm);
+    letter-spacing: 0.1em;
+}
+
+.hint-list {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--space-sm);
+}
+
+.hint-game {
+    font-size: 0.75rem;
+    padding: var(--space-xs) var(--space-sm);
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+    color: var(--text-secondary);
+}
+
+/* ========================================
+   启动画面
+   ======================================== */
+
+.boot-screen {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-lg);
+    width: 100%;
+    height: 100%;
+}
+
+.boot-lines {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.boot-line {
+    height: 2px;
+    background: var(--neon-blue);
+    animation: bootLine 1.5s ease-out forwards;
+    transform-origin: left;
+}
+
+.boot-line:nth-child(1) { width: 200px; animation-delay: 0s; }
+.boot-line:nth-child(2) { width: 280px; animation-delay: 0.2s; }
+.boot-line:nth-child(3) { width: 160px; animation-delay: 0.4s; }
+
+@keyframes bootLine {
+    0% { transform: scaleX(0); opacity: 0; }
+    50% { transform: scaleX(1); opacity: 1; }
+    100% { transform: scaleX(1); opacity: 0.3; }
+}
+
+.boot-text {
+    font-size: 1.5rem;
+    font-weight: 700;
+    letter-spacing: 0.3em;
+    color: var(--neon-blue);
+    text-shadow:
+        0 0 10px var(--neon-blue),
+        0 0 20px var(--neon-blue),
+        0 0 40px var(--neon-blue);
+    animation: powerOn 0.5s ease-out forwards;
+}
+
+@keyframes powerOn {
+    0% { opacity: 0; transform: scale(0.8); }
+    50% { opacity: 1; transform: scale(1.1); }
+    100% { opacity: 1; transform: scale(1); }
+}
+
+.boot-progress {
+    width: 200px;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 2px;
     overflow: hidden;
 }
 
-body[data-theme="cli"] .screen-wrapper canvas {
+.boot-progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, var(--neon-blue), var(--neon-green));
+    border-radius: 2px;
+    animation: progressLoad 1.5s ease-out forwards;
+}
+
+@keyframes progressLoad {
+    0% { width: 0%; }
+    100% { width: 100%; }
+}
+
+/* ========================================
+   游戏屏幕
+   ======================================== */
+
+.game-screen {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.screen-wrapper {
+    position: relative;
+    background: #000;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow:
+        0 0 0 4px #111,
+        0 0 40px var(--screen-glow);
+}
+
+.screen-wrapper canvas {
+    display: block;
     image-rendering: pixelated;
     image-rendering: crisp-edges;
     max-width: 100%;
     height: auto;
-    display: block;
-    background: #000;
 }
 
-/* 屏幕扫描线效果 */
-body[data-theme="cli"] .screen-wrapper::after {
-    content: '';
+/* CRT 效果 */
+.crt-overlay {
     position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
+    inset: 0;
+    background:
+        radial-gradient(ellipse at center, transparent 0%, rgba(0,0,0,0.3) 100%);
+    pointer-events: none;
+    border-radius: 8px;
+}
+
+.crt-scanlines {
+    position: absolute;
+    inset: 0;
     background: repeating-linear-gradient(
         0deg,
-        rgba(0, 0, 0, 0.1) 0px,
-        rgba(0, 0, 0, 0.1) 1px,
+        rgba(0, 0, 0, 0.15) 0px,
+        rgba(0, 0, 0, 0.15) 1px,
         transparent 1px,
-        transparent 3px
+        transparent 2px
     );
+    pointer-events: none;
+    border-radius: 8px;
+    animation: scanlineMove 10s linear infinite;
+}
+
+@keyframes scanlineMove {
+    0% { background-position: 0 0; }
+    100% { background-position: 0 100px; }
+}
+
+/* CRT 边角 */
+.crt-corner-tl,
+.crt-corner-tr,
+.crt-corner-bl,
+.crt-corner-br {
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    border: 2px solid rgba(0, 0, 0, 0.5);
     pointer-events: none;
 }
 
-/* 全屏状态 */
-body[data-theme="cli"] .screen-wrapper.fullscreen {
-    position: fixed;
+.crt-corner-tl {
     top: 0;
     left: 0;
+    border-right: none;
+    border-bottom: none;
+    border-top-left-radius: 8px;
+}
+
+.crt-corner-tr {
+    top: 0;
     right: 0;
+    border-left: none;
+    border-bottom: none;
+    border-top-right-radius: 8px;
+}
+
+.crt-corner-bl {
     bottom: 0;
+    left: 0;
+    border-right: none;
+    border-top: none;
+    border-bottom-left-radius: 8px;
+}
+
+.crt-corner-br {
+    bottom: 0;
+    right: 0;
+    border-left: none;
+    border-top: none;
+    border-bottom-right-radius: 8px;
+}
+
+/* 全屏模式 */
+.screen-wrapper.fullscreen {
+    position: fixed;
+    inset: 0;
     z-index: 9999;
-    border: none;
-    padding: 0;
+    border-radius: 0;
     display: flex;
     justify-content: center;
     align-items: center;
 }
 
-body[data-theme="cli"] .screen-wrapper.fullscreen canvas {
+.screen-wrapper.fullscreen canvas {
     max-width: 100vw;
     max-height: 100vh;
     width: auto;
     height: auto;
 }
 
-/* ========================================
-   状态栏
-   ======================================== */
-
-body[data-theme="cli"] .status-bar {
-    margin-top: 1vw;
-    padding: 0.8vw 1.2vw;
-    border: 1px dashed var(--cli-border);
-    color: var(--cli-fg-dim);
-    font-size: 0.85rem;
-}
-
-body[data-theme="cli"] .status-bar::before {
-    content: '[STATUS] ';
-    color: var(--cli-fg);
-}
-
-body[data-theme="cli"] .status-bar.running::before {
-    content: '[RUNNING] ';
-    color: var(--cli-fg);
-}
-
-body[data-theme="cli"] .status-bar.paused::before {
-    content: '[PAUSED] ';
-    color: var(--cli-warning);
-}
-
-body[data-theme="cli"] .status-bar.error::before {
-    content: '[ERROR] ';
-    color: var(--cli-error);
-}
-
-/* ========================================
-   键盘映射说明
-   ======================================== */
-
-body[data-theme="cli"] .controls-info {
-    margin-top: 3vw;
-    padding: 1.5vw;
-    border: 1px dashed var(--cli-border);
-}
-
-body[data-theme="cli"] .controls-title {
-    color: var(--cli-fg);
-    font-size: 1rem;
-    margin-bottom: 1.5vw;
-    padding-bottom: 0.8vw;
-    border-bottom: 1px dashed var(--cli-border);
-}
-
-body[data-theme="cli"] .controls-title::before {
-    content: '## ';
-    color: var(--cli-fg-dim);
-}
-
-body[data-theme="cli"] .controls-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-    gap: 1vw;
-    margin-bottom: 1.5vw;
-}
-
-body[data-theme="cli"] .control-item {
-    display: flex;
-    align-items: center;
-    gap: 1vw;
-    padding: 0.5vw 0;
-}
-
-body[data-theme="cli"] .key {
-    display: inline-block;
-    background: var(--cli-input-bg);
-    border: 1px solid var(--cli-border);
-    color: var(--cli-fg);
-    padding: 0.3vw 0.8vw;
-    font-family: inherit;
-    font-size: 0.85rem;
-    min-width: 3vw;
-    text-align: center;
-    white-space: nowrap;
-}
-
-body[data-theme="cli"] .desc {
-    color: var(--cli-fg-dim);
-    font-size: 0.85rem;
-}
-
-body[data-theme="cli"] .gamepad-hint {
+.screen-wrapper.fullscreen .crt-overlay,
+.screen-wrapper.fullscreen .crt-scanlines {
     display: none;
-    align-items: center;
-    gap: 0.8vw;
-    color: var(--cli-fg-dim);
-    font-size: 0.85rem;
-    margin-top: 1vw;
-    padding-top: 1vw;
-    border-top: 1px dashed var(--cli-border);
-}
-
-body[data-theme="cli"] .gamepad-hint.visible {
-    display: flex;
-}
-
-body[data-theme="cli"] .gamepad-hint::before {
-    content: '🎮 ';
-}
-
-body[data-theme="cli"] .gamepad-icon {
-    font-size: 1.2rem;
 }
 
 /* ========================================
-   加载中动画
+   控制面板
    ======================================== */
 
-body[data-theme="cli"] .loading-indicator {
+.control-panel {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-lg);
+    width: 100%;
+    max-width: 500px;
+}
+
+/* 游戏信息 */
+.game-info {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: var(--space-md) var(--space-lg);
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    backdrop-filter: blur(10px);
+}
+
+.game-title {
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.game-status {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+}
+
+.status-indicator {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--neon-green);
+    box-shadow: 0 0 10px var(--neon-green);
+    animation: statusPulse 1.5s ease-in-out infinite;
+}
+
+@keyframes statusPulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+.status-text {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+}
+
+/* 操作按钮 */
+.action-buttons {
+    display: flex;
+    gap: var(--space-md);
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.action-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-xs);
+    padding: var(--space-md);
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 12px;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: var(--transition-fast);
+    min-width: 70px;
+}
+
+.action-btn:hover {
+    background: rgba(0, 212, 255, 0.1);
+    border-color: var(--neon-blue);
+    color: var(--text-primary);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 212, 255, 0.2);
+}
+
+.action-btn:active {
+    transform: translateY(0);
+}
+
+.action-btn .btn-icon {
+    width: 24px;
+    height: 24px;
+}
+
+.action-btn .btn-label {
+    font-size: 0.7rem;
+    font-weight: 500;
+}
+
+.pause-btn.playing .btn-icon:not(.hidden) {
+    display: none;
+}
+
+.pause-btn.playing .btn-icon-play {
+    display: block !important;
+}
+
+/* ========================================
+   虚拟手柄
+   ======================================== */
+
+.virtual-gamepad {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    width: 100%;
+    max-width: 350px;
+    padding: var(--space-lg);
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 16px;
+}
+
+.dpad {
+    position: relative;
+    width: 110px;
+    height: 110px;
+}
+
+.dpad-up,
+.dpad-down,
+.dpad-left,
+.dpad-right {
+    position: absolute;
+    width: 36px;
+    height: 36px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 6px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: var(--transition-fast);
+    -webkit-tap-highlight-color: transparent;
+}
+
+.dpad-up:active,
+.dpad-down:active,
+.dpad-left:active,
+.dpad-right:active {
+    background: var(--neon-blue);
+    border-color: var(--neon-blue);
+    color: #fff;
+    box-shadow: 0 0 20px var(--neon-blue);
+}
+
+.dpad-up { top: 0; left: 50%; transform: translateX(-50%); }
+.dpad-down { bottom: 0; left: 50%; transform: translateX(-50%); }
+.dpad-left { left: 0; top: 50%; transform: translateY(-50%); }
+.dpad-right { right: 0; top: 50%; transform: translateY(-50%); }
+
+.dpad-up svg,
+.dpad-down svg,
+.dpad-left svg,
+.dpad-right svg {
+    width: 16px;
+    height: 16px;
+}
+
+.dpad-center {
     position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    color: var(--cli-fg);
-    font-size: 1rem;
-    display: none;
+    width: 30px;
+    height: 30px;
+    background: var(--tv-plastic-dark);
+    border-radius: 50%;
 }
 
-body[data-theme="cli"] .loading-indicator.active {
-    display: block;
+.face-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
 }
 
-body[data-theme="cli"] .loading-indicator::before {
-    content: 'Loading';
-    animation: loadingDots 1.5s infinite;
+.face-btn {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: 700;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: var(--transition-fast);
+    -webkit-tap-highlight-color: transparent;
 }
 
-@keyframes loadingDots {
-    0% { content: 'Loading'; }
-    33% { content: 'Loading.'; }
-    66% { content: 'Loading..'; }
+.face-a {
+    background: linear-gradient(145deg, #ff4757, #c0392b);
+    color: #fff;
+    box-shadow: 0 4px 15px rgba(255, 71, 87, 0.4);
+}
+
+.face-b {
+    background: linear-gradient(145deg, #7f8cfa, #5352ed);
+    color: #fff;
+    box-shadow: 0 4px 15px rgba(127, 140, 250, 0.4);
+}
+
+.face-btn:active {
+    transform: scale(0.9);
+}
+
+.system-buttons {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: var(--space-md);
+}
+
+.sys-btn {
+    font-size: 0.6rem;
+    font-weight: 600;
+    padding: var(--space-xs) var(--space-sm);
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+    color: var(--text-dim);
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.sys-btn:active {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+/* ========================================
+   键盘说明
+   ======================================== */
+
+.keyboard-guide {
+    width: 100%;
+    max-width: 500px;
+    padding: var(--space-lg);
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+}
+
+.guide-header {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    margin-bottom: var(--space-md);
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+}
+
+.guide-icon {
+    width: 18px;
+    height: 18px;
+}
+
+.guide-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-md) var(--space-lg);
+}
+
+.guide-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+    font-size: 0.8rem;
+    color: var(--text-dim);
+    white-space: nowrap;
+}
+
+.guide-item span {
+    margin: 0 2px;
+}
+
+.guide-item kbd {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    min-width: 24px;
+    height: 24px;
+    padding: 0 var(--space-xs);
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 4px;
+    font-family: inherit;
+    font-size: 0.7rem;
+    color: var(--text-secondary);
+}
+
+.gamepad-status {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    margin-top: var(--space-md);
+    padding-top: var(--space-md);
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    color: var(--neon-green);
+    font-size: 0.8rem;
+}
+
+.gp-icon {
+    width: 20px;
+    height: 20px;
 }
 
 /* ========================================
@@ -326,27 +1033,146 @@ body[data-theme="cli"] .loading-indicator::before {
    ======================================== */
 
 @media (max-width: 576px) {
-    body[data-theme="cli"] .emulator-header {
-        flex-direction: column;
-        align-items: flex-start;
+    .tv-frame {
+        padding: var(--space-md);
+        border-radius: 16px;
     }
 
-    body[data-theme="cli"] .emulator-actions {
-        width: 100%;
+    .tv-top {
+        padding: var(--space-xs) var(--space-sm);
     }
 
-    body[data-theme="cli"] .emulator-actions .btn {
-        flex: 1;
-        padding: 0.8vw 1vw;
-        font-size: 0.85rem;
+    .tv-brand {
+        font-size: 0.55rem;
     }
 
-    body[data-theme="cli"] .controls-grid {
-        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-        gap: 0.8vw;
+    .action-buttons {
+        gap: var(--space-sm);
     }
 
-    body[data-theme="cli"] .screen-wrapper {
-        padding: 2vw;
+    .action-btn {
+        padding: var(--space-sm);
+        min-width: 60px;
+    }
+
+    .action-btn .btn-icon {
+        width: 20px;
+        height: 20px;
+    }
+
+    .keyboard-guide {
+        padding: var(--space-md);
+    }
+
+    .guide-grid {
+        gap: var(--space-sm);
+    }
+}
+
+/* 触屏设备显示虚拟手柄 */
+@media (hover: none) and (pointer: coarse) {
+    .virtual-gamepad {
+        display: flex !important;
+    }
+}
+
+/* ========================================
+   Slot Machine 动画
+   ======================================== */
+
+.slot-machine-overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: rgba(0, 0, 0, 0.85);
+    z-index: 100;
+    backdrop-filter: blur(4px);
+}
+
+.slot-machine-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-lg);
+}
+
+.slot-label-text {
+    font-size: 1rem;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+}
+
+.slot-reel {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--neon-blue);
+    text-shadow:
+        0 0 10px var(--neon-blue),
+        0 0 20px var(--neon-blue),
+        0 0 40px var(--neon-blue);
+    min-height: 2em;
+    text-align: center;
+    max-width: 400px;
+    overflow: hidden;
+    animation: slotRoll 1.5s ease-out forwards;
+}
+
+@keyframes slotRoll {
+    0% {
+        transform: translateY(-100%);
+        opacity: 0;
+    }
+    10% {
+        opacity: 1;
+    }
+    25% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(0);
+    }
+    75% {
+        transform: translateY(0);
+    }
+    95% {
+        transform: translateY(0);
+    }
+    100% {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.slot-reel.rolling {
+    animation: slotRollFast 1.5s ease-out forwards;
+}
+
+@keyframes slotRollFast {
+    0% {
+        transform: translateY(-100%);
+        opacity: 0;
+    }
+    5% {
+        opacity: 1;
+    }
+    25% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(0);
+    }
+    75% {
+        transform: translateY(0);
+    }
+    95% {
+        transform: translateY(0);
+    }
+    100% {
+        transform: translateY(0);
+        opacity: 1;
     }
 }

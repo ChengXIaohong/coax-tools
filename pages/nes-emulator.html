@@ -3,11 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="小霸王游戏机模拟器，支持上传 NES/FC 格式 ROM 文件，重温经典红白机游戏。支持键盘和手柄操作。">
+    <meta name="description" content="小霸王游戏机 - 沉浸式红白机模拟器，支持上传 NES/FC 格式 ROM，重温经典游戏。支持键盘和手柄操作。">
     <meta name="keywords" content="小霸王, FC, NES, 模拟器, 红白机, 游戏模拟, 复古游戏">
-    <meta name="author" content="coax">
     <title>小霸王游戏机 - coax的小工具</title>
-    <!-- 主题初始化：防止 FOUC（Flash of Unstyled Content）闪烁 -->
+    <!-- 主题初始化：防止 FOUC -->
     <script>
     (function() {
         var saved = localStorage.getItem('coax-tools-mode');
@@ -22,75 +21,260 @@
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎮</text></svg>">
 </head>
 <body data-theme="editorial">
+    <!-- 背景氛围层 -->
+    <div class="arcade-bg">
+        <div class="arcade-glow arcade-glow-1"></div>
+        <div class="arcade-glow arcade-glow-2"></div>
+        <div class="arcade-grid"></div>
+    </div>
+
     <div class="container">
-        <header>
-            <div class="header-content">
-                <h1>小霸王游戏机</h1>
-                <p class="header-subtitle">上传 NES/FC 格式 ROM 文件，重温经典游戏</p>
+        <!-- 顶部导航 -->
+        <nav class="top-nav">
+            <a href="../index.html" class="back-btn">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M19 12H5M12 19l-7-7 7-7"/>
+                </svg>
+                返回首页
+            </a>
+            <div class="nav-brand">
+                <span class="brand-icon">🎮</span>
+                <span class="brand-text">小霸王</span>
             </div>
-        </header>
+        </nav>
 
-        <main>
-            <!-- 上传区域 -->
-            <div class="upload-zone" id="uploadZone">
-                <div class="upload-prompt" id="uploadPrompt">
-                    <span class="upload-icon">📂</span>
-                    <p class="upload-text">请上传 ROM 文件</p>
-                    <p class="upload-hint">支持 .nes 格式文件</p>
-                    <input type="file" id="fileInput" accept=".nes" class="file-input">
-                    <button class="btn btn-primary upload-btn" id="selectFileBtn">选择文件</button>
+        <!-- 主内容区 -->
+        <main class="arcade-main">
+            <!-- 电视框架 -->
+            <div class="tv-frame" id="tvFrame">
+                <!-- 电视顶部装饰 -->
+                <div class="tv-top">
+                    <div class="tv-brand"> FAMILY COMPUTER </div>
+                    <div class="tv-leds">
+                        <div class="led led-power" id="ledPower" data-on="false"></div>
+                        <div class="led led-activity" id="ledActivity"></div>
+                    </div>
+                </div>
+
+                <!-- 屏幕区域 -->
+                <div class="tv-screen-container" id="tvScreenContainer">
+                    <!-- 上传状态 -->
+                    <div class="screen-content" id="screenContent">
+                        <!-- 上传界面 -->
+                        <div class="upload-arcade" id="uploadArcade">
+                            <div class="upload-cartridge-slot">
+                                <div class="slot-label">ROM</div>
+                                <div class="slot-opening">
+                                    <div class="slot-inner"></div>
+                                </div>
+                                <div class="slot-hint">插入卡带</div>
+                            </div>
+
+                            <div class="upload-zone" id="uploadZone">
+                                <input type="file" id="fileInput" accept=".nes" class="file-input">
+                                <div class="upload-prompt" id="uploadPrompt">
+                                    <div class="upload-icon-wrap">
+                                        <svg class="upload-icon" viewBox="0 0 64 64" fill="none">
+                                            <rect x="8" y="20" width="48" height="32" rx="4" stroke="currentColor" stroke-width="2"/>
+                                            <rect x="16" y="28" width="32" height="16" rx="2" stroke="currentColor" stroke-width="2" stroke-dasharray="4 2"/>
+                                            <path d="M32 8v12M26 14l6-6 6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                        </svg>
+                                    </div>
+                                    <p class="upload-text">拖放 NES/FC 文件到此处</p>
+                                    <p class="upload-subtext">或点击选择文件</p>
+                                    <div class="upload-formats">
+                                        <span class="format-tag">.nes</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 经典游戏提示 -->
+                            <div class="classic-hints">
+                                <div class="hint-label">经典推荐</div>
+                                <div class="hint-list">
+                                    <span class="hint-game">超级玛丽</span>
+                                    <span class="hint-game">魂斗罗</span>
+                                    <span class="hint-game">沙拉小子</span>
+                                    <span class="hint-game">坦克大战</span>
+                                </div>
+                            </div>
+                        
+                            <!-- Slot Machine 动画 -->
+                            <div class="slot-machine-overlay hidden" id="slotMachineOverlay">
+                                <div class="slot-machine-container">
+                                    <div class="slot-label-text">即将开始</div>
+                                    <div class="slot-reel" id="slotReel"></div>
+                                </div>
+                            </div>
+</div>
+
+                        <!-- 模拟器加载中 -->
+                        <div class="boot-screen hidden" id="bootScreen">
+                            <div class="boot-lines">
+                                <div class="boot-line"></div>
+                                <div class="boot-line"></div>
+                                <div class="boot-line"></div>
+                            </div>
+                            <div class="boot-text">POWER ON</div>
+                            <div class="boot-progress">
+                                <div class="boot-progress-bar"></div>
+                            </div>
+                        </div>
+
+                        <!-- 游戏屏幕 -->
+                        <div class="game-screen hidden" id="gameScreen">
+                            <div class="screen-wrapper" id="screenWrapper">
+                                <canvas id="nesScreen" width="256" height="240"></canvas>
+                                <!-- CRT 效果叠加层 -->
+                                <div class="crt-overlay"></div>
+                                <div class="crt-scanlines"></div>
+                                <div class="crt-corner-tl"></div>
+                                <div class="crt-corner-tr"></div>
+                                <div class="crt-corner-bl"></div>
+                                <div class="crt-corner-br"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 屏幕反光层 -->
+                    <div class="screen-glare"></div>
+                </div>
+
+                <!-- 电视底部控制区 -->
+                <div class="tv-bottom">
+                    <div class="tv-controls">
+                        <div class="channel-dial">
+                            <span class="dial-label">CH</span>
+                            <div class="dial-knob"></div>
+                        </div>
+                        <div class="volume-dial">
+                            <span class="dial-label">VOL</span>
+                            <div class="dial-knob"></div>
+                        </div>
+                    </div>
+                    <div class="tv-vent">
+                        <div class="vent-slot"></div>
+                        <div class="vent-slot"></div>
+                        <div class="vent-slot"></div>
+                    </div>
                 </div>
             </div>
 
-            <!-- 模拟器容器 -->
-            <div class="emulator-container hidden" id="emulatorContainer">
-                <div class="emulator-header">
-                    <div class="rom-info" id="romInfo"></div>
-                    <div class="emulator-actions">
-                        <button class="btn btn-secondary" id="resetBtn">重置</button>
-                        <button class="btn btn-secondary" id="pauseBtn">暂停</button>
-                        <button class="btn btn-secondary" id="fullscreenBtn">全屏</button>
-                        <button class="btn btn-secondary" id="loadNewBtn">加载新ROM</button>
+            <!-- 控制面板 -->
+            <div class="control-panel" id="controlPanel">
+                <!-- 当前游戏信息 -->
+                <div class="game-info hidden" id="gameInfo">
+                    <div class="game-title" id="gameTitle">超级玛丽</div>
+                    <div class="game-status">
+                        <span class="status-indicator"></span>
+                        <span class="status-text" id="statusText">运行中</span>
                     </div>
                 </div>
-                <div class="screen-wrapper" id="screenWrapper">
-                    <canvas id="nesScreen" width="256" height="240"></canvas>
+
+                <!-- 操作按钮 -->
+                <div class="action-buttons" id="actionButtons">
+                    <button class="action-btn pause-btn" id="pauseBtn" title="暂停/继续">
+                        <svg class="btn-icon" viewBox="0 0 24 24" fill="currentColor">
+                            <rect x="6" y="4" width="4" height="16"/>
+                            <rect x="14" y="4" width="4" height="16"/>
+                        </svg>
+                        <svg class="btn-icon-play hidden" viewBox="0 0 24 24" fill="currentColor">
+                            <polygon points="5,3 19,12 5,21"/>
+                        </svg>
+                        <span class="btn-label">暂停</span>
+                    </button>
+                    <button class="action-btn reset-btn" id="resetBtn" title="重置游戏">
+                        <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
+                            <path d="M3 3v5h5"/>
+                        </svg>
+                        <span class="btn-label">重置</span>
+                    </button>
+                    <button class="action-btn fullscreen-btn" id="fullscreenBtn" title="全屏模式">
+                        <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/>
+                        </svg>
+                        <span class="btn-label">全屏</span>
+                    </button>
+                    <button class="action-btn load-btn" id="loadNewBtn" title="加载新游戏">
+                        <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/>
+                        </svg>
+                        <span class="btn-label">换游戏</span>
+                    </button>
                 </div>
             </div>
 
-            <!-- 状态栏 -->
-            <div class="status-bar hidden" id="statusBar">
-                <span id="statusText">就绪</span>
+            <!-- 虚拟手柄 (触屏设备) -->
+            <div class="virtual-gamepad hidden" id="virtualGamepad">
+                <div class="dpad">
+                    <div class="dpad-up" data-key="up">
+                        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 4l-8 8h16z"/></svg>
+                    </div>
+                    <div class="dpad-down" data-key="down">
+                        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 20l8-8H4z"/></svg>
+                    </div>
+                    <div class="dpad-left" data-key="left">
+                        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M4 12l8 8V4z"/></svg>
+                    </div>
+                    <div class="dpad-right" data-key="right">
+                        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20 12l-8-8v16z"/></svg>
+                    </div>
+                    <div class="dpad-center"></div>
+                </div>
+                <div class="face-buttons">
+                    <div class="face-btn face-a" data-key="a">A</div>
+                    <div class="face-btn face-b" data-key="b">B</div>
+                </div>
+                <div class="system-buttons">
+                    <div class="sys-btn select-btn" data-key="select">SEL</div>
+                    <div class="sys-btn start-btn" data-key="start">STA</div>
+                </div>
             </div>
 
-            <!-- 键盘映射说明 -->
-            <div class="controls-info">
-                <div class="controls-title">键盘控制</div>
-                <div class="controls-grid">
-                    <div class="control-item">
-                        <span class="key">↑ ↓ ← →</span>
-                        <span class="desc">方向键</span>
+            <!-- 键盘说明 -->
+            <div class="keyboard-guide" id="keyboardGuide">
+                <div class="guide-header">
+                    <svg class="guide-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="2" y="4" width="20" height="16" rx="2"/>
+                        <path d="M6 8h.01M10 8h.01M14 8h.01M18 8h.01M8 12h.01M12 12h.01M16 12h.01M6 16h12"/>
+                    </svg>
+                    <span>键盘控制</span>
+                </div>
+                <div class="guide-grid">
+                    <div class="guide-item">
+                        <kbd>↑</kbd><kbd>↓</kbd><kbd>←</kbd><kbd>→</kbd>
+                        <span>或</span>
+                        <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd>
+                        <span>方向</span>
                     </div>
-                    <div class="control-item">
-                        <span class="key">Z</span>
-                        <span class="desc">B 按钮</span>
+                    <div class="guide-item">
+                        <kbd>X</kbd><span>加速 / A按钮</span>
                     </div>
-                    <div class="control-item">
-                        <span class="key">X</span>
-                        <span class="desc">A 按钮</span>
+                    <div class="guide-item">
+                        <kbd>Z</kbd><span>刹车 / B按钮</span>
                     </div>
-                    <div class="control-item">
-                        <span class="key">Enter</span>
-                        <span class="desc">开始键</span>
+                    <div class="guide-item">
+                        <kbd>Enter</kbd><span>开始</span>
                     </div>
-                    <div class="control-item">
-                        <span class="key">Shift</span>
-                        <span class="desc">选择键</span>
+                    <div class="guide-item">
+                        <kbd>Shift</kbd><span>选择</span>
+                    </div>
+                    <div class="guide-item">
+                        <kbd>P</kbd><span>暂停</span>
+                    </div>
+                    <div class="guide-item">
+                        <kbd>R</kbd><span>重置</span>
+                    </div>
+                    <div class="guide-item">
+                        <kbd>F</kbd><span>全屏</span>
                     </div>
                 </div>
-                <div class="gamepad-hint" id="gamepadHint">
-                    <span class="gamepad-icon">🎮</span>
-                    <span>检测到手柄，支持即插即用</span>
+                <div class="gamepad-status hidden" id="gamepadStatus">
+                    <svg class="gp-icon" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M6 9H4a2 2 0 0 0-2 2v2a2 2 0 0 0 2 2h2m12-5h2a2 2 0 0 1 2 2v2a2 2 0 0 1-2 2h-2m-4-4v4a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2V8a6 6 0 0 0-6-6h-1.5a4.5 4.5 0 0 0-4.5 4.5v.5"/>
+                    </svg>
+                    <span>手柄已连接</span>
                 </div>
             </div>
         </main>
