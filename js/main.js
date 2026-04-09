@@ -25,14 +25,6 @@ const tools = [
         category: "security"
     },
     {
-        id: 3,
-        title: "换算",
-        description: "支持长度、重量、温度等多种单位之间的换算。",
-        link: "pages/converter.html",
-        icon: "⚖️",
-        category: "common"
-    },
-    {
         id: 4,
         title: "JSON",
         description: "验证并格式化JSON数据，使其更易读和调试。",

@@ -16,44 +16,6 @@
 }
 
 /* ========================================
-   导航区
-   ======================================== */
-
-.nav-zone {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 1vw 0;
-    margin-bottom: 2vw;
-    border-bottom: 1px dashed var(--cli-border);
-}
-
-.nav-breadcrumb {
-    display: flex;
-    align-items: center;
-    gap: 0.5vw;
-    color: var(--cli-fg-dim);
-    font-size: 0.9rem;
-}
-
-.nav-breadcrumb .material-icons {
-    font-size: 1.2rem;
-}
-
-.nav-separator {
-    opacity: 0.5;
-}
-
-.nav-item-current {
-    color: var(--cli-fg);
-}
-
-.nav-title-icon {
-    font-size: 1rem !important;
-    color: var(--cli-fg-dim);
-}
-
-/* ========================================
    内容区
    ======================================== */
 
@@ -64,17 +26,7 @@
 .content-zone {
     display: flex;
     flex-direction: column;
-    gap: 2.5vw;
-}
-
-.tool-desc {
-    margin-bottom: 0.5vw;
-}
-
-.tool-desc p {
-    margin: 0;
-    color: var(--cli-fg-dim);
-    font-size: 0.9rem;
+    gap: 1.5vw;
 }
 
 /* ========================================
@@ -188,6 +140,100 @@
 }
 
 /* ========================================
+   操作按钮
+   ======================================== */
+
+.action-buttons {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    margin-top: 1.5rem;
+}
+
+.btn {
+    padding: 0.75rem 1.5rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    transition: var(--transition);
+    border: none;
+    border-radius: 30px;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.btn .material-icons {
+    font-size: 1.1rem;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+}
+
+.btn:active {
+    transform: translateY(0);
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-hover) 100%);
+    color: #fff;
+    box-shadow: 0 4px 15px var(--primary-glow);
+}
+
+.btn-primary:hover {
+    box-shadow: 0 6px 20px var(--primary-glow);
+    color: #fff;
+}
+
+.btn-download {
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-hover) 100%);
+    color: #fff;
+    box-shadow: 0 4px 15px var(--primary-glow);
+    font-weight: bold;
+    opacity: 0;
+    transform: translateY(10px);
+    pointer-events: none;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.has-result .btn-download {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+}
+
+.has-result .btn-download:hover {
+    box-shadow: 0 6px 20px var(--primary-glow);
+    color: #fff;
+}
+
+.btn-ghost {
+    background: transparent;
+    color: var(--cli-fg-dim);
+    border: 1px solid var(--cli-border);
+    transition: var(--transition);
+}
+
+.btn-ghost:hover {
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+    background: rgba(0, 210, 106, 0.08);
+}
+
+.btn-sm {
+    padding: 0.5rem 1rem;
+    font-size: 0.85rem;
+}
+
+.btn-sm .material-icons {
+    font-size: 1rem;
+}
+
+/* ========================================
    输入模式切换
    ======================================== */
 
@@ -288,6 +334,81 @@
 .file-upload-btn:hover {
     transform: translateY(-2px);
     box-shadow: 0 4px 12px var(--primary-glow);
+}
+
+/* ========================================
+   预览模式：隐藏输入区和生成按钮
+   ======================================== */
+
+.preview-panel {
+    display: none;
+}
+
+.preview-panel:not(.hidden) {
+    display: block;
+}
+
+.has-result .input-panel {
+    display: none !important;
+}
+
+.has-result .action-buttons {
+    display: none;
+}
+
+.has-result .edit-again-actions {
+    display: block;
+}
+
+.has-result #regenerateBtn {
+    display: inline-flex !important;
+}
+
+/* ========================================
+   配置面板折叠
+   ======================================== */
+
+.config-toggle {
+    width: 100%;
+    background: transparent;
+    border: none;
+    color: var(--cli-fg);
+    padding: 0;
+    font-family: inherit;
+    font-size: inherit;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.8vw;
+}
+
+.config-toggle:hover .panel-title {
+    color: var(--primary-color);
+}
+
+.config-toggle .panel-title {
+    font-size: 0.9rem;
+    transition: color 0.2s;
+}
+
+.toggle-icon {
+    font-size: 0.8rem;
+    color: var(--primary-color);
+    transition: transform 0.3s;
+    flex-shrink: 0;
+}
+
+.config-panel:not(.collapsed) .toggle-icon {
+    transform: rotate(90deg);
+}
+
+.config-body {
+    margin-top: 1.2rem;
+}
+
+.config-panel.collapsed .config-body {
+    display: none;
 }
 
 /* ========================================
@@ -479,158 +600,8 @@
 }
 
 /* ========================================
-   高级设置折叠面板
-   ======================================== */
-
-.controls-panel {
-    margin-bottom: 1rem;
-    background: var(--bg-card);
-    border-radius: var(--border-radius);
-    box-shadow: var(--shadow-light), inset 0 0 0 1px var(--cli-border);
-    overflow: hidden;
-}
-
-.controls-panel.collapsed .controls-body {
-    display: none;
-}
-
-.controls-panel.collapsed .toggle-icon {
-    transform: rotate(0deg);
-}
-
-.controls-toggle {
-    width: 100%;
-    background: transparent;
-    border: none;
-    color: var(--cli-fg);
-    padding: 1rem 1.25rem;
-    font-size: 0.9rem;
-    font-family: inherit;
-    cursor: pointer;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-bottom: 1px solid var(--cli-border);
-    transition: var(--transition);
-}
-
-.controls-toggle:hover {
-    background: rgba(0, 210, 106, 0.05);
-}
-
-.toggle-icon {
-    transition: transform 0.3s;
-    transform: rotate(90deg);
-    color: var(--primary-color);
-}
-
-.controls-body {
-    padding: 1.25rem;
-    background: linear-gradient(180deg, rgba(0, 210, 106, 0.02) 0%, rgba(0, 210, 106, 0.06) 100%);
-}
-
-/* ========================================
-   操作按钮
-   ======================================== */
-
-.action-buttons {
-    display: flex;
-    gap: 0.75rem;
-    flex-wrap: wrap;
-    margin-top: 1.5rem;
-}
-
-.btn {
-    padding: 0.75rem 1.5rem;
-    font-size: 0.9rem;
-    font-weight: 600;
-    font-family: inherit;
-    cursor: pointer;
-    transition: var(--transition);
-    border: none;
-    border-radius: 30px;
-    text-decoration: none;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-}
-
-.btn .material-icons {
-    font-size: 1.1rem;
-}
-
-.btn:hover {
-    transform: translateY(-2px);
-}
-
-.btn:active {
-    transform: translateY(0);
-}
-
-.btn-primary {
-    background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-hover) 100%);
-    color: #fff;
-    box-shadow: 0 4px 15px var(--primary-glow);
-}
-
-.btn-primary:hover {
-    box-shadow: 0 6px 20px var(--primary-glow);
-    color: #fff;
-}
-
-.btn-download {
-    display: none;
-    background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-hover) 100%);
-    color: #fff;
-    box-shadow: 0 4px 15px var(--primary-glow);
-    font-weight: bold;
-}
-
-.btn-download.visible {
-    display: inline-flex;
-}
-
-.btn-download:disabled {
-    opacity: 0.4;
-    cursor: not-allowed;
-    transform: none;
-}
-
-.btn-download:hover:not(:disabled) {
-    box-shadow: 0 6px 20px var(--primary-glow);
-    color: #fff;
-}
-
-.btn-ghost {
-    background: transparent;
-    color: var(--cli-fg-dim);
-    border: 1px solid var(--cli-border);
-    transition: var(--transition);
-}
-
-.btn-ghost:hover {
-    border-color: var(--primary-color);
-    color: var(--primary-color);
-    background: rgba(0, 210, 106, 0.08);
-}
-
-.btn-sm {
-    padding: 0.5rem 1rem;
-    font-size: 0.85rem;
-}
-
-.btn-sm .material-icons {
-    font-size: 1rem;
-}
-
-/* ========================================
    预览区
    ======================================== */
-
-.preview-section .panel {
-    min-height: 400px;
-}
 
 .preview-actions {
     display: flex;
@@ -677,54 +648,30 @@
 }
 
 /* ========================================
-   加载遮罩
+   内嵌加载指示器
    ======================================== */
 
-.loading-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.7);
-    display: none;
-    align-items: center;
-    justify-content: center;
-    z-index: 1000;
-    backdrop-filter: blur(4px);
-}
-
-.loading-overlay.active {
-    display: flex;
-}
-
-.loading-content {
-    text-align: center;
-    color: var(--cli-fg);
-}
-
-.loading-spinner-large {
-    width: 50px;
-    height: 50px;
+.canvas-spinner {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 40px;
+    height: 40px;
     border: 3px solid var(--cli-border);
     border-top-color: var(--primary-color);
     border-radius: 50%;
     animation: spin 0.8s linear infinite;
-    margin: 0 auto 1rem;
+    display: none;
+    z-index: 10;
+}
+
+.canvas-spinner.active {
+    display: block;
 }
 
 @keyframes spin {
-    to { transform: rotate(360deg); }
-}
-
-.loading-text {
-    font-size: 0.95rem;
-    margin-bottom: 0.5rem;
-}
-
-.loading-detail {
-    font-size: 0.8rem;
-    color: var(--cli-fg-dim);
+    to { transform: translate(-50%, -50%) rotate(360deg); }
 }
 
 /* ========================================
@@ -768,10 +715,6 @@
     .shape-options {
         flex-wrap: wrap;
     }
-
-    .controls-body {
-        padding: 1rem;
-    }
 }
 
 @media (max-width: 480px) {
@@ -780,8 +723,7 @@
         align-items: stretch;
     }
 
-    .file-upload-btn,
-    .btn-ghost {
+    .file-upload-btn {
         width: 100%;
         justify-content: center;
     }

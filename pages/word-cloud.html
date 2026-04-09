@@ -31,10 +31,14 @@
             </div>
         </header>
 
-        <main>
-            <!-- 输入区（生成前显示） -->
-            <div class="input-section" id="inputSection">
-                <div class="panel">
+        <main class="word-cloud-main">
+            <!-- 消息提示 -->
+            <div id="message" class="message"></div>
+
+            <!-- 单页布局：输入区 + 预览区 -->
+            <div class="content-zone" id="contentZone">
+                <!-- 输入面板 -->
+                <div class="panel input-panel" id="inputPanel">
                     <div class="panel-header">
                         <span class="panel-title">// 数据输入</span>
                     </div>
@@ -51,110 +55,99 @@
                     </div>
                 </div>
 
-                <!-- 基础配置（折叠） -->
-                <div class="controls-panel collapsed" id="basicPanel">
-                    <button class="controls-toggle" id="basicToggle">
-                        <span>基础配置</span>
+                <!-- 配置面板（默认折叠，点击展开） -->
+                <div class="panel config-panel collapsed" id="configPanel">
+                    <button class="config-toggle" id="configToggle">
+                        <span class="panel-title">// 样式选项</span>
                         <span class="toggle-icon">▸</span>
                     </button>
-                    <div class="controls-body">
+                    <div class="config-body" id="configBody">
                         <div class="config-grid">
-                            <!-- 配色方案 -->
-                            <div class="config-group">
-                                <label>配色方案</label>
-                                <select id="colorScheme">
-                                    <option value="green">终端绿 (#00e676)</option>
-                                    <option value="blue">海洋蓝 (#00aaff)</option>
-                                    <option value="sunset">晚霞橙 (#ff6b35)</option>
-                                    <option value="purple">梦幻紫 (#9b59b6)</option>
-                                    <option value="rainbow">彩虹渐变</option>
-                                    <option value="monochrome">黑白灰度</option>
-                                </select>
-                            </div>
+                        <!-- 配色方案 -->
+                        <div class="config-group">
+                            <label>配色方案</label>
+                            <select id="colorScheme">
+                                <option value="green">终端绿 (#00e676)</option>
+                                <option value="blue">海洋蓝 (#00aaff)</option>
+                                <option value="sunset">晚霞橙 (#ff6b35)</option>
+                                <option value="purple">梦幻紫 (#9b59b6)</option>
+                                <option value="rainbow">彩虹渐变</option>
+                                <option value="monochrome">黑白灰度</option>
+                            </select>
+                        </div>
 
-                            <!-- 尺寸 -->
-                            <div class="config-group">
-                                <label>画布尺寸</label>
-                                <div class="size-inputs">
-                                    <input type="number" id="canvasWidth" value="800" min="300" max="2000" step="50">
-                                    <span>×</span>
-                                    <input type="number" id="canvasHeight" value="600" min="300" max="2000" step="50">
-                                </div>
+                        <!-- 尺寸 -->
+                        <div class="config-group">
+                            <label>画布尺寸</label>
+                            <div class="size-inputs">
+                                <input type="number" id="canvasWidth" value="800" min="300" max="2000" step="50">
+                                <span>×</span>
+                                <input type="number" id="canvasHeight" value="600" min="300" max="2000" step="50">
                             </div>
+                        </div>
 
-                            <!-- 背景色 -->
-                            <div class="config-group">
-                                <label>背景色</label>
-                                <div class="bg-color-options">
-                                    <button class="bg-color-btn active" data-bg="dark" style="background:#0c0c0c;color:#00e676;">深色</button>
-                                    <button class="bg-color-btn" data-bg="light" style="background:#f8f8f8;color:#006400;">浅色</button>
-                                    <button class="bg-color-btn" data-bg="transparent" style="background:linear-gradient(45deg,#333,#666);color:#fff;">透明</button>
-                                </div>
+                        <!-- 背景色 -->
+                        <div class="config-group">
+                            <label>背景色</label>
+                            <div class="bg-color-options">
+                                <button class="bg-color-btn active" data-bg="dark" style="background:#0c0c0c;color:#00e676;">深色</button>
+                                <button class="bg-color-btn" data-bg="light" style="background:#f8f8f8;color:#006400;">浅色</button>
+                                <button class="bg-color-btn" data-bg="transparent" style="background:linear-gradient(45deg,#333,#666);color:#fff;">透明</button>
                             </div>
+                        </div>
 
-                            <!-- 字体大小范围 -->
-                            <div class="config-group">
-                                <label>字体大小范围</label>
-                                <div class="size-range-inputs">
-                                    <input type="number" id="fontSizeMin" value="14" min="8" max="100">
-                                    <span>~</span>
-                                    <input type="number" id="fontSizeMax" value="80" min="10" max="200">
-                                </div>
+                        <!-- 字体大小范围 -->
+                        <div class="config-group">
+                            <label>字体大小范围</label>
+                            <div class="size-range-inputs">
+                                <input type="number" id="fontSizeMin" value="14" min="8" max="100">
+                                <span>~</span>
+                                <input type="number" id="fontSizeMax" value="80" min="10" max="200">
+                            </div>
+                        </div>
+
+                        <!-- 形状选择 -->
+                        <div class="config-group">
+                            <label>形状</label>
+                            <div class="shape-options">
+                                <button class="shape-btn active" data-shape="circle" title="圆形">
+                                    ⭕
+                                </button>
+                                <button class="shape-btn" data-shape="heart" title="心形">
+                                    ❤️
+                                </button>
+                                <button class="shape-btn" data-shape="star" title="星形">
+                                    ⭐
+                                </button>
+                                <button class="shape-btn" data-shape="triangle" title="三角形">
+                                    📐
+                                </button>
+                                <button class="shape-btn" data-shape="diamond" title="钻石形">
+                                    💎
+                                </button>
+                                <button class="shape-btn" data-shape="pentagon" title="五边形">
+                                    ⬠
+                                </button>
+                                <button class="shape-btn" data-shape="hexagon" title="六边形">
+                                    ⬡
+                                </button>
+                                <label class="shape-btn custom-shape-btn" title="自定义图片遮罩">
+                                    <span class="material-icons">image</span>
+                                    <input type="file" id="customShapeInput" accept="image/*" hidden>
+                                </label>
+                            </div>
+                            <div id="customShapeName" class="custom-shape-name"></div>
+                        </div>
+
+                        <!-- 文字旋转 -->
+                        <div class="config-group">
+                            <label>文字旋转</label>
+                            <div class="checkbox-group">
+                                <input type="checkbox" id="enableRotation" checked>
+                                <label for="enableRotation">允许文字旋转</label>
                             </div>
                         </div>
                     </div>
-                </div>
-
-                <!-- 高级设置 -->
-                <div class="controls-panel collapsed" id="advancedPanel">
-                    <button class="controls-toggle" id="controlsToggle">
-                        <span>高级设置</span>
-                        <span class="toggle-icon">▸</span>
-                    </button>
-                    <div class="controls-body">
-                        <div class="config-grid">
-                            <!-- 形状选择 -->
-                            <div class="config-group">
-                                <label>形状</label>
-                                <div class="shape-options">
-                                    <button class="shape-btn active" data-shape="circle" title="圆形">
-                                        ⭕
-                                    </button>
-                                    <button class="shape-btn" data-shape="heart" title="心形">
-                                        ❤️
-                                    </button>
-                                    <button class="shape-btn" data-shape="star" title="星形">
-                                        ⭐
-                                    </button>
-                                    <button class="shape-btn" data-shape="triangle" title="三角形">
-                                        📐
-                                    </button>
-                                    <button class="shape-btn" data-shape="diamond" title="钻石形">
-                                        💎
-                                    </button>
-                                    <button class="shape-btn" data-shape="pentagon" title="五边形">
-                                        ⬠
-                                    </button>
-                                    <button class="shape-btn" data-shape="hexagon" title="六边形">
-                                        ⬡
-                                    </button>
-                                    <label class="shape-btn custom-shape-btn" title="自定义图片遮罩">
-                                        <span class="material-icons">image</span>
-                                        <input type="file" id="customShapeInput" accept="image/*" hidden>
-                                    </label>
-                                </div>
-                                <div id="customShapeName" class="custom-shape-name"></div>
-                            </div>
-
-                            <!-- 文字旋转 -->
-                            <div class="config-group">
-                                <label>文字旋转</label>
-                                <div class="checkbox-group">
-                                    <input type="checkbox" id="enableRotation" checked>
-                                    <label for="enableRotation">允许文字旋转</label>
-                                </div>
-                            </div>
-                        </div>
                     </div>
                 </div>
 
@@ -165,19 +158,29 @@
                         生成词云
                     </button>
                 </div>
-            </div>
 
-            <!-- 预览区（生成后显示） -->
-            <div class="preview-section hidden" id="previewSection">
-                <div class="panel">
+                <!-- 重新编辑按钮（预览模式下显示） -->
+                <div class="edit-again-actions" style="display:none;" id="editAgainActions">
+                    <button id="editAgainBtn" class="btn btn-ghost">
+                        <span class="material-icons">edit</span>
+                        重新编辑
+                    </button>
+                </div>
+
+                <!-- 预览区（默认隐藏，生成后显示） -->
+                <div class="panel preview-panel hidden" id="previewPanel">
                     <div class="panel-header">
                         <span class="panel-title">// 词云预览</span>
                         <div class="preview-actions" id="previewActions">
-                            <button id="downloadBtn" class="btn btn-download" disabled>
+                            <button id="regenerateBtn" class="btn btn-ghost" style="display:none;">
+                                <span class="material-icons">refresh</span>
+                                重新生成
+                            </button>
+                            <button id="downloadBtn" class="btn btn-download">
                                 <span class="material-icons">download</span>
                                 PNG
                             </button>
-                            <button id="downloadSvgBtn" class="btn btn-download" disabled>
+                            <button id="downloadSvgBtn" class="btn btn-download">
                                 <span class="material-icons">picture_as_pdf</span>
                                 SVG
                             </button>
@@ -185,19 +188,8 @@
                     </div>
                     <div class="canvas-container" id="canvasContainer">
                         <canvas id="wordCloudCanvas"></canvas>
-                        <div id="previewPlaceholder" class="preview-placeholder">
-                            <span class="icon material-icons">cloud</span>
-                            <span>请先输入数据并点击「生成词云」</span>
-                        </div>
+                        <div id="canvasSpinner" class="canvas-spinner"></div>
                     </div>
-                </div>
-
-                <!-- 返回修改按钮 -->
-                <div class="action-buttons">
-                    <button id="backBtn" class="btn btn-ghost">
-                        <span class="material-icons">edit</span>
-                        修改数据
-                    </button>
                 </div>
             </div>
         </main>
@@ -208,15 +200,6 @@
                 <p>渝ICP备2025071398号</p>
             </div>
         </footer>
-    </div>
-
-    <!-- 加载遮罩 -->
-    <div class="loading-overlay" id="loadingOverlay">
-        <div class="loading-content">
-            <div class="loading-spinner-large"></div>
-            <p class="loading-text">词云生成中...</p>
-            <p class="loading-detail">正在渲染您的词云，请稍候</p>
-        </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/wordcloud@1.2.2/src/wordcloud2.min.js"></script>

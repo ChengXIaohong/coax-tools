@@ -22,7 +22,7 @@
         fontSizeMax: 80,
         enableRotation: true,
         canDownload: false,
-        lastGeneratedWords: null  // 缓存上次生成的数据，用于SVG导出
+        lastGeneratedWords: null   // 缓存上次生成的数据，用于SVG导出
     };
 
     // 形状配置（扩展更多内置形状）
@@ -88,30 +88,30 @@
         enableRotation: $('enableRotation'),
         bgColorBtns: document.querySelectorAll('.bg-color-btn'),
 
-        // 高级设置
-        advancedPanel: $('advancedPanel'),
-        controlsToggle: $('controlsToggle'),
-        basicPanel: $('basicPanel'),
-        basicToggle: $('basicToggle'),
-
         // 操作
         generateBtn: $('generateBtn'),
         downloadBtn: $('downloadBtn'),
         downloadSvgBtn: $('downloadSvgBtn'),
         previewActions: $('previewActions'),
 
-        // 区域切换
-        inputSection: $('inputSection'),
-        previewSection: $('previewSection'),
-        backBtn: $('backBtn'),
-
         // 预览
         canvas: $('wordCloudCanvas'),
         canvasContainer: $('canvasContainer'),
         previewPlaceholder: $('previewPlaceholder'),
+        canvasSpinner: $('canvasSpinner'),
+        previewPanel: $('previewPanel'),
 
-        // 加载遮罩
-        loadingOverlay: $('loadingOverlay')
+        // 操作（新增）
+        regenerateBtn: $('regenerateBtn'),
+        editAgainBtn: $('editAgainBtn'),
+        editAgainActions: $('editAgainActions'),
+
+        // 配置面板折叠
+        configPanel: $('configPanel'),
+        configToggle: $('configToggle'),
+
+        // 区域
+        contentZone: $('contentZone')
     };
 
     // =====================
@@ -142,55 +142,71 @@
 
         // 形状选择
         elements.shapeButtons.forEach(btn => {
-            btn.addEventListener('click', () => selectShape(btn.dataset.shape));
+            btn.addEventListener('click', () => {
+                selectShape(btn.dataset.shape);
+                autoRegenerate();
+            });
         });
 
         // 自定义形状
-        elements.customShapeInput.addEventListener('change', handleCustomShape);
+        elements.customShapeInput.addEventListener('change', (e) => {
+            handleCustomShape(e);
+            autoRegenerate();
+        });
 
         // 配色方案
         elements.colorScheme.addEventListener('change', (e) => {
             state.colorScheme = e.target.value;
+            autoRegenerate();
         });
 
         // 尺寸
         elements.canvasWidth.addEventListener('change', (e) => {
             state.width = parseInt(e.target.value) || 800;
+            autoRegenerate();
         });
         elements.canvasHeight.addEventListener('change', (e) => {
             state.height = parseInt(e.target.value) || 600;
+            autoRegenerate();
         });
 
         // 字体大小
         elements.fontSizeMin.addEventListener('change', (e) => {
             state.fontSizeMin = parseInt(e.target.value) || 14;
+            autoRegenerate();
         });
         elements.fontSizeMax.addEventListener('change', (e) => {
             state.fontSizeMax = parseInt(e.target.value) || 80;
+            autoRegenerate();
         });
 
         // 旋转
         elements.enableRotation.addEventListener('change', (e) => {
             state.enableRotation = e.target.checked;
+            autoRegenerate();
         });
 
         // 背景色
         elements.bgColorBtns.forEach(btn => {
-            btn.addEventListener('click', () => selectBgColor(btn.dataset.bg));
+            btn.addEventListener('click', () => {
+                selectBgColor(btn.dataset.bg);
+                autoRegenerate();
+            });
         });
 
-        // 高级设置折叠
-        elements.controlsToggle.addEventListener('click', () => {
-            elements.advancedPanel.classList.toggle('collapsed');
-        });
-
-        // 基础配置折叠
-        elements.basicToggle.addEventListener('click', () => {
-            elements.basicPanel.classList.toggle('collapsed');
+        // 配置面板折叠
+        elements.configToggle.addEventListener('click', () => {
+            elements.configPanel.classList.toggle('collapsed');
         });
 
         // 生成
-        elements.generateBtn.addEventListener('click', generateWordCloud);
+        elements.generateBtn.addEventListener('click', () => generateWordCloud(false));
+
+        // 重新生成
+        elements.regenerateBtn.addEventListener('click', () => generateWordCloud(true));
+
+        // 重新编辑
+        elements.editAgainBtn.addEventListener('click', resetToEditMode);
 
         // 下载
         elements.downloadBtn.addEventListener('click', downloadImage);
@@ -199,14 +215,6 @@
         if (elements.downloadSvgBtn) {
             elements.downloadSvgBtn.addEventListener('click', downloadSVG);
         }
-
-        // 返回修改
-        elements.backBtn.addEventListener('click', () => {
-            elements.previewSection.classList.add('hidden');
-            elements.inputSection.classList.remove('hidden');
-            // 滚动到顶部
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        });
     }
 
     // =====================
@@ -395,26 +403,56 @@
     // 词云生成
     // =====================
 
-    function generateWordCloud() {
-        // 获取输入数据
-        const text = elements.textInput.value;
+    let regenerateTimer = null;
 
-        if (!text.trim()) {
-            showStatus('请输入文本数据', 'error');
-            return;
-        }
+    /**
+     * 防抖自动重渲染：配置变化后延迟刷新
+     */
+    function autoRegenerate() {
+        if (!state.canDownload) return;
+        clearTimeout(regenerateTimer);
+        regenerateTimer = setTimeout(() => {
+            generateWordCloud(true);
+        }, 400);
+    }
 
-        // 自动识别格式
-        const words = detectAndParse(text);
+    /**
+     * 重置为编辑模式
+     */
+    function resetToEditMode() {
+        elements.contentZone.classList.remove('has-result');
+        elements.inputPanel.classList.remove('hidden');
+        elements.previewPanel.classList.add('hidden');
+        state.canDownload = false;
+        state.words = [];
+        elements.canvas.getContext('2d').clearRect(0, 0, state.width, state.height);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
 
-        if (words.length === 0) {
-            showStatus('未能解析有效数据', 'error');
-            return;
+    /**
+     * 生成词云
+     * @param {boolean} isRegenerate - 是否为重新生成（跳过输入验证）
+     */
+    function generateWordCloud(isRegenerate) {
+        // 获取输入数据（首次生成需验证）
+        if (!isRegenerate) {
+            const text = elements.textInput.value;
+            if (!text.trim()) {
+                showStatus('请输入文本数据', 'error');
+                return;
+            }
+            const words = detectAndParse(text);
+            if (words.length === 0) {
+                showStatus('未能解析有效数据', 'error');
+                return;
+            }
+            state.words = words;
         }
 
         // 获取当前配置
         const width = state.width;
         const height = state.height;
+        const words = state.words;
         const colors = colorSchemes[state.colorScheme] || colorSchemes.green;
 
         // 设置 canvas 尺寸
@@ -461,43 +499,40 @@
         };
 
         try {
-            // 显示加载遮罩
-            elements.loadingOverlay.classList.add('active');
+            // 显示内嵌加载指示器
+            elements.canvasSpinner.classList.add('active');
 
-            // 延迟执行以显示遮罩
+            // 延迟执行以显示 spinner
             setTimeout(() => {
                 WordCloud(canvas, options);
                 state.canDownload = true;
                 state.lastGeneratedWords = words;  // 缓存用于SVG导出
 
-                // 显示下载按钮
-                elements.downloadBtn.disabled = false;
-                elements.downloadBtn.classList.add('visible');
-                elements.downloadSvgBtn.disabled = false;
-                elements.downloadSvgBtn.classList.add('visible');
+                // 添加 has-result class 到 content zone
+                elements.contentZone.classList.add('has-result');
 
-                // 隐藏占位符
-                elements.previewPlaceholder.style.display = 'none';
+                // 显示预览面板
+                elements.previewPanel.classList.remove('hidden');
 
-                // 隐藏输入区，显示预览区
-                elements.inputSection.classList.add('hidden');
-                elements.previewSection.classList.remove('hidden');
+                // 自动展开配置面板（方便用户微调）
+                elements.configPanel.classList.remove('collapsed');
 
-                showStatus(`生成成功，共 ${words.length} 个词`, 'success');
+                // 滚动到预览区
+                elements.previewPanel.scrollIntoView({ behavior: 'auto', block: 'start' });
+
+                // 隐藏加载指示器
+                elements.canvasSpinner.classList.remove('active');
+
+                const msg = isRegenerate ? '已更新' : `生成成功，共 ${words.length} 个词`;
+                showStatus(msg, 'success');
 
                 // 保存当前配置到 localStorage
                 saveConfig();
-
-                // 隐藏加载遮罩
-                elements.loadingOverlay.classList.remove('active');
-
-                // 滚动到预览区
-                elements.previewSection.scrollIntoView({ behavior: 'smooth' });
             }, 100);
         } catch (err) {
             console.error('WordCloud error:', err);
             showStatus('生成失败: ' + err.message, 'error');
-            elements.loadingOverlay.classList.remove('active');
+            elements.canvasSpinner.classList.remove('active');
         }
     }
 
