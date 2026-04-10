@@ -11,9 +11,8 @@
     <script>
     (function() {
         var saved = localStorage.getItem('coax-tools-mode');
-        if (saved === 'light') {
-            document.body.setAttribute('data-mode', 'light');
-        }
+        var theme = saved === 'light' ? 'light' : 'sci-fi';
+        document.documentElement.setAttribute('data-theme', theme);
     })();
     </script>
     <link rel="stylesheet" href="../styles/theme-base.css">
@@ -21,7 +20,7 @@
     <link rel="stylesheet" href="../css/text-reader.css">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 </head>
-<body data-theme="tool">
+<body data-theme="sci-fi">
     <div class="bg-orbs"></div>
     <div class="grid-pattern"></div>
     <div class="container">
@@ -45,17 +44,6 @@
                 </div>
                 <span class="tool-desc">支持超大文件的分块加载</span>
             </header>
-
-            <!-- 导航区 -->
-            <div class="nav-zone">
-                <div class="nav-breadcrumb">
-                    <span class="nav-item"><span class="material-icons">home</span></span>
-                    <span class="nav-separator">/</span>
-                    <span class="nav-item"><span class="material-icons nav-title-icon">menu_book</span></span>
-                    <span class="nav-separator">/</span>
-                    <span class="nav-item nav-item-current">文本阅读器</span>
-                </div>
-            </div>
 
             <!-- 内容区 -->
             <div class="content-zone">
@@ -136,7 +124,7 @@
         </footer>
     </div>
 
-    <script src="../js/text-reader.js"></script>
     <script src="../js/theme-switcher.js"></script>
+    <script src="../js/text-reader.js"></script>
 </body>
 </html>

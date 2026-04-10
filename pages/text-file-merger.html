@@ -11,9 +11,8 @@
     <script>
     (function() {
         var saved = localStorage.getItem('coax-tools-mode');
-        if (saved === 'light') {
-            document.body.setAttribute('data-mode', 'light');
-        }
+        var theme = saved === 'light' ? 'light' : 'sci-fi';
+        document.documentElement.setAttribute('data-theme', theme);
     })();
     </script>
     <link rel="stylesheet" href="../styles/theme-base.css">
@@ -23,7 +22,7 @@
     <!-- 添加favicon图标 -->
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔧</text></svg>">
 </head>
-<body data-theme="tool">
+<body data-theme="sci-fi">
     <div class="bg-orbs"></div>
     <div class="grid-pattern"></div>
     <div class="container">
@@ -49,17 +48,6 @@
                 </div>
                 <span class="tool-desc">合并多个文本文件</span>
             </header>
-
-            <!-- 导航区 -->
-            <div class="nav-zone">
-                <div class="nav-breadcrumb">
-                    <span class="nav-item"><span class="material-icons">home</span></span>
-                    <span class="nav-separator">/</span>
-                    <span class="nav-item"><span class="material-icons nav-title-icon">merge_type</span></span>
-                    <span class="nav-separator">/</span>
-                    <span class="nav-item nav-item-current">文本文件合并</span>
-                </div>
-            </div>
 
             <!-- 内容区 -->
             <div class="content-zone">
@@ -130,7 +118,7 @@
         </footer>
     </div>
 
-    <script src="../js/text-file-merger.js"></script>
     <script src="../js/theme-switcher.js"></script>
+    <script src="../js/text-file-merger.js"></script>
 </body>
 </html>

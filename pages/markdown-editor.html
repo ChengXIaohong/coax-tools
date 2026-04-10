@@ -11,9 +11,8 @@
     <script>
     (function() {
         var saved = localStorage.getItem('coax-tools-mode');
-        if (saved === 'light') {
-            document.body.setAttribute('data-mode', 'light');
-        }
+        var theme = saved === 'light' ? 'light' : 'sci-fi';
+        document.documentElement.setAttribute('data-theme', theme);
     })();
     </script>
     <link rel="stylesheet" href="../styles/theme-base.css">
@@ -21,7 +20,7 @@
     <link rel="stylesheet" href="../css/markdown-editor.css">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 </head>
-<body data-theme="tool">
+<body data-theme="sci-fi">
     <div class="bg-orbs"></div>
     <div class="grid-pattern"></div>
     <div class="container">
@@ -119,7 +118,7 @@
     <!-- 消息提示 -->
     <div class="message" id="message"></div>
 
-    <script src="../js/markdown-editor.js"></script>
     <script src="../js/theme-switcher.js"></script>
+    <script src="../js/markdown-editor.js"></script>
 </body>
 </html>

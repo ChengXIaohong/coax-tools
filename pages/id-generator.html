@@ -11,9 +11,8 @@
     <script>
     (function() {
         var saved = localStorage.getItem('coax-tools-mode');
-        if (saved === 'light') {
-            document.body.setAttribute('data-mode', 'light');
-        }
+        var theme = saved === 'light' ? 'light' : 'sci-fi';
+        document.documentElement.setAttribute('data-theme', theme);
     })();
     </script>
     <link rel="stylesheet" href="../styles/theme-base.css">
@@ -24,7 +23,7 @@
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔧</text></svg>">
     <script src="../js/id-data.js"></script>
 </head>
-<body data-theme="tool">
+<body data-theme="sci-fi">
     <div class="bg-orbs"></div>
     <div class="grid-pattern"></div>
     <div class="container">
@@ -207,7 +206,7 @@
         </div>
     </div>
 
-    <script src="../js/id-generator.js"></script>
     <script src="../js/theme-switcher.js"></script>
+    <script src="../js/id-generator.js"></script>
 </body>
 </html>

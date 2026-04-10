@@ -11,9 +11,8 @@
     <script>
     (function() {
         var saved = localStorage.getItem('coax-tools-mode');
-        if (saved === 'light') {
-            document.documentElement.setAttribute('data-mode', 'light');
-        }
+        var theme = saved === 'light' ? 'light' : 'sci-fi';
+        document.documentElement.setAttribute('data-theme', theme);
     })();
     </script>
     <link rel="stylesheet" href="../styles/theme-base.css">
@@ -21,7 +20,7 @@
     <link rel="stylesheet" href="../css/ascii-art.css">
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎨</text></svg>">
 </head>
-<body data-theme="tool">
+<body data-theme="sci-fi">
     <div class="bg-orbs"></div>
     <div class="grid-pattern"></div>
     <div class="container">
@@ -49,56 +48,38 @@
             <!-- 输入区 -->
             <div class="input-section">
                 <div class="panel">
-                    <div class="panel-header">
-                        <span class="panel-title">// 输入文字</span>
-                    </div>
                     <div class="input-content">
                         <input type="text" id="asciiInput" placeholder="输入要转换的文字（支持英文、数字、常用符号）..." maxlength="50" autocomplete="off">
                     </div>
                 </div>
 
                 <!-- 配置区 -->
-                <div class="controls-panel collapsed" id="configPanel">
-                    <button class="controls-toggle" id="configToggle">
-                        <span>配置选项</span>
-                        <span class="toggle-icon">▸</span>
-                    </button>
-                    <div class="controls-body">
-                        <div class="config-grid">
-                            <div class="config-group">
-                                <label for="fontSelect">字体风格</label>
-                                <select id="fontSelect">
-                                    <option value="Banner">Banner</option>
-                                    <option value="Shadow">Shadow</option>
-                                    <option value="Lean">Lean</option>
-                                    <option value="Block">Block</option>
-                                    <option value="Standard">Standard</option>
-                                    <option value="Big">Big</option>
-                                    <option value="Bubble">Bubble</option>
-                                    <option value="Digital">Digital</option>
-                                    <option value="IVORY">Ivory</option>
-                                    <option value="Larry3d">Larry3d</option>
-                                    <option value="Nancyj">Nancyj</option>
-                                    <option value="O8">O8</option>
-                                    <option value="Rectangles">Rectangles</option>
-                                    <option value="Relief">Relief</option>
-                                    <option value="Slant">Slant</option>
-                                    <option value="Small">Small</option>
-                                    <option value="Soft">Soft</option>
-                                    <option value="Speed">Speed</option>
-                                    <option value="Varsity">Varsity</option>
-                                </select>
-                            </div>
-                            <div class="config-group">
-                                <label for="widthInput">输出宽度</label>
-                                <input type="number" id="widthInput" value="80" min="40" max="200" step="1">
-                            </div>
-                            <div class="config-group">
-                                <label>边框</label>
-                                <div class="checkbox-group">
-                                    <input type="checkbox" id="borderToggle" checked>
-                                    <label for="borderToggle">启用边框</label>
-                                </div>
+                <div class="config-section">
+                    <div class="config-grid">
+                        <div class="config-group">
+                            <label for="fontSelect">字体风格</label>
+                            <select id="fontSelect">
+                                <option value="Standard">Standard</option>
+                                <option value="Banner">Banner</option>
+                                <option value="Big">Big</option>
+                                <option value="Block">Block</option>
+                                <option value="Bubble">Bubble</option>
+                                <option value="Digital">Digital</option>
+                                <option value="Lean">Lean</option>
+                                <option value="Shadow">Shadow</option>
+                                <option value="Slant">Slant</option>
+                                <option value="Small">Small</option>
+                            </select>
+                        </div>
+                        <div class="config-group">
+                            <label for="widthInput">输出宽度</label>
+                            <input type="number" id="widthInput" value="80" min="40" max="200" step="1">
+                        </div>
+                        <div class="config-group">
+                            <label>边框</label>
+                            <div class="checkbox-group">
+                                <input type="checkbox" id="borderToggle" checked>
+                                <label for="borderToggle">启用边框</label>
                             </div>
                         </div>
                     </div>
@@ -107,9 +88,6 @@
                 <!-- 预览区 -->
                 <div class="preview-section">
                     <div class="panel">
-                        <div class="panel-header">
-                            <span class="panel-title">// 预览输出</span>
-                        </div>
                         <div id="asciiPreview" class="ascii-preview">
                             <pre id="asciiOutput"></pre>
                         </div>
@@ -118,9 +96,6 @@
 
                 <!-- 导出区 -->
                 <div class="panel">
-                    <div class="panel-header">
-                        <span class="panel-title">// 导出</span>
-                    </div>
                     <div class="panel-body">
                         <div class="export-buttons">
                             <button class="btn btn-primary" id="copyBtn">
@@ -142,15 +117,6 @@
                 <p>渝ICP备2025071398号</p>
             </div>
         </footer>
-    </div>
-
-    <!-- 加载遮罩 -->
-    <div class="loading-overlay" id="loadingOverlay">
-        <div class="loading-content">
-            <div class="loading-spinner-large"></div>
-            <p class="loading-text">字符画生成中...</p>
-            <p class="loading-detail">正在渲染您的字符画，请稍候</p>
-        </div>
     </div>
 
     <!-- 加载 figlet.js 和 html2canvas -->

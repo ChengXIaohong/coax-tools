@@ -11,9 +11,8 @@
     <script>
     (function() {
         var saved = localStorage.getItem('coax-tools-mode');
-        if (saved === 'light') {
-            document.body.setAttribute('data-mode', 'light');
-        }
+        var theme = saved === 'light' ? 'light' : 'sci-fi';
+        document.documentElement.setAttribute('data-theme', theme);
     })();
     </script>
     <link rel="stylesheet" href="../styles/theme-base.css">
@@ -22,7 +21,7 @@
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📄</text></svg>">
 </head>
-<body data-theme="tool">
+<body data-theme="sci-fi">
     <div class="bg-orbs"></div>
     <div class="grid-pattern"></div>
     <div class="container">
@@ -48,24 +47,6 @@
                 </div>
                 <span class="tool-desc">将Word文档转换为纯文本</span>
             </header>
-
-            <!-- 导航区 -->
-            <div class="nav-zone">
-                <div class="nav-breadcrumb">
-                    <span class="nav-item"><span class="material-icons">home</span></span>
-                    <span class="nav-separator">/</span>
-                    <span class="nav-item nav-item-current">Docx转文本</span>
-                </div>
-                <div class="nav-actions">
-                    <button class="nav-btn" id="historyBtn" title="历史记录">
-                        <span class="material-icons">history</span>
-                        <span class="nav-btn-text">历史</span>
-                    </button>
-                    <button class="nav-btn" id="helpBtn" title="使用帮助">
-                        <span class="material-icons">help_outline</span>
-                    </button>
-                </div>
-            </div>
 
             <!-- 内容区 -->
             <div class="content-zone">
@@ -324,7 +305,7 @@
     </div>
 
     <script src="https://unpkg.com/mammoth@1.4.2/mammoth.browser.min.js"></script>
-    <script src="../js/docx-converter.js"></script>
     <script src="../js/theme-switcher.js"></script>
+    <script src="../js/docx-converter.js"></script>
 </body>
 </html>

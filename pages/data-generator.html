@@ -12,17 +12,15 @@
     <link rel="stylesheet" href="../css/data-generator.css">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 </head>
-<body data-theme="tool">
+<body data-theme="sci-fi">
     <div class="bg-orbs"></div>
     <div class="grid-pattern"></div>
     <!-- 主题初始化：防止 FOUC（Flash of Unstyled Content）闪烁 -->
     <script>
     (function() {
         var saved = localStorage.getItem('coax-tools-mode');
-        if (saved === 'light' || saved === 'dark') {
-            document.body.setAttribute('data-mode', saved);
-        }
-        // 如果没有保存任何值，保持默认的 dark 模式（body 上没有 data-mode）
+        var theme = saved === 'light' ? 'light' : 'sci-fi';
+        document.documentElement.setAttribute('data-theme', theme);
     })();
     </script>
     <div class="container">
@@ -47,17 +45,6 @@
                 </div>
                 <span class="tool-desc">生成多种类型的模拟数据</span>
             </header>
-            <!-- 导航区 -->
-            <div class="nav-zone">
-                <div class="nav-breadcrumb">
-                    <span class="nav-item"><span class="material-icons">home</span></span>
-                    <span class="nav-separator">/</span>
-                    <span class="nav-item"><span class="material-icons nav-title-icon">database</span></span>
-                    <span class="nav-separator">/</span>
-                    <span class="nav-item nav-item-current">数据生成器</span>
-                </div>
-            </div>
-
             <!-- 内容区 -->
             <div class="content-zone">
                 <!-- 描述区 -->
@@ -172,7 +159,7 @@
     <script src="https://cdn.bootcdn.net/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://cdn.bootcdn.net/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
     <script src="../js/id-data.js"></script>
-    <script src="../js/data-generator.js"></script>
     <script src="../js/theme-switcher.js"></script>
+    <script src="../js/data-generator.js"></script>
 </body>
 </html>

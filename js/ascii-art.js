@@ -20,6 +20,11 @@
     // figlet 字体加载状态
     let figletReady = false;
 
+    // 获取当前字体（防御性）
+    function getCurrentFont() {
+        return fontSelectEl ? fontSelectEl.value : 'Standard';
+    }
+
     // emoji 装饰词库
     const emojiMap = {
         '爱': '❤️', '喜欢': '😍', '开心': '😄', '高兴': '🥳',
@@ -156,7 +161,7 @@
     // 更新预览
     function updatePreview() {
         const text = inputEl.value;
-        const font = fontSelectEl.value;
+        const font = getCurrentFont();
         const width = parseInt(widthInputEl.value, 10) || 80;
         const showBorder = borderToggleEl.checked;
 
@@ -326,7 +331,9 @@
         }
         debouncedUpdate();
     });
-    fontSelectEl.addEventListener('change', updatePreview);
+    if (fontSelectEl) {
+        fontSelectEl.addEventListener('change', updatePreview);
+    }
     widthInputEl.addEventListener('input', debouncedUpdate);
     borderToggleEl.addEventListener('change', updatePreview);
     copyBtn.addEventListener('click', copyToClipboard);
