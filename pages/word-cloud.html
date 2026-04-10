@@ -17,12 +17,14 @@
     })();
     </script>
     <link rel="stylesheet" href="../styles/theme-base.css">
-    <link rel="stylesheet" href="../styles/theme-editorial.css">
+    <link rel="stylesheet" href="../styles/theme-tool.css">
     <link rel="stylesheet" href="../css/word-cloud.css">
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>☁️</text></svg>">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 </head>
-<body data-theme="editorial">
+<body data-theme="tool">
+    <div class="bg-orbs"></div>
+    <div class="grid-pattern"></div>
     <div class="container">
         <header>
             <div class="header-content">
@@ -32,6 +34,25 @@
         </header>
 
         <main class="word-cloud-main">
+            <!-- 统一顶栏 -->
+            <header class="tool-header-bar">
+                <a href="../index.html" class="back-btn">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M19 12H5M12 19l-7-7 7-7"/>
+                    </svg>
+                    返回首页
+                </a>
+                <div class="tool-title">
+                    <div class="tool-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/>
+                        </svg>
+                    </div>
+                    <span class="tool-name">词云生成器</span>
+                </div>
+                <span class="tool-desc">生成漂亮的词云图片</span>
+            </header>
+
             <!-- 消息提示 -->
             <div id="message" class="message"></div>
 
@@ -196,7 +217,7 @@
 
         <footer>
             <div class="footer-content">
-                <p>&copy; <span id="currentYear"></span> coax. 保留所有权利。</p>
+                <p>&copy; <span id="currentYear"></span> root@coax. 保留所有权利。</p>
                 <p>渝ICP备2025071398号</p>
             </div>
         </footer>

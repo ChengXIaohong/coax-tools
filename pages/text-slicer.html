@@ -17,24 +17,38 @@
     })();
     </script>
     <link rel="stylesheet" href="../styles/theme-base.css">
-    <link rel="stylesheet" href="../styles/theme-cli.css">
+    <link rel="stylesheet" href="../styles/theme-tool.css">
     <link rel="stylesheet" href="../css/text-slicer.css">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>✂️</text></svg>">
 </head>
-<body data-theme="cli">
+<body data-theme="tool">
+    <div class="bg-orbs"></div>
+    <div class="grid-pattern"></div>
     <div class="container">
         <main class="docx-main">
-            <!-- 导航区 -->
-            <div class="nav-zone">
-                <div class="nav-breadcrumb">
-                    <span class="nav-item"><span class="material-icons">home</span></span>
-                    <span class="nav-separator">/</span>
-                    <span class="nav-item"><span class="material-icons nav-title-icon">content_cut</span></span>
-                    <span class="nav-separator">/</span>
-                    <span class="nav-item nav-item-current">文本文件切片工具</span>
+            <!-- 统一顶栏 -->
+            <header class="tool-header-bar">
+                <a href="../index.html" class="back-btn">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M19 12H5M12 19l-7-7 7-7"/>
+                    </svg>
+                    返回首页
+                </a>
+                <div class="tool-title">
+                    <div class="tool-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="6" cy="6" r="3"/>
+                            <circle cx="6" cy="18" r="3"/>
+                            <line x1="20" y1="4" x2="8.12" y2="15.88"/>
+                            <line x1="14.47" y1="14.48" x2="20" y2="20"/>
+                            <line x1="8.12" y1="8.12" x2="12" y2="12"/>
+                        </svg>
+                    </div>
+                    <span class="tool-name">文本切片工具</span>
                 </div>
-            </div>
+                <span class="tool-desc">将大文本按行数或大小分割</span>
+            </header>
 
             <!-- 内容区 -->
             <div class="content-zone">
@@ -158,7 +172,7 @@
 
         <footer>
             <div class="footer-content">
-                <p>&copy; <span id="currentYear"></span> coax的小工具. 保留所有权利。</p>
+                <p>&copy; <span id="currentYear"></span> root@coax. 保留所有权利。</p>
                 <p>渝ICP备2025071398号</p>
             </div>
         </footer>

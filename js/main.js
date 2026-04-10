@@ -225,10 +225,20 @@ function renderTools(toolsList) {
         const section = document.createElement('section');
         section.className = 'tool-category';
         
+        // 分类图标 SVG
+        const categoryIcons = {
+            common: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>',
+            text: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>',
+            data: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>',
+            dev: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>',
+            security: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>',
+            doc: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>'
+        };
+
         // 分类标题
         const header = document.createElement('div');
         header.className = 'category-header';
-        header.innerHTML = `<span class="category-icon">📂</span><span class="category-name">${catName}</span><span class="category-count">(${catTools.length})</span>`;
+        header.innerHTML = `<span class="category-icon">${categoryIcons[catKey] || categoryIcons.common}</span><span class="category-name">${catName}</span><span class="category-count">(${catTools.length})</span>`;
         section.appendChild(header);
         
         // 工具网格
@@ -248,8 +258,21 @@ function renderTools(toolsList) {
                 <div class="card-arrow"></div>
             `;
             
-            card.addEventListener('click', function() {
-                window.location.href = tool.link;
+            card.addEventListener('click', function(e) {
+                // 添加涟漪效果
+                const rect = card.getBoundingClientRect();
+                const x = ((e.clientX - rect.left) / rect.width) * 100;
+                const y = ((e.clientY - rect.top) / rect.height) * 100;
+                card.style.setProperty('--ripple-x', x + '%');
+                card.style.setProperty('--ripple-y', y + '%');
+                card.classList.remove('ripple');
+                void card.offsetWidth; // 强制重绘
+                card.classList.add('ripple');
+
+                // 延迟跳转，让涟漪效果先显示
+                setTimeout(() => {
+                    window.location.href = tool.link;
+                }, 150);
             });
             
             grid.appendChild(card);

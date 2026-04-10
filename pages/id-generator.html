@@ -17,36 +17,41 @@
     })();
     </script>
     <link rel="stylesheet" href="../styles/theme-base.css">
-    <link rel="stylesheet" href="../styles/theme-cli.css">
+    <link rel="stylesheet" href="../styles/theme-tool.css">
     <link rel="stylesheet" href="../css/id-generator.css">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <!-- 添加favicon图标 -->
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔧</text></svg>">
     <script src="../js/id-data.js"></script>
 </head>
-<body data-theme="cli">
+<body data-theme="tool">
+    <div class="bg-orbs"></div>
+    <div class="grid-pattern"></div>
     <div class="container">
         <main class="docx-main">
-            <!-- 导航区 -->
-            <div class="nav-zone">
-                <div class="nav-breadcrumb">
-                    <span class="nav-item"><span class="material-icons">home</span></span>
-                    <span class="nav-separator">/</span>
-                    <span class="nav-item"><span class="material-icons nav-title-icon">badge</span></span>
-                    <span class="nav-separator">/</span>
-                    <span class="nav-item nav-item-current">ID生成器</span>
+            <!-- 统一顶栏 -->
+            <header class="tool-header-bar">
+                <a href="../index.html" class="back-btn">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M19 12H5M12 19l-7-7 7-7"/>
+                    </svg>
+                    返回首页
+                </a>
+                <div class="tool-title">
+                    <div class="tool-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="2" y="4" width="20" height="16" rx="2"/>
+                            <path d="M7 15h0M12 15h0M17 15h0"/>
+                            <path d="M7 11h0M12 11h0M17 11h0"/>
+                        </svg>
+                    </div>
+                    <span class="tool-name">身份证生成器</span>
                 </div>
-            </div>
+                <span class="tool-desc">生成模拟身份证信息</span>
+            </header>
 
             <!-- 内容区 -->
             <div class="content-zone">
-                <!-- 描述区 -->
-                <div class="tool-desc">
-                    <p>生成各类ID</p>
-                </div>
-
-                <!-- 操作区 -->
-                <div class="id-generator-container">
                     <div class="options-header">
                         <span>选项</span>
                         <button id="toggleOptionsBtn" class="toggle-btn" title="收起/展开选项">▼</button>
@@ -172,7 +177,7 @@
 
         <footer>
             <div class="footer-content">
-                <p>&copy; <span id="currentYear"></span> coax的小工具. 保留所有权利。</p>
+                <p>&copy; <span id="currentYear"></span> root@coax. 保留所有权利。</p>
                 <p>渝ICP备2025071398号</p>
             </div>
         </footer>

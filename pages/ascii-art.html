@@ -17,17 +17,32 @@
     })();
     </script>
     <link rel="stylesheet" href="../styles/theme-base.css">
-    <link rel="stylesheet" href="../styles/theme-editorial.css">
+    <link rel="stylesheet" href="../styles/theme-tool.css">
     <link rel="stylesheet" href="../css/ascii-art.css">
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎨</text></svg>">
 </head>
-<body data-theme="editorial">
+<body data-theme="tool">
+    <div class="bg-orbs"></div>
+    <div class="grid-pattern"></div>
     <div class="container">
-        <header>
-            <div class="header-content">
-                <h1>字符画生成器</h1>
-                <p class="header-subtitle">将文字转换为炫酷的 ASCII Art 效果</p>
+        <header class="tool-header-bar">
+            <a href="../index.html" class="back-btn">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M19 12H5M12 19l-7-7 7-7"/>
+                </svg>
+                返回首页
+            </a>
+            <div class="tool-title">
+                <div class="tool-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 19l7-7 3 3-7 7-3-3z"/>
+                        <path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/>
+                        <path d="M2 2l7.586 7.586"/>
+                    </svg>
+                </div>
+                <span class="tool-name">字符画生成器</span>
             </div>
+            <span class="tool-desc">将文字转换为炫酷的 ASCII Art</span>
         </header>
 
         <main>
@@ -123,7 +138,7 @@
 
         <footer>
             <div class="footer-content">
-                <p>&copy; <span id="currentYear"></span> coax. 保留所有权利。</p>
+                <p>&copy; <span id="currentYear"></span> root@coax. 保留所有权利。</p>
                 <p>渝ICP备2025071398号</p>
             </div>
         </footer>
