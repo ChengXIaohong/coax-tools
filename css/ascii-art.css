@@ -1,23 +1,22 @@
 /*
  * 字符画生成器样式
+ * 适配 Liquid Glass 科幻主题
  */
 
-@import url('https://fonts.googleapis.com/icon?family=Material+Icons');
-
-.ascii-main {
-    padding: 0;
-}
+/* ========================================
+   导航区
+   ======================================== */
 
 .nav-zone {
-    margin-bottom: 1.5vw;
+    margin-bottom: 1.5rem;
 }
 
 .nav-breadcrumb {
     display: flex;
     align-items: center;
-    gap: 0.5vw;
+    gap: 0.5rem;
     font-size: 0.85rem;
-    color: var(--cli-fg-dim);
+    color: var(--tool-fg-dim);
 }
 
 .nav-breadcrumb .material-icons {
@@ -27,13 +26,13 @@
 .nav-item {
     display: flex;
     align-items: center;
-    gap: 0.3vw;
+    gap: 0.3rem;
     cursor: pointer;
     transition: color 0.15s;
 }
 
 .nav-item:hover {
-    color: var(--cli-fg);
+    color: var(--tool-fg);
 }
 
 .nav-separator {
@@ -45,40 +44,38 @@
 }
 
 .nav-item-current {
-    color: var(--cli-fg);
+    color: var(--tool-fg);
     opacity: 1;
 }
 
 .tool-desc {
-    margin-bottom: 2vw;
-    padding: 1vw 0;
-    border-bottom: 1px dashed var(--cli-border);
+    margin-bottom: 2rem;
+    padding: 1rem 0;
+    border-bottom: 1px solid var(--tool-border);
 }
 
 .tool-desc p {
-    color: var(--cli-fg-dim);
+    color: var(--tool-fg-dim);
     font-size: 1rem;
     margin: 0;
 }
 
-.tool-desc p::before {
-    content: '// ';
-    color: var(--cli-fg-dim);
-    opacity: 0.5;
-}
+/* ========================================
+   操作区
+   ======================================== */
 
 .operation-zone {
     display: flex;
     flex-direction: column;
-    gap: 2vw;
+    gap: 2rem;
 }
 
 .section-header {
-    margin-bottom: 1vw;
+    margin-bottom: 1rem;
 }
 
 .section-title {
-    color: var(--cli-fg-dim);
+    color: var(--tool-fg-dim);
     font-size: 0.9rem;
 }
 
@@ -89,7 +86,7 @@
 .config-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: 1.5vw;
+    gap: 1.5rem;
 }
 
 .form-group {
@@ -98,8 +95,8 @@
 
 .form-group label {
     display: block;
-    margin-bottom: 0.5vw;
-    color: var(--cli-fg-dim);
+    margin-bottom: 0.5rem;
+    color: var(--tool-fg-dim);
     font-size: 0.85rem;
 }
 
@@ -110,26 +107,27 @@
 .checkbox-group label {
     display: flex;
     align-items: center;
-    gap: 0.8vw;
+    gap: 0.8rem;
     cursor: pointer;
 }
 
 .form-group input[type="checkbox"] {
-    width: 1.2vw;
-    height: 1.2vw;
+    width: 1.2rem;
+    height: 1.2rem;
     min-width: 18px;
     min-height: 18px;
     appearance: none;
-    border: 1px solid var(--cli-border);
-    background: transparent;
+    border: 1px solid var(--tool-border);
+    background: var(--tool-surface);
     cursor: pointer;
     position: relative;
     transition: all 0.15s;
+    border-radius: 4px;
 }
 
 .form-group input[type="checkbox"]:checked {
-    border-color: var(--cli-fg);
-    background: var(--cli-fg);
+    border-color: var(--tool-accent);
+    background: var(--tool-accent);
 }
 
 .form-group input[type="checkbox"]:checked::after {
@@ -138,27 +136,26 @@
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    color: var(--cli-bg);
+    color: white;
     font-size: 0.8rem;
     font-weight: bold;
 }
 
 .form-group input[type="checkbox"]:focus {
     outline: none;
-    box-shadow: 0 0 0 2px rgba(0, 230, 118, 0.3);
+    box-shadow: 0 0 0 3px var(--tool-accent-glow);
 }
 
-/* 预览区 */
+/* 预览区 - Glass Panel */
 .ascii-preview {
-    border: 1px dashed var(--cli-border);
-    padding: 2vw;
+    border: 1px solid var(--tool-border);
+    padding: 2rem;
     min-height: 200px;
-    background: rgba(0, 0, 0, 0.2);
+    background: var(--tool-surface);
     overflow-x: auto;
-}
-
-body[data-theme="cli"][data-mode="light"], html[data-mode="light"] .ascii-preview {
-    background: rgba(0, 0, 0, 0.05);
+    border-radius: 16px;
+    backdrop-filter: blur(var(--tool-glass-blur));
+    -webkit-backdrop-filter: blur(var(--tool-glass-blur));
 }
 
 .ascii-preview #asciiOutput {
@@ -167,36 +164,38 @@ body[data-theme="cli"][data-mode="light"], html[data-mode="light"] .ascii-previe
     font-family: 'SF Mono', 'Fira Code', 'Consolas', 'Monaco', 'Courier New', monospace;
     font-size: 0.85rem;
     line-height: 1.2;
-    color: var(--cli-fg);
+    color: var(--tool-fg);
     white-space: pre;
     overflow-x: auto;
 }
 
 .ascii-preview .ascii-border {
-    border: 2px solid var(--cli-fg);
-    padding: 1vw;
+    border: 2px solid var(--tool-accent);
+    padding: 1rem;
     display: inline-block;
     margin: 0 auto;
+    border-radius: 8px;
+    box-shadow: 0 0 20px var(--tool-accent-glow);
 }
 
 .ascii-preview .ascii-border-top,
 .ascii-preview .ascii-border-bottom {
     text-align: center;
-    color: var(--cli-fg-dim);
+    color: var(--tool-fg-dim);
     font-size: 0.8rem;
 }
 
 /* 导出按钮区 */
 .export-buttons {
     display: flex;
-    gap: 1vw;
+    gap: 1rem;
     flex-wrap: wrap;
 }
 
 .export-buttons .btn {
     display: inline-flex;
     align-items: center;
-    gap: 0.5vw;
+    gap: 0.5rem;
 }
 
 .export-buttons .btn-icon {
@@ -204,50 +203,122 @@ body[data-theme="cli"][data-mode="light"], html[data-mode="light"] .ascii-previe
 }
 
 .copy-status {
-    margin-top: 1vw;
-    padding: 0.8vw 1vw;
+    margin-top: 1rem;
+    padding: 0.8rem 1rem;
     font-size: 0.85rem;
-    border: 1px dashed var(--cli-border);
-    color: var(--cli-fg);
+    border: 1px solid var(--tool-border);
+    color: var(--tool-fg);
     animation: slideIn 0.3s ease-out;
+    border-radius: 8px;
+    background: var(--tool-surface);
 }
 
 .copy-status.success {
-    border-color: var(--cli-fg);
-    color: var(--cli-fg);
+    border-color: var(--tool-accent);
+    color: var(--tool-accent);
+    background: rgba(167, 139, 250, 0.1);
 }
 
 .copy-status.error {
-    border-color: var(--cli-error);
-    color: var(--cli-error);
+    border-color: #ff5252;
+    color: #ff5252;
+    background: rgba(255, 82, 82, 0.1);
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 /* 加载状态 */
 .ascii-preview.loading::after {
     content: '正在加载字体...';
-    color: var(--cli-fg-dim);
+    color: var(--tool-fg-dim);
     font-size: 0.9rem;
     display: block;
     text-align: center;
-    padding: 2vw;
+    padding: 2rem;
 }
 
 /* 隐藏占位符时的样式 */
 .ascii-preview:has(#asciiOutput:empty)::before {
     content: '> 在上方输入文字即可预览 ASCII Art...';
-    color: var(--cli-fg-dim);
+    color: var(--tool-fg-dim);
     font-size: 0.85rem;
     display: block;
-    padding: 1vw;
+    padding: 1rem;
     opacity: 0.5;
     font-style: italic;
 }
 
-/* 响应式 */
+/* ========================================
+   通用按钮
+   ======================================== */
+
+.btn {
+    padding: 0.75rem 1.5rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    transition: all var(--tool-duration-normal, 250ms);
+    border: none;
+    border-radius: 10px;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.btn .material-icons {
+    font-size: 1.1rem;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+}
+
+.btn:active {
+    transform: translateY(0);
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, var(--tool-accent) 0%, #8b5cf6 100%);
+    color: #fff;
+    box-shadow: 0 4px 20px var(--tool-accent-glow);
+}
+
+.btn-primary:hover {
+    box-shadow: 0 6px 30px var(--tool-accent-glow);
+    color: #fff;
+}
+
+.btn-secondary {
+    background: transparent;
+    color: var(--tool-fg);
+    border: 1px solid var(--tool-border);
+}
+
+.btn-secondary:hover {
+    border-color: var(--tool-accent);
+    box-shadow: 0 0 20px var(--tool-accent-glow);
+}
+
+/* ========================================
+   响应式
+   ======================================== */
+
 @media (max-width: 576px) {
     .config-grid {
         grid-template-columns: 1fr;
-        gap: 1.2vw;
+        gap: 1.2rem;
     }
 
     .export-buttons {
@@ -260,7 +331,7 @@ body[data-theme="cli"][data-mode="light"], html[data-mode="light"] .ascii-previe
     }
 
     .ascii-preview {
-        padding: 12px;
+        padding: 1rem;
         overflow-x: scroll;
     }
 

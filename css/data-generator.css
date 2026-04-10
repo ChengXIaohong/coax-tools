@@ -1,45 +1,7 @@
 /*
  * 数据生成器样式
- * 适配 CLI 主题
+ * 适配 Liquid Glass 科幻主题
  */
-
-/* ========================================
-   导航区
-   ======================================== */
-
-.nav-zone {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 1vw 0;
-    margin-bottom: 2vw;
-    border-bottom: 1px dashed var(--cli-border);
-}
-
-.nav-breadcrumb {
-    display: flex;
-    align-items: center;
-    gap: 0.5vw;
-    color: var(--cli-fg-dim);
-    font-size: 0.9rem;
-}
-
-.nav-breadcrumb .material-icons {
-    font-size: 1.2rem;
-}
-
-.nav-separator {
-    opacity: 0.5;
-}
-
-.nav-item-current {
-    color: var(--cli-fg);
-}
-
-.nav-title-icon {
-    font-size: 1rem !important;
-    color: var(--cli-fg-dim);
-}
 
 /* ========================================
    内容区
@@ -48,270 +10,293 @@
 .content-zone {
     display: flex;
     flex-direction: column;
-    gap: 2.5vw;
+    gap: 2rem;
 }
 
 .tool-desc {
-    margin-bottom: 0.5vw;
+    margin-bottom: 0.5rem;
 }
 
 .tool-desc p {
     margin: 0;
-    color: var(--cli-fg-dim);
+    color: var(--tool-fg-dim);
     font-size: 0.9rem;
 }
 
-body {
-    font-family: inherit;
-    max-width: none;
-    margin: 0;
-    padding: 0;
-    background: transparent;
-    color: var(--cli-fg);
-}
-
-.container {
-    display: flex;
-    flex-direction: column;
-    gap: 2vw;
-}
+/* ========================================
+   选项容器 - Glass Panel
+   ======================================== */
 
 .options-container {
-    background: rgba(0, 255, 0, 0.02);
-    border: 1px dashed var(--cli-border);
-    padding: 2vw;
+    background: var(--tool-glass-bg);
+    border: 1px solid var(--tool-glass-border);
+    backdrop-filter: blur(var(--tool-glass-blur));
+    -webkit-backdrop-filter: blur(var(--tool-glass-blur));
+    padding: 2rem;
+    border-radius: 16px;
 }
 
 .options-container h3 {
-    color: var(--cli-fg);
-    margin: 0 0 1.5vw 0;
+    color: var(--tool-fg);
+    margin: 0 0 1.5rem 0;
     font-size: 1rem;
-}
-
-.options-container h3::before {
-    content: '## ';
-    color: var(--cli-fg-dim);
+    font-weight: 500;
 }
 
 .row-count-input {
-    margin-bottom: 1.5vw;
+    margin-bottom: 1.5rem;
 }
 
 .row-count-input label {
-    color: var(--cli-fg-dim);
-    margin-right: 1vw;
+    color: var(--tool-fg-dim);
+    margin-right: 1rem;
     font-size: 0.9rem;
 }
 
 .row-count-input input {
-    padding: 0.6vw 1vw;
-    border: 1px solid var(--cli-border);
-    background: var(--cli-input-bg);
-    color: var(--cli-fg);
+    padding: 0.6rem 1rem;
+    border: 1px solid var(--tool-border);
+    background: var(--tool-surface);
+    color: var(--tool-fg);
     font-family: inherit;
     font-size: 0.9rem;
-    width: 10vw;
+    width: 10rem;
     min-width: 80px;
+    border-radius: 10px;
+    transition: all var(--tool-duration-fast, 150ms);
 }
 
 .row-count-input input:focus {
     outline: none;
-    border-color: var(--cli-fg);
+    border-color: var(--tool-accent);
+    box-shadow: 0 0 0 3px var(--tool-accent-glow);
 }
 
 .options-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(15vw, 1fr));
-    gap: 1vw;
-    margin-top: 1.5vw;
+    grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
+    gap: 1rem;
+    margin-top: 1.5rem;
 }
 
 .option-item {
     display: flex;
     align-items: center;
-    gap: 0.5vw;
-    color: var(--cli-fg);
+    gap: 0.5rem;
+    color: var(--tool-fg);
     cursor: pointer;
 }
 
 .option-item input {
     appearance: none;
-    width: 1vw;
-    height: 1vw;
+    width: 1rem;
+    height: 1rem;
     min-width: 16px;
     min-height: 16px;
-    border: 1px solid var(--cli-border);
-    background: var(--cli-input-bg);
+    border: 1px solid var(--tool-border);
+    background: var(--tool-surface);
     cursor: pointer;
+    border-radius: 4px;
+    transition: all 0.15s;
 }
 
 .option-item input:checked {
-    border-color: var(--cli-fg);
-    background: var(--cli-fg);
+    border-color: var(--tool-accent);
+    background: var(--tool-accent);
+}
+
+.option-item input:checked::after {
+    content: '✓';
+    display: block;
+    color: white;
+    font-size: 0.7rem;
+    text-align: center;
+    line-height: 1rem;
 }
 
 .name-options {
-    margin-top: 1.5vw;
-    padding-top: 1.5vw;
-    border-top: 1px dashed var(--cli-border);
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--tool-border);
 }
 
 .name-options h4 {
-    margin: 0 0 1vw 0;
-    color: var(--cli-fg);
+    margin: 0 0 1rem 0;
+    color: var(--tool-fg);
     font-size: 0.95rem;
-}
-
-.name-options h4::before {
-    content: '### ';
-    color: var(--cli-fg-dim);
+    font-weight: 500;
 }
 
 .name-options select {
-    padding: 0.6vw 1vw;
-    border: 1px solid var(--cli-border);
-    background: var(--cli-input-bg);
-    color: var(--cli-fg);
+    padding: 0.6rem 1rem;
+    border: 1px solid var(--tool-border);
+    background: var(--tool-surface);
+    color: var(--tool-fg);
     font-family: inherit;
     font-size: 0.9rem;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all var(--tool-duration-fast, 150ms);
 }
 
 .name-options select:focus {
     outline: none;
-    border-color: var(--cli-fg);
+    border-color: var(--tool-accent);
+    box-shadow: 0 0 0 3px var(--tool-accent-glow);
 }
+
+/* ========================================
+   控制按钮
+   ======================================== */
 
 .controls {
     display: flex;
     justify-content: flex-start;
-    gap: 1vw;
-    padding: 2vw 0;
+    gap: 1rem;
+    padding: 2rem 0;
     flex-wrap: wrap;
 }
 
 button {
-    padding: 1vw 2vw;
-    border: 1px solid var(--cli-fg);
-    background: transparent;
-    color: var(--cli-fg);
+    padding: 0.75rem 1.5rem;
+    border: 1px solid var(--tool-border);
+    background: var(--tool-surface);
+    color: var(--tool-fg);
     cursor: pointer;
     font-family: inherit;
     font-size: 0.9rem;
-    transition: all 0.15s;
+    transition: all var(--tool-duration-normal, 250ms);
+    border-radius: 10px;
 }
 
 button:hover:not(.disabled) {
-    background: var(--cli-fg);
-    color: var(--cli-bg);
+    border-color: var(--tool-accent);
+    box-shadow: 0 0 15px var(--tool-accent-glow);
 }
 
 .start-btn {
-    background: var(--cli-fg);
-    color: var(--cli-bg);
+    background: linear-gradient(135deg, var(--tool-accent) 0%, #8b5cf6 100%);
+    color: #fff;
+    border: none;
+    box-shadow: 0 4px 20px var(--tool-accent-glow);
 }
 
 .start-btn:hover:not(.disabled) {
-    background: transparent;
-    color: var(--cli-fg);
+    box-shadow: 0 6px 30px var(--tool-accent-glow);
+    transform: translateY(-2px);
+    color: #fff;
 }
 
 .preview-btn {
-    border-color: var(--cli-border);
-    color: var(--cli-fg-dim);
+    border-color: var(--tool-border);
+    color: var(--tool-fg-dim);
 }
 
 .preview-btn:hover:not(.disabled) {
-    border-color: var(--cli-fg);
-    color: var(--cli-fg);
-    background: transparent;
+    border-color: var(--tool-accent-2);
+    color: var(--tool-fg);
+    box-shadow: 0 0 15px var(--tool-accent-2-glow);
 }
 
 .disabled {
-    border-color: var(--cli-border);
-    color: var(--cli-fg-dim);
+    border-color: var(--tool-border);
+    color: var(--tool-fg-muted);
     cursor: not-allowed;
+    opacity: 0.6;
 }
+
+/* ========================================
+   进度容器 - Glass Panel
+   ======================================== */
 
 .progress-container {
     display: none;
-    background: rgba(0, 255, 0, 0.02);
-    border: 1px dashed var(--cli-border);
-    padding: 2vw;
+    background: var(--tool-glass-bg);
+    border: 1px solid var(--tool-glass-border);
+    backdrop-filter: blur(var(--tool-glass-blur));
+    -webkit-backdrop-filter: blur(var(--tool-glass-blur));
+    padding: 2rem;
+    border-radius: 16px;
 }
 
 .progress-container h3 {
-    margin: 0 0 1.5vw 0;
-    color: var(--cli-fg);
+    margin: 0 0 1.5rem 0;
+    color: var(--tool-fg);
     font-size: 0.95rem;
 }
 
 .progress-bar {
     width: 100%;
-    height: 1.5vw;
+    height: 1.5rem;
     min-height: 16px;
-    background: var(--cli-border);
+    background: var(--tool-border);
     overflow: hidden;
+    border-radius: 8px;
 }
 
 .progress-fill {
     height: 100%;
-    background: var(--cli-fg);
+    background: linear-gradient(90deg, var(--tool-accent), #8b5cf6);
     width: 0%;
     transition: width 0.3s;
+    border-radius: 8px;
+    box-shadow: 0 0 10px var(--tool-accent-glow);
 }
 
+/* ========================================
+   预览容器 - Glass Panel
+   ======================================== */
+
 .preview-container {
-    background: rgba(0, 255, 0, 0.02);
-    border: 1px dashed var(--cli-border);
-    padding: 2vw;
+    background: var(--tool-glass-bg);
+    border: 1px solid var(--tool-glass-border);
+    backdrop-filter: blur(var(--tool-glass-blur));
+    -webkit-backdrop-filter: blur(var(--tool-glass-blur));
+    padding: 2rem;
+    border-radius: 16px;
     overflow-x: auto;
 }
 
 .preview-container h3 {
-    margin: 0 0 1.5vw 0;
-    color: var(--cli-fg);
+    margin: 0 0 1.5rem 0;
+    color: var(--tool-fg);
     font-size: 1rem;
 }
 
 table {
     width: 100%;
     border-collapse: collapse;
-    margin-top: 1.5vw;
+    margin-top: 1.5rem;
 }
 
 th {
-    background: transparent;
-    color: var(--cli-fg);
+    background: var(--tool-surface);
+    color: var(--tool-fg);
     text-align: left;
-    padding: 1vw;
-    border-bottom: 2px solid var(--cli-border);
-    font-weight: normal;
-}
-
-th::before {
-    content: '| ';
-    color: var(--cli-fg-dim);
+    padding: 1rem;
+    border-bottom: 2px solid var(--tool-border);
+    font-weight: 500;
 }
 
 td {
-    padding: 0.8vw;
-    border-bottom: 1px dashed var(--cli-border);
-    color: var(--cli-fg-dim);
+    padding: 0.8rem 1rem;
+    border-bottom: 1px solid var(--tool-border);
+    color: var(--tool-fg-dim);
 }
 
-tr:nth-child(even) {
-    background: rgba(0, 255, 0, 0.02);
+tr:hover {
+    background: var(--tool-surface);
 }
 
 .empty-preview {
     text-align: center;
-    padding: 4vw;
-    color: var(--cli-fg-dim);
+    padding: 4rem;
+    color: var(--tool-fg-dim);
 }
 
-.empty-preview::before {
-    content: '> ';
-}
+/* ========================================
+   Modal - Glass Blur
+   ======================================== */
 
 .modal {
     display: none;
@@ -321,56 +306,62 @@ tr:nth-child(even) {
     top: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.9);
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
 }
 
 .modal-content {
-    background: var(--cli-bg);
-    border: 1px solid var(--cli-fg);
+    background: var(--tool-bg-elevated);
+    border: 1px solid var(--tool-border);
     margin: 5% auto;
-    padding: 2vw;
+    padding: 2rem;
     width: 90%;
     max-width: 800px;
     max-height: 80vh;
     overflow-y: auto;
+    border-radius: 16px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
 }
 
 .modal-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 2vw;
-    padding-bottom: 1vw;
-    border-bottom: 1px dashed var(--cli-border);
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--tool-border);
 }
 
 .modal-header h2 {
     margin: 0;
-    color: var(--cli-fg);
+    color: var(--tool-fg);
     font-size: 1rem;
+    font-weight: 500;
 }
 
 .close {
-    color: var(--cli-fg);
+    color: var(--tool-fg-dim);
     font-size: 1.5rem;
     cursor: pointer;
     font-family: inherit;
+    transition: color 0.15s;
 }
 
 .close:hover {
-    color: var(--cli-error);
+    color: var(--tool-accent);
 }
 
 .modal-body {
-    margin-bottom: 2vw;
+    margin-bottom: 2rem;
 }
 
 .modal-footer {
     display: flex;
     justify-content: flex-end;
-    gap: 1vw;
-    padding-top: 2vw;
-    border-top: 1px dashed var(--cli-border);
+    gap: 1rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--tool-border);
 }
 
 .modal-table {
@@ -380,15 +371,19 @@ tr:nth-child(even) {
 
 .modal-table th,
 .modal-table td {
-    padding: 0.8vw;
+    padding: 0.8rem;
     text-align: left;
-    border-bottom: 1px dashed var(--cli-border);
+    border-bottom: 1px solid var(--tool-border);
 }
 
 .modal-table th {
-    background: transparent;
-    color: var(--cli-fg);
+    background: var(--tool-surface);
+    color: var(--tool-fg);
 }
+
+/* ========================================
+   响应式
+   ======================================== */
 
 @media (max-width: 768px) {
     .options-grid {

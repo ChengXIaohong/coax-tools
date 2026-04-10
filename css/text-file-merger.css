@@ -1,6 +1,6 @@
 /*
  * 文本文件合成器样式
- * 适配 CLI 主题
+ * 适配 Liquid Glass 科幻主题
  */
 
 /* ========================================
@@ -11,16 +11,16 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 1vw 0;
-    margin-bottom: 2vw;
-    border-bottom: 1px dashed var(--cli-border);
+    padding: 1rem 0;
+    margin-bottom: 2rem;
+    border-bottom: 1px solid var(--tool-border);
 }
 
 .nav-breadcrumb {
     display: flex;
     align-items: center;
-    gap: 0.5vw;
-    color: var(--cli-fg-dim);
+    gap: 0.5rem;
+    color: var(--tool-fg-dim);
     font-size: 0.9rem;
 }
 
@@ -33,12 +33,12 @@
 }
 
 .nav-item-current {
-    color: var(--cli-fg);
+    color: var(--tool-fg);
 }
 
 .nav-title-icon {
     font-size: 1rem !important;
-    color: var(--cli-fg-dim);
+    color: var(--tool-fg-dim);
 }
 
 /* ========================================
@@ -48,16 +48,16 @@
 .content-zone {
     display: flex;
     flex-direction: column;
-    gap: 2.5vw;
+    gap: 2rem;
 }
 
 .tool-desc {
-    margin-bottom: 0.5vw;
+    margin-bottom: 0.5rem;
 }
 
 .tool-desc p {
     margin: 0;
-    color: var(--cli-fg-dim);
+    color: var(--tool-fg-dim);
     font-size: 0.9rem;
 }
 
@@ -69,30 +69,40 @@
     border-radius: 0;
 }
 
+/* ========================================
+   上传区 - Glass Panel
+   ======================================== */
+
 .upload-area {
-    border: 2px dashed var(--cli-border);
-    padding: 4vw 2vw;
+    border: 2px dashed var(--tool-border);
+    padding: 3rem 2rem;
     text-align: center;
-    margin: 2vw 0;
-    transition: border-color 0.15s;
-    background: rgba(0, 255, 0, 0.02);
+    margin-bottom: 1.5rem;
+    transition: all var(--tool-duration-normal) var(--tool-ease-out);
+    background: var(--tool-glass-bg);
+    backdrop-filter: blur(var(--tool-glass-blur));
+    -webkit-backdrop-filter: blur(var(--tool-glass-blur));
     cursor: pointer;
+    border-radius: 16px;
 }
 
 .upload-area:hover,
 .upload-area.dragover {
-    border-color: var(--cli-fg);
+    border-color: var(--tool-accent);
+    background: var(--tool-surface-hover);
+    box-shadow: inset 0 0 30px var(--tool-accent-glow);
 }
 
 .upload-area h3 {
-    margin-bottom: 1vw;
-    color: var(--cli-fg);
-    font-size: 1rem;
+    margin-bottom: 1rem;
+    color: var(--tool-fg);
+    font-size: 1.1rem;
+    font-weight: 500;
 }
 
 .upload-area h3::before {
     content: '> ';
-    color: var(--cli-fg-dim);
+    color: var(--tool-accent);
 }
 
 .file-input {
@@ -100,57 +110,75 @@
 }
 
 .file-label {
-    display: inline-block;
-    padding: 1vw 2vw;
-    background: transparent;
-    color: var(--cli-fg);
-    border: 1px solid var(--cli-fg);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    background: linear-gradient(135deg, var(--tool-accent) 0%, #8b5cf6 100%);
+    color: #fff;
+    border: none;
     cursor: pointer;
     font-family: inherit;
     font-size: 0.9rem;
-    transition: all 0.15s;
+    font-weight: 600;
+    transition: all var(--tool-duration-normal) var(--tool-ease-out);
+    border-radius: 10px;
+    box-shadow: 0 4px 20px var(--tool-accent-glow);
 }
 
 .file-label:hover {
-    background: var(--cli-fg);
-    color: var(--cli-bg);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 30px var(--tool-accent-glow);
 }
 
+.file-label .material-icons {
+    font-size: 1.1rem;
+}
+
+/* ========================================
+   文件列表 - Glass Panel
+   ======================================== */
+
 .file-list-container {
-    margin: 2vw 0;
+    margin-bottom: 1.5rem;
     display: none;
 }
 
 .file-list-container h3 {
-    margin-bottom: 1vw;
-    color: var(--cli-fg);
+    margin-bottom: 1rem;
+    color: var(--tool-fg);
     font-size: 1rem;
-}
-
-.file-list-container h3::before {
-    content: '## ';
-    color: var(--cli-fg-dim);
+    font-weight: 500;
 }
 
 .file-list {
     list-style: none;
     padding: 0;
-    margin: 0 0 1.5vw 0;
+    margin: 0 0 1.5rem 0;
     max-height: 25vh;
     overflow-y: auto;
-    border: 1px solid var(--cli-border);
+    background: var(--tool-glass-bg);
+    border: 1px solid var(--tool-glass-border);
+    backdrop-filter: blur(var(--tool-glass-blur));
+    -webkit-backdrop-filter: blur(var(--tool-glass-blur));
+    border-radius: 12px;
 }
 
 .file-list li {
-    padding: 0.8vw 1.5vw;
-    border-bottom: 1px dashed var(--cli-border);
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid var(--tool-border);
     display: flex;
     justify-content: space-between;
     align-items: center;
+    transition: background 0.15s;
 }
 
 .file-list li:last-child {
     border-bottom: none;
+}
+
+.file-list li:hover {
+    background: var(--tool-surface-hover);
 }
 
 .file-list li .file-name {
@@ -158,67 +186,72 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    color: var(--cli-fg);
+    color: var(--tool-fg);
 }
 
 .file-list li .file-size {
-    color: var(--cli-fg-dim);
+    color: var(--tool-fg-dim);
     font-size: 0.8rem;
-    margin: 0 1vw;
+    margin: 0 1rem;
 }
 
 .file-list li .remove-btn {
     background: transparent;
-    color: var(--cli-error);
-    border: 1px solid var(--cli-error);
-    padding: 0.2vw 0.6vw;
+    color: var(--cli-error, #F44747);
+    border: 1px solid var(--cli-error, #F44747);
+    padding: 0.3rem 0.6rem;
     cursor: pointer;
     font-family: inherit;
     font-size: 0.8rem;
     transition: all 0.15s;
+    border-radius: 6px;
 }
 
 .file-list li .remove-btn:hover {
-    background: var(--cli-error);
-    color: var(--cli-bg);
+    background: var(--cli-error, #F44747);
+    color: #fff;
 }
 
 .clear-btn {
     background: transparent;
-    color: var(--cli-fg-dim);
-    border: 1px solid var(--cli-border);
-    padding: 0.8vw 1.5vw;
+    color: var(--tool-fg-dim);
+    border: 1px solid var(--tool-border);
+    padding: 0.6rem 1.2rem;
     cursor: pointer;
     font-family: inherit;
-    font-size: 0.9rem;
+    font-size: 0.85rem;
     transition: all 0.15s;
+    border-radius: 8px;
 }
 
 .clear-btn:hover {
-    border-color: var(--cli-error);
-    color: var(--cli-error);
+    border-color: var(--cli-error, #F44747);
+    color: var(--cli-error, #F44747);
 }
 
+/* ========================================
+   选项区 - Glass Panel
+   ======================================== */
+
 .merge-options {
-    margin: 2vw 0;
-    padding: 1.5vw;
-    border: 1px dashed var(--cli-border);
-    background: rgba(0, 255, 0, 0.02);
+    margin-bottom: 1.5rem;
+    padding: 1.5rem;
+    background: var(--tool-glass-bg);
+    border: 1px solid var(--tool-glass-border);
+    backdrop-filter: blur(var(--tool-glass-blur));
+    -webkit-backdrop-filter: blur(var(--tool-glass-blur));
+    border-radius: 16px;
 }
 
 .merge-options h3 {
-    margin: 0 0 1.5vw 0;
-    color: var(--cli-fg);
+    margin: 0 0 1.5rem 0;
+    color: var(--tool-fg);
     font-size: 1rem;
-}
-
-.merge-options h3::before {
-    content: '## ';
-    color: var(--cli-fg-dim);
+    font-weight: 500;
 }
 
 .option-group {
-    margin-bottom: 1.5vw;
+    margin-bottom: 1.5rem;
 }
 
 .option-group:last-child {
@@ -227,89 +260,108 @@
 
 .option-group label {
     display: block;
-    margin-bottom: 0.5vw;
-    color: var(--cli-fg-dim);
+    margin-bottom: 0.5rem;
+    color: var(--tool-fg-dim);
     font-size: 0.85rem;
 }
 
 .option-group select,
 .option-group input {
     width: 100%;
-    padding: 0.8vw 1vw;
-    border: 1px solid var(--cli-border);
-    background: var(--cli-input-bg);
-    color: var(--cli-fg);
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--tool-border);
+    background: var(--tool-surface);
+    color: var(--tool-fg);
     font-family: inherit;
     font-size: 0.9rem;
+    border-radius: 10px;
+    transition: all var(--tool-duration-fast) var(--tool-ease-out);
+    box-sizing: border-box;
 }
 
 .option-group select:focus,
 .option-group input:focus {
     outline: none;
-    border-color: var(--cli-fg);
+    border-color: var(--tool-accent);
+    box-shadow: 0 0 0 3px var(--tool-accent-glow);
 }
+
+/* ========================================
+   合并按钮
+   ======================================== */
 
 .merge-btn {
     display: block;
     width: 100%;
-    padding: 1.2vw;
-    background: transparent;
-    color: var(--cli-fg);
-    border: 1px solid var(--cli-fg);
+    padding: 1rem;
+    background: linear-gradient(135deg, var(--tool-accent) 0%, #8b5cf6 100%);
+    color: #fff;
+    border: none;
     cursor: pointer;
     font-family: inherit;
     font-size: 1rem;
-    margin: 2vw 0;
-    transition: all 0.15s;
+    font-weight: 600;
+    margin: 1.5rem 0;
+    transition: all var(--tool-duration-normal) var(--tool-ease-out);
+    border-radius: 10px;
+    box-shadow: 0 4px 20px var(--tool-accent-glow);
 }
 
 .merge-btn:hover:not(:disabled) {
-    background: var(--cli-fg);
-    color: var(--cli-bg);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 30px var(--tool-accent-glow);
 }
 
 .merge-btn:disabled {
-    border-color: var(--cli-border);
-    color: var(--cli-fg-dim);
+    background: var(--tool-surface);
+    color: var(--tool-fg-muted);
+    border: 1px solid var(--tool-border);
     cursor: not-allowed;
+    box-shadow: none;
 }
+
+/* ========================================
+   消息提示
+   ======================================== */
 
 .message {
-    padding: 1vw 1.5vw;
-    margin: 1vw 0;
+    padding: 1rem 1.5rem;
+    margin: 1rem 0;
     text-align: left;
     display: none;
-}
-
-.message::before {
-    content: '[MSG] ';
-    color: var(--cli-fg-dim);
+    border-radius: 10px;
+    border: 1px solid;
+    font-size: 0.85rem;
 }
 
 .message.error {
-    border: 1px dashed var(--cli-error);
-    color: var(--cli-error);
+    border-color: var(--cli-error, #F44747);
+    color: var(--cli-error, #F44747);
+    background: rgba(244, 71, 71, 0.1);
 }
 
 .message.success {
-    border: 1px dashed var(--cli-fg);
-    color: var(--cli-fg);
+    border-color: var(--tool-accent);
+    color: var(--tool-accent);
+    background: rgba(167, 139, 250, 0.1);
 }
+
+/* ========================================
+   加载状态
+   ======================================== */
 
 .loading {
     display: none;
     text-align: center;
-    padding: 2vw;
+    padding: 2rem;
 }
 
 .spinner {
-    border: 2px solid var(--cli-border);
-    border-top-color: var(--cli-fg);
+    border: 2px solid var(--tool-border);
+    border-top-color: var(--tool-accent);
     border-radius: 50%;
-    width: 3vw;
-    min-width: 30px;
-    height: 3vw;
-    min-height: 30px;
+    width: 2rem;
+    height: 2rem;
     animation: spin 1s linear infinite;
     margin: 0 auto;
 }
@@ -319,30 +371,42 @@
     100% { transform: rotate(360deg); }
 }
 
+/* ========================================
+   进度条 - Glass Panel
+   ======================================== */
+
 .progress-container {
-    margin: 1.5vw 0;
+    margin: 1.5rem 0;
     display: none;
+    background: var(--tool-glass-bg);
+    border: 1px solid var(--tool-glass-border);
+    backdrop-filter: blur(var(--tool-glass-blur));
+    -webkit-backdrop-filter: blur(var(--tool-glass-blur));
+    padding: 1rem;
+    border-radius: 12px;
 }
 
 .progress-bar {
     width: 100%;
-    height: 1.5vw;
-    min-height: 16px;
-    background: var(--cli-border);
+    height: 0.5rem;
+    background: var(--tool-border);
     overflow: hidden;
+    border-radius: 4px;
 }
 
 .progress-fill {
     height: 100%;
-    background: var(--cli-fg);
+    background: linear-gradient(90deg, var(--tool-accent), #8b5cf6);
     width: 0%;
     transition: width 0.3s;
+    border-radius: 4px;
+    box-shadow: 0 0 10px var(--tool-accent-glow);
 }
 
 .progress-text {
     text-align: center;
-    margin-top: 0.5vw;
-    color: var(--cli-fg-dim);
+    margin-top: 0.75rem;
+    color: var(--tool-fg-dim);
     font-size: 0.85rem;
 }
 
@@ -350,10 +414,10 @@
     .file-list li {
         flex-direction: column;
         align-items: flex-start;
-        gap: 0.5vw;
+        gap: 0.5rem;
     }
 
     .file-list li .file-size {
-        margin: 0.3vw 0;
+        margin: 0.3rem 0;
     }
 }

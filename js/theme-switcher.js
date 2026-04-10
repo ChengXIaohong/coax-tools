@@ -37,6 +37,9 @@ const ThemeSwitcher = (function() {
         const existing = document.querySelector('.theme-switcher');
         if (existing) existing.remove();
 
+        // 仅首页显示切换按钮
+        if (!isHomePage()) return;
+
         const switcher = document.createElement('button');
         switcher.className = 'theme-switcher';
         switcher.setAttribute('aria-label', '切换明暗主题');
@@ -46,6 +49,12 @@ const ThemeSwitcher = (function() {
         });
 
         document.body.appendChild(switcher);
+    }
+
+    function isHomePage() {
+        return window.location.pathname.endsWith('index.html') ||
+               window.location.pathname.endsWith('/') ||
+               window.location.pathname === '';
     }
 
     function listenForThemeChanges() {

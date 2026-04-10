@@ -1,19 +1,7 @@
 /*
  * 文字云生成器样式
- * 适配 CLI 主题，与图片压缩工具风格统一
+ * 适配 Liquid Glass 科幻主题
  */
-
-:root {
-    --primary-color: #00d26a;
-    --primary-hover: #00b85c;
-    --primary-glow: rgba(0, 210, 106, 0.3);
-    --bg-light: #f5f7fa;
-    --bg-card: #ffffff;
-    --shadow-light: 0 2px 12px rgba(0, 0, 0, 0.08);
-    --shadow-hover: 0 4px 20px rgba(0, 0, 0, 0.12);
-    --border-radius: 12px;
-    --transition: all 0.3s ease;
-}
 
 /* ========================================
    内容区
@@ -26,7 +14,7 @@
 .content-zone {
     display: flex;
     flex-direction: column;
-    gap: 1.5vw;
+    gap: 1.5rem;
 }
 
 /* ========================================
@@ -39,10 +27,13 @@
     margin-bottom: 1rem;
     display: none;
     font-size: 0.85rem;
-    border-radius: var(--border-radius);
-    border: none;
+    border-radius: 12px;
+    border: 1px solid var(--tool-glass-border);
     position: relative;
     padding-left: 2.5rem;
+    background: var(--tool-glass-bg);
+    backdrop-filter: blur(var(--tool-glass-blur));
+    -webkit-backdrop-filter: blur(var(--tool-glass-blur));
 }
 
 .message::before {
@@ -72,13 +63,13 @@
 }
 
 .message-success {
-    background: rgba(0, 210, 106, 0.1);
-    color: var(--primary-color);
-    border: 1px solid rgba(0, 210, 106, 0.3);
+    background: rgba(167, 139, 250, 0.1);
+    color: var(--tool-accent);
+    border: 1px solid rgba(167, 139, 250, 0.3);
 }
 
 .message-success::before {
-    background: var(--primary-color);
+    background: var(--tool-accent);
 }
 
 .message-warning {
@@ -102,41 +93,45 @@
 }
 
 /* ========================================
-   面板通用
+   面板通用 - Glass Morphism
    ======================================== */
 
 .panel {
-    background: var(--bg-card);
-    border-radius: var(--border-radius);
-    padding: 1.5vw;
-    box-shadow: var(--shadow-light);
-    transition: var(--transition);
+    background: var(--tool-glass-bg);
+    border: 1px solid var(--tool-glass-border);
+    backdrop-filter: blur(var(--tool-glass-blur));
+    -webkit-backdrop-filter: blur(var(--tool-glass-blur));
+    border-radius: 16px;
+    padding: 1.5rem;
+    transition: all var(--tool-duration-normal, 250ms) var(--tool-ease-out, cubic-bezier(0.16, 1, 0.3, 1));
 }
 
 .panel:hover {
-    box-shadow: var(--shadow-hover);
+    border-color: var(--tool-border-hover);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
 }
 
 .panel-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 1.5vw;
-    padding-bottom: 1vw;
-    border-bottom: 1px dashed var(--cli-border);
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--tool-border);
     flex-wrap: wrap;
-    gap: 0.8vw;
+    gap: 0.8rem;
 }
 
 .panel-title {
-    color: var(--cli-fg-dim);
+    color: var(--tool-fg-dim);
     font-size: 0.9rem;
 }
 
 .panel-title::before {
-    content: '>';
-    color: var(--primary-color);
+    content: '//';
+    color: var(--tool-accent);
     margin-right: 0.5rem;
+    opacity: 0.7;
 }
 
 /* ========================================
@@ -156,9 +151,9 @@
     font-weight: 600;
     font-family: inherit;
     cursor: pointer;
-    transition: var(--transition);
+    transition: all var(--tool-duration-normal, 250ms) var(--tool-ease-out, cubic-bezier(0.16, 1, 0.3, 1));
     border: none;
-    border-radius: 30px;
+    border-radius: 10px;
     text-decoration: none;
     display: inline-flex;
     align-items: center;
@@ -179,20 +174,20 @@
 }
 
 .btn-primary {
-    background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-hover) 100%);
+    background: linear-gradient(135deg, var(--tool-accent) 0%, #8b5cf6 100%);
     color: #fff;
-    box-shadow: 0 4px 15px var(--primary-glow);
+    box-shadow: 0 4px 20px var(--tool-accent-glow);
 }
 
 .btn-primary:hover {
-    box-shadow: 0 6px 20px var(--primary-glow);
+    box-shadow: 0 6px 30px var(--tool-accent-glow);
     color: #fff;
 }
 
 .btn-download {
-    background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-hover) 100%);
+    background: linear-gradient(135deg, var(--tool-accent) 0%, #8b5cf6 100%);
     color: #fff;
-    box-shadow: 0 4px 15px var(--primary-glow);
+    box-shadow: 0 4px 20px var(--tool-accent-glow);
     font-weight: bold;
     opacity: 0;
     transform: translateY(10px);
@@ -207,21 +202,19 @@
 }
 
 .has-result .btn-download:hover {
-    box-shadow: 0 6px 20px var(--primary-glow);
+    box-shadow: 0 6px 30px var(--tool-accent-glow);
     color: #fff;
 }
 
-.btn-ghost {
+.btn-secondary {
     background: transparent;
-    color: var(--cli-fg-dim);
-    border: 1px solid var(--cli-border);
-    transition: var(--transition);
+    color: var(--tool-fg);
+    border: 1px solid var(--tool-border);
 }
 
-.btn-ghost:hover {
-    border-color: var(--primary-color);
-    color: var(--primary-color);
-    background: rgba(0, 210, 106, 0.08);
+.btn-secondary:hover {
+    border-color: var(--tool-accent);
+    box-shadow: 0 0 20px var(--tool-accent-glow);
 }
 
 .btn-sm {
@@ -239,14 +232,14 @@
 
 .input-mode-tabs {
     display: flex;
-    gap: 0.3vw;
+    gap: 0.3rem;
 }
 
 .tab-btn {
     background: transparent;
-    border: 1px solid var(--cli-border);
-    color: var(--cli-fg-dim);
-    padding: 0.4vw 1vw;
+    border: 1px solid var(--tool-border);
+    color: var(--tool-fg-dim);
+    padding: 0.4rem 1rem;
     font-family: inherit;
     font-size: 0.85rem;
     cursor: pointer;
@@ -255,15 +248,15 @@
 }
 
 .tab-btn:hover {
-    border-color: var(--primary-color);
-    color: var(--cli-fg);
+    border-color: var(--tool-accent);
+    color: var(--tool-fg);
 }
 
 .tab-btn.active {
-    background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-hover) 100%);
+    background: linear-gradient(135deg, var(--tool-accent) 0%, #8b5cf6 100%);
     color: #fff;
-    border-color: var(--primary-color);
-    box-shadow: 0 2px 8px var(--primary-glow);
+    border-color: var(--tool-accent);
+    box-shadow: 0 2px 12px var(--tool-accent-glow);
 }
 
 /* ========================================
@@ -273,58 +266,58 @@
 .input-content {
     display: flex;
     flex-direction: column;
-    gap: 1vw;
+    gap: 1rem;
 }
 
 .input-content textarea {
     width: 100%;
     min-height: 180px;
-    background: linear-gradient(135deg, rgba(0, 210, 106, 0.02) 0%, rgba(0, 210, 106, 0.06) 100%);
-    border: 1px solid var(--cli-border);
-    color: var(--cli-fg);
+    background: var(--tool-surface);
+    border: 1px solid var(--tool-border);
+    color: var(--tool-fg);
     font-family: 'SF Mono', 'Fira Code', 'Consolas', 'Monaco', monospace;
     font-size: 0.9rem;
-    padding: 1vw;
+    padding: 1rem;
     resize: vertical;
-    border-radius: 16px;
-    transition: var(--transition);
+    border-radius: 12px;
+    transition: all var(--tool-duration-fast, 150ms);
 }
 
 .input-content textarea:hover {
-    border-color: rgba(0, 210, 106, 0.5);
+    border-color: var(--tool-border-hover);
 }
 
 .input-content textarea:focus {
     outline: none;
-    border-color: var(--primary-color);
-    box-shadow: 0 0 0 3px var(--primary-glow), 0 4px 16px var(--primary-glow);
+    border-color: var(--tool-accent);
+    box-shadow: 0 0 0 3px var(--tool-accent-glow);
 }
 
 .input-content textarea::placeholder {
-    color: var(--cli-fg-dim);
+    color: var(--tool-fg-dim);
     opacity: 0.6;
 }
 
 .input-actions {
     display: flex;
-    gap: 0.8vw;
+    gap: 0.8rem;
     align-items: center;
 }
 
 .file-upload-btn {
     display: inline-flex;
     align-items: center;
-    gap: 0.4vw;
-    padding: 0.6vw 1.2vw;
-    background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-hover) 100%);
+    gap: 0.4rem;
+    padding: 0.6rem 1.2rem;
+    background: linear-gradient(135deg, var(--tool-accent) 0%, #8b5cf6 100%);
     border: none;
     color: #fff;
     font-family: inherit;
     font-size: 0.85rem;
     cursor: pointer;
-    transition: var(--transition);
+    transition: all var(--tool-duration-normal, 250ms);
     border-radius: 20px;
-    box-shadow: 0 2px 8px var(--primary-glow);
+    box-shadow: 0 4px 15px var(--tool-accent-glow);
 }
 
 .file-upload-btn .material-icons {
@@ -333,11 +326,11 @@
 
 .file-upload-btn:hover {
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px var(--primary-glow);
+    box-shadow: 0 6px 20px var(--tool-accent-glow);
 }
 
 /* ========================================
-   预览模式：隐藏输入区和生成按钮
+   预览模式
    ======================================== */
 
 .preview-panel {
@@ -372,7 +365,7 @@
     width: 100%;
     background: transparent;
     border: none;
-    color: var(--cli-fg);
+    color: var(--tool-fg);
     padding: 0;
     font-family: inherit;
     font-size: inherit;
@@ -380,11 +373,11 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    gap: 0.8vw;
+    gap: 0.8rem;
 }
 
 .config-toggle:hover .panel-title {
-    color: var(--primary-color);
+    color: var(--tool-accent);
 }
 
 .config-toggle .panel-title {
@@ -394,7 +387,7 @@
 
 .toggle-icon {
     font-size: 0.8rem;
-    color: var(--primary-color);
+    color: var(--tool-accent);
     transition: transform 0.3s;
     flex-shrink: 0;
 }
@@ -418,80 +411,81 @@
 .config-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-    gap: 1.5vw;
-    margin-bottom: 1.5vw;
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
 }
 
 .config-group {
     display: flex;
     flex-direction: column;
-    gap: 0.6vw;
+    gap: 0.6rem;
 }
 
 .config-group > label {
-    color: var(--cli-fg);
+    color: var(--tool-fg);
     font-size: 0.85rem;
     font-weight: 500;
 }
 
 /* Select 下拉框 */
 .config-group select {
-    background: var(--cli-input-bg);
-    border: 1px solid var(--cli-border);
-    color: var(--cli-fg);
+    background: var(--tool-surface);
+    border: 1px solid var(--tool-border);
+    color: var(--tool-fg);
     font-family: inherit;
     font-size: 0.9rem;
-    padding: 0.6vw 2.5vw 0.6vw 1vw;
-    border-radius: 20px;
+    padding: 0.6rem 2.5rem 0.6rem 1rem;
+    border-radius: 10px;
     cursor: pointer;
-    transition: var(--transition);
+    transition: all var(--tool-duration-fast, 150ms);
     appearance: none;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2300d26a' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23a78bfa' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
     background-repeat: no-repeat;
-    background-position: right 1vw center;
+    background-position: right 1rem center;
 }
 
 .config-group select:hover {
-    border-color: var(--primary-color);
+    border-color: var(--tool-accent);
 }
 
 .config-group select:focus {
     outline: none;
-    border-color: var(--primary-color);
-    box-shadow: 0 0 0 3px var(--primary-glow), 0 2px 8px var(--primary-glow);
+    border-color: var(--tool-accent);
+    box-shadow: 0 0 0 3px var(--tool-accent-glow);
 }
 
 /* 形状选择 */
 .shape-options {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.5vw;
+    gap: 0.5rem;
 }
 
 .shape-btn {
-    background: transparent;
-    border: 1px solid var(--cli-border);
-    color: var(--cli-fg-dim);
-    padding: 0.5vw 1vw;
+    background: var(--tool-surface);
+    border: 1px solid var(--tool-border);
+    color: var(--tool-fg-dim);
+    padding: 0.5rem 1rem;
     font-family: inherit;
     font-size: 0.85rem;
     cursor: pointer;
     transition: all 0.15s;
     display: inline-flex;
     align-items: center;
-    gap: 0.3vw;
+    gap: 0.3rem;
     border-radius: 8px;
 }
 
 .shape-btn:hover {
-    border-color: var(--primary-color);
-    color: var(--cli-fg);
+    border-color: var(--tool-accent);
+    color: var(--tool-fg);
+    box-shadow: 0 0 15px var(--tool-accent-glow);
 }
 
 .shape-btn.active {
-    border-color: var(--primary-color);
-    color: var(--primary-color);
-    background: rgba(0, 210, 106, 0.1);
+    border-color: var(--tool-accent);
+    color: var(--tool-accent);
+    background: rgba(167, 139, 250, 0.1);
 }
 
 .custom-shape-btn {
@@ -504,8 +498,8 @@
 
 .custom-shape-name {
     font-size: 0.8rem;
-    color: var(--primary-color);
-    margin-top: 0.3vw;
+    color: var(--tool-accent);
+    margin-top: 0.3rem;
     display: none;
 }
 
@@ -516,14 +510,14 @@
 /* 背景色选择 */
 .bg-color-options {
     display: flex;
-    gap: 0.5vw;
+    gap: 0.5rem;
 }
 
 .bg-color-btn {
-    padding: 0.5vw 1vw;
-    background: transparent;
-    border: 1px solid var(--cli-border);
-    color: var(--cli-fg-dim);
+    padding: 0.5rem 1rem;
+    background: var(--tool-surface);
+    border: 1px solid var(--tool-border);
+    color: var(--tool-fg-dim);
     font-family: inherit;
     font-size: 0.85rem;
     cursor: pointer;
@@ -532,12 +526,13 @@
 }
 
 .bg-color-btn:hover {
-    border-color: var(--primary-color);
+    border-color: var(--tool-accent);
+    box-shadow: 0 0 15px var(--tool-accent-glow);
 }
 
 .bg-color-btn.active {
-    border-color: var(--primary-color);
-    box-shadow: 0 0 8px var(--primary-glow);
+    border-color: var(--tool-accent);
+    box-shadow: 0 0 15px var(--tool-accent-glow);
 }
 
 /* 尺寸输入 */
@@ -545,56 +540,56 @@
 .size-range-inputs {
     display: flex;
     align-items: center;
-    gap: 0.5vw;
+    gap: 0.5rem;
 }
 
 .size-inputs input,
 .size-range-inputs input {
     width: 100px;
-    background: var(--cli-input-bg);
-    border: 1px solid var(--cli-border);
-    color: var(--cli-fg);
+    background: var(--tool-surface);
+    border: 1px solid var(--tool-border);
+    color: var(--tool-fg);
     font-family: inherit;
     font-size: 0.9rem;
-    padding: 0.5vw 0.8vw;
-    border-radius: 20px;
-    transition: var(--transition);
+    padding: 0.5rem 0.8rem;
+    border-radius: 10px;
+    transition: all var(--tool-duration-fast, 150ms);
 }
 
 .size-inputs input:hover,
 .size-range-inputs input:hover {
-    border-color: var(--primary-color);
+    border-color: var(--tool-accent);
 }
 
 .size-inputs input:focus,
 .size-range-inputs input:focus {
     outline: none;
-    border-color: var(--primary-color);
-    box-shadow: 0 0 0 3px var(--primary-glow), 0 2px 8px var(--primary-glow);
+    border-color: var(--tool-accent);
+    box-shadow: 0 0 0 3px var(--tool-accent-glow);
 }
 
 .size-inputs span,
 .size-range-inputs span {
-    color: var(--cli-fg-dim);
+    color: var(--tool-fg-dim);
 }
 
 /* 复选框组 */
 .checkbox-group {
     display: flex;
     align-items: center;
-    gap: 0.5vw;
+    gap: 0.5rem;
 }
 
 .checkbox-group input[type="checkbox"] {
     width: 18px;
     height: 18px;
-    accent-color: var(--primary-color);
+    accent-color: var(--tool-accent);
     cursor: pointer;
     border-radius: 4px;
 }
 
 .checkbox-group label {
-    color: var(--cli-fg);
+    color: var(--tool-fg);
     font-size: 0.9rem;
     cursor: pointer;
 }
@@ -614,9 +609,9 @@
     justify-content: center;
     align-items: center;
     min-height: 400px;
-    background: linear-gradient(135deg, rgba(0, 210, 106, 0.02) 0%, rgba(0, 210, 106, 0.06) 100%);
-    border: 1px solid var(--cli-border);
-    border-radius: 8px;
+    background: var(--tool-surface);
+    border: 1px solid var(--tool-border);
+    border-radius: 12px;
 }
 
 #wordCloudCanvas {
@@ -631,7 +626,7 @@
     left: 50%;
     transform: translate(-50%, -50%);
     text-align: center;
-    color: var(--cli-fg-dim);
+    color: var(--tool-fg-dim);
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -658,8 +653,8 @@
     transform: translate(-50%, -50%);
     width: 40px;
     height: 40px;
-    border: 3px solid var(--cli-border);
-    border-top-color: var(--primary-color);
+    border: 3px solid var(--tool-border);
+    border-top-color: var(--tool-accent);
     border-radius: 50%;
     animation: spin 0.8s linear infinite;
     display: none;

@@ -1,45 +1,7 @@
 /*
  * 图片压缩器样式
- * 适配 CLI 主题，渐进式展示
+ * 适配 Liquid Glass 科幻主题
  */
-
-/* ========================================
-   导航区
-   ======================================== */
-
-.nav-zone {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 1vw 0;
-    margin-bottom: 2vw;
-    border-bottom: 1px dashed var(--cli-border);
-}
-
-.nav-breadcrumb {
-    display: flex;
-    align-items: center;
-    gap: 0.5vw;
-    color: var(--cli-fg-dim);
-    font-size: 0.9rem;
-}
-
-.nav-breadcrumb .material-icons {
-    font-size: 1.2rem;
-}
-
-.nav-separator {
-    opacity: 0.5;
-}
-
-.nav-item-current {
-    color: var(--cli-fg);
-}
-
-.nav-title-icon {
-    font-size: 1rem !important;
-    color: var(--cli-fg-dim);
-}
 
 /* ========================================
    内容区
@@ -48,29 +10,17 @@
 .content-zone {
     display: flex;
     flex-direction: column;
-    gap: 2.5vw;
+    gap: 2rem;
 }
 
 .tool-desc {
-    margin-bottom: 0.5vw;
+    margin-bottom: 0.5rem;
 }
 
 .tool-desc p {
     margin: 0;
-    color: var(--cli-fg-dim);
+    color: var(--tool-fg-dim);
     font-size: 0.9rem;
-}
-
-:root {
-    --primary-color: #00d26a;
-    --primary-hover: #00b85c;
-    --primary-glow: rgba(0, 210, 106, 0.3);
-    --bg-light: #f5f7fa;
-    --bg-card: #ffffff;
-    --shadow-light: 0 2px 12px rgba(0, 0, 0, 0.08);
-    --shadow-hover: 0 4px 20px rgba(0, 0, 0, 0.12);
-    --border-radius: 12px;
-    --transition: all 0.3s ease;
 }
 
 .compressor-container {
@@ -80,6 +30,10 @@
     box-shadow: none;
     border-radius: 0;
 }
+
+/* ========================================
+   上传区域 - Glass Effect
+   ======================================== */
 
 .upload-section {
     display: block;
@@ -98,12 +52,12 @@
 }
 
 .upload-area {
-    border: 2px dashed var(--cli-border);
+    border: 2px dashed var(--tool-border);
     padding: 3rem 2rem;
     text-align: center;
-    transition: var(--transition);
-    background: linear-gradient(180deg, rgba(0, 210, 106, 0.03) 0%, rgba(0, 210, 106, 0.08) 100%);
-    border-radius: var(--border-radius);
+    transition: all var(--tool-duration-normal, 250ms);
+    background: var(--tool-surface);
+    border-radius: 16px;
     position: relative;
     overflow: hidden;
 }
@@ -115,15 +69,15 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background: radial-gradient(circle at center, var(--primary-glow) 0%, transparent 70%);
+    background: radial-gradient(circle at center, var(--tool-accent-glow) 0%, transparent 70%);
     opacity: 0;
-    transition: var(--transition);
+    transition: opacity var(--tool-duration-normal, 250ms);
 }
 
 .upload-area:hover,
 .upload-area.dragover {
-    border-color: var(--primary-color);
-    box-shadow: 0 0 20px var(--primary-glow);
+    border-color: var(--tool-accent);
+    box-shadow: inset 0 0 40px var(--tool-accent-glow);
 }
 
 .upload-area:hover::before,
@@ -151,26 +105,29 @@
 
 .upload-area h3 {
     margin: 0 0 0.5rem;
-    color: var(--cli-fg);
+    color: var(--tool-fg);
     font-size: 1.2rem;
     font-weight: 600;
+    position: relative;
 }
 
 .upload-area p {
-    color: var(--cli-fg-dim);
+    color: var(--tool-fg-dim);
     margin: 0 0 1rem;
     font-size: 0.85rem;
+    position: relative;
 }
 
 .upload-area .format-hint {
     display: inline-flex;
     gap: 0.5rem;
     margin-top: 0.5rem;
+    position: relative;
 }
 
 .upload-area .format-tag {
-    background: rgba(0, 210, 106, 0.15);
-    color: var(--primary-color);
+    background: rgba(167, 139, 250, 0.15);
+    color: var(--tool-accent);
     padding: 0.25rem 0.6rem;
     border-radius: 20px;
     font-size: 0.75rem;
@@ -194,21 +151,22 @@
 
 .file-input-button {
     padding: 0.8rem 2rem;
-    background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-hover) 100%);
+    background: linear-gradient(135deg, var(--tool-accent) 0%, #8b5cf6 100%);
     color: #fff;
     border: none;
     font-size: 0.95rem;
     font-weight: 600;
     font-family: inherit;
     cursor: pointer;
-    transition: var(--transition);
+    transition: all var(--tool-duration-normal, 250ms);
     border-radius: 30px;
-    box-shadow: 0 4px 15px var(--primary-glow);
+    box-shadow: 0 4px 20px var(--tool-accent-glow);
+    position: relative;
 }
 
 .file-input-button:hover {
     transform: translateY(-2px);
-    box-shadow: 0 6px 20px var(--primary-glow);
+    box-shadow: 0 6px 30px var(--tool-accent-glow);
 }
 
 .file-input-button:active {
@@ -217,9 +175,14 @@
 
 #fileInfo {
     margin-top: 1rem;
-    color: var(--cli-fg-dim);
+    color: var(--tool-fg-dim);
     font-size: 0.8rem;
+    position: relative;
 }
+
+/* ========================================
+   预览区域 - Glass Panels
+   ======================================== */
 
 .preview-container {
     display: grid;
@@ -243,20 +206,23 @@
 }
 
 .preview-panel {
-    background: var(--bg-card);
-    border-radius: var(--border-radius);
+    background: var(--tool-glass-bg);
+    border: 1px solid var(--tool-glass-border);
+    backdrop-filter: blur(var(--tool-glass-blur));
+    -webkit-backdrop-filter: blur(var(--tool-glass-blur));
+    border-radius: 16px;
     padding: 1rem;
-    box-shadow: var(--shadow-light);
-    transition: var(--transition);
+    transition: all var(--tool-duration-normal, 250ms);
 }
 
 .preview-panel:hover {
-    box-shadow: var(--shadow-hover);
+    border-color: var(--tool-border-hover);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
 }
 
 .preview-panel h3 {
     margin: 0 0 0.75rem;
-    color: var(--cli-fg-dim);
+    color: var(--tool-fg-dim);
     font-size: 0.8rem;
     text-transform: uppercase;
     letter-spacing: 0.1em;
@@ -267,14 +233,14 @@
 
 .preview-panel h3::before {
     content: '>';
-    color: var(--primary-color);
+    color: var(--tool-accent);
 }
 
 .preview-wrapper {
     position: relative;
-    background: linear-gradient(135deg, rgba(0, 210, 106, 0.02) 0%, rgba(0, 210, 106, 0.06) 100%);
-    border: 1px solid var(--cli-border);
-    border-radius: 8px;
+    background: var(--tool-surface);
+    border: 1px solid var(--tool-border);
+    border-radius: 12px;
     min-height: 160px;
     display: flex;
     align-items: center;
@@ -294,7 +260,7 @@
 }
 
 .preview-placeholder {
-    color: var(--cli-fg-dim);
+    color: var(--tool-fg-dim);
     font-size: 0.85rem;
     display: flex;
     flex-direction: column;
@@ -316,12 +282,13 @@
     bottom: 0;
     left: 0;
     right: 0;
-    background: linear-gradient(135deg, rgba(0, 0, 0, 0.9) 0%, rgba(0, 0, 0, 0.85) 100%);
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(8px);
     padding: 0.6rem 1rem;
     font-size: 0.8rem;
-    color: var(--cli-fg);
+    color: var(--tool-fg);
     display: none;
-    border-radius: 0 0 8px 8px;
+    border-radius: 0 0 12px 12px;
 }
 
 .preview-tooltip.visible {
@@ -335,15 +302,21 @@
 }
 
 .preview-tooltip .highlight {
-    color: var(--primary-color);
+    color: var(--tool-accent);
     font-weight: bold;
 }
 
+/* ========================================
+   控制面板 - Glass Effect
+   ======================================== */
+
 .controls-panel {
     margin-bottom: 1rem;
-    background: var(--bg-card);
-    border-radius: var(--border-radius);
-    box-shadow: var(--shadow-light);
+    background: var(--tool-glass-bg);
+    border: 1px solid var(--tool-glass-border);
+    backdrop-filter: blur(var(--tool-glass-blur));
+    -webkit-backdrop-filter: blur(var(--tool-glass-blur));
+    border-radius: 16px;
     overflow: hidden;
 }
 
@@ -359,7 +332,7 @@
     width: 100%;
     background: transparent;
     border: none;
-    color: var(--cli-fg);
+    color: var(--tool-fg);
     padding: 1rem 1.25rem;
     font-size: 0.9rem;
     font-family: inherit;
@@ -367,23 +340,23 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border-bottom: 1px solid var(--cli-border);
-    transition: var(--transition);
+    border-bottom: 1px solid var(--tool-border);
+    transition: background var(--tool-duration-fast, 150ms);
 }
 
 .controls-toggle:hover {
-    background: rgba(0, 210, 106, 0.05);
+    background: var(--tool-surface-hover);
 }
 
 .toggle-icon {
     transition: transform 0.3s;
     transform: rotate(90deg);
-    color: var(--primary-color);
+    color: var(--tool-accent);
 }
 
 .controls-body {
     padding: 1.25rem;
-    background: linear-gradient(180deg, rgba(0, 210, 106, 0.02) 0%, rgba(0, 210, 106, 0.06) 100%);
+    background: var(--tool-surface);
 }
 
 .control-group {
@@ -400,11 +373,11 @@
     align-items: center;
     margin-bottom: 0.6rem;
     font-size: 0.85rem;
-    color: var(--cli-fg);
+    color: var(--tool-fg);
 }
 
 .control-group label .hint {
-    color: var(--cli-fg-dim);
+    color: var(--tool-fg-dim);
     font-size: 0.75rem;
     font-weight: normal;
 }
@@ -412,7 +385,7 @@
 .control-group input[type="range"] {
     width: 100%;
     height: 6px;
-    background: var(--cli-border);
+    background: var(--tool-border);
     appearance: none;
     cursor: pointer;
     border-radius: 3px;
@@ -422,11 +395,11 @@
     appearance: none;
     width: 18px;
     height: 18px;
-    background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-hover) 100%);
+    background: linear-gradient(135deg, var(--tool-accent) 0%, #8b5cf6 100%);
     cursor: pointer;
     border-radius: 50%;
-    box-shadow: 0 2px 8px var(--primary-glow);
-    transition: var(--transition);
+    box-shadow: 0 2px 12px var(--tool-accent-glow);
+    transition: all var(--tool-duration-fast, 150ms);
 }
 
 .control-group input[type="range"]::-webkit-slider-thumb:hover {
@@ -434,12 +407,16 @@
 }
 
 .slider-value {
-    color: var(--primary-color);
+    color: var(--tool-accent);
     font-weight: bold;
     min-width: 4rem;
     text-align: right;
     font-size: 0.9rem;
 }
+
+/* ========================================
+   操作按钮
+   ======================================== */
 
 .action-buttons {
     display: flex;
@@ -454,9 +431,9 @@
     font-weight: 600;
     font-family: inherit;
     cursor: pointer;
-    transition: var(--transition);
+    transition: all var(--tool-duration-normal, 250ms);
     border: none;
-    border-radius: 30px;
+    border-radius: 10px;
     text-decoration: none;
     display: inline-flex;
     align-items: center;
@@ -473,13 +450,13 @@
 }
 
 .btn-primary {
-    background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-hover) 100%);
+    background: linear-gradient(135deg, var(--tool-accent) 0%, #8b5cf6 100%);
     color: #fff;
-    box-shadow: 0 4px 15px var(--primary-glow);
+    box-shadow: 0 4px 20px var(--tool-accent-glow);
 }
 
 .btn-primary:hover {
-    box-shadow: 0 6px 20px var(--primary-glow);
+    box-shadow: 0 6px 30px var(--tool-accent-glow);
     color: #fff;
 }
 
@@ -489,9 +466,9 @@
 
 .btn-download {
     display: none;
-    background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-hover) 100%);
+    background: linear-gradient(135deg, var(--tool-accent) 0%, #8b5cf6 100%);
     color: #fff;
-    box-shadow: 0 4px 15px var(--primary-glow);
+    box-shadow: 0 4px 20px var(--tool-accent-glow);
     font-weight: bold;
 }
 
@@ -500,21 +477,24 @@
 }
 
 .btn-download:hover {
-    box-shadow: 0 6px 20px var(--primary-glow);
+    box-shadow: 0 6px 30px var(--tool-accent-glow);
     color: #fff;
 }
 
-.btn-ghost {
+.btn-secondary {
     background: transparent;
-    color: var(--cli-fg-dim);
-    border: 2px solid var(--cli-border);
+    color: var(--tool-fg);
+    border: 2px solid var(--tool-border);
 }
 
-.btn-ghost:hover {
-    border-color: var(--primary-color);
-    color: var(--primary-color);
-    box-shadow: 0 0 10px var(--primary-glow);
+.btn-secondary:hover {
+    border-color: var(--tool-accent);
+    box-shadow: 0 0 20px var(--tool-accent-glow);
 }
+
+/* ========================================
+   消息提示
+   ======================================== */
 
 .message {
     text-align: center;
@@ -522,10 +502,12 @@
     margin-bottom: 1rem;
     display: none;
     font-size: 0.85rem;
-    border-radius: var(--border-radius);
-    border: none;
+    border-radius: 12px;
+    border: 1px solid var(--tool-glass-border);
     position: relative;
     padding-left: 2.5rem;
+    background: var(--tool-glass-bg);
+    backdrop-filter: blur(var(--tool-glass-blur));
 }
 
 .message::before {
@@ -554,13 +536,13 @@
 }
 
 .message-success {
-    background: rgba(0, 210, 106, 0.1);
-    color: var(--primary-color);
-    border: 1px solid rgba(0, 210, 106, 0.3);
+    background: rgba(167, 139, 250, 0.1);
+    color: var(--tool-accent);
+    border: 1px solid rgba(167, 139, 250, 0.3);
 }
 
 .message-success::before {
-    background: var(--primary-color);
+    background: var(--tool-accent);
 }
 
 .message-warning {
@@ -583,13 +565,19 @@
     background: #2196f3;
 }
 
+/* ========================================
+   进度条
+   ======================================== */
+
 .progress-container {
     display: none;
     margin: 1rem 0;
-    background: var(--bg-card);
-    border-radius: var(--border-radius);
+    background: var(--tool-glass-bg);
+    border: 1px solid var(--tool-glass-border);
+    backdrop-filter: blur(var(--tool-glass-blur));
+    -webkit-backdrop-filter: blur(var(--tool-glass-blur));
+    border-radius: 16px;
     padding: 1rem;
-    box-shadow: var(--shadow-light);
 }
 
 .progress-container.active {
@@ -602,7 +590,7 @@
     align-items: center;
     margin-bottom: 0.75rem;
     font-size: 0.85rem;
-    color: var(--cli-fg);
+    color: var(--tool-fg);
 }
 
 .progress-status {
@@ -614,8 +602,8 @@
 .progress-spinner {
     width: 16px;
     height: 16px;
-    border: 2px solid var(--cli-border);
-    border-top-color: var(--primary-color);
+    border: 2px solid var(--tool-border);
+    border-top-color: var(--tool-accent);
     border-radius: 50%;
     animation: spin 0.8s linear infinite;
 }
@@ -626,14 +614,14 @@
 
 .progress-bar {
     height: 8px;
-    background: var(--cli-border);
+    background: var(--tool-border);
     overflow: hidden;
     border-radius: 4px;
 }
 
 .progress-fill {
     height: 100%;
-    background: linear-gradient(90deg, var(--primary-color) 0%, var(--primary-hover) 100%);
+    background: linear-gradient(90deg, var(--tool-accent) 0%, #8b5cf6 100%);
     width: 0%;
     transition: width 0.3s ease-out;
     border-radius: 4px;
@@ -656,6 +644,10 @@
     100% { transform: translateX(100%); }
 }
 
+/* ========================================
+   加载遮罩 - Glass Blur
+   ======================================== */
+
 .loading-overlay {
     position: fixed;
     top: 0;
@@ -663,11 +655,12 @@
     right: 0;
     bottom: 0;
     background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
     display: none;
     align-items: center;
     justify-content: center;
     z-index: 1000;
-    backdrop-filter: blur(4px);
 }
 
 .loading-overlay.active {
@@ -676,14 +669,14 @@
 
 .loading-content {
     text-align: center;
-    color: var(--cli-fg);
+    color: var(--tool-fg);
 }
 
 .loading-spinner-large {
     width: 50px;
     height: 50px;
-    border: 3px solid var(--cli-border);
-    border-top-color: var(--primary-color);
+    border: 3px solid var(--tool-border);
+    border-top-color: var(--tool-accent);
     border-radius: 50%;
     animation: spin 0.8s linear infinite;
     margin: 0 auto 1rem;
@@ -696,8 +689,12 @@
 
 .loading-detail {
     font-size: 0.8rem;
-    color: var(--cli-fg-dim);
+    color: var(--tool-fg-dim);
 }
+
+/* ========================================
+   响应式
+   ======================================== */
 
 @media (max-width: 480px) {
     .action-buttons {

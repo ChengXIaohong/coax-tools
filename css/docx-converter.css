@@ -1,72 +1,7 @@
 /*
  * DOCX 转换器样式
- * 适配 CLI 主题 - 优化版
+ * 适配 Liquid Glass 科幻主题
  */
-
-.docx-main {
-    padding: 0;
-}
-
-/* ========================================
-   导航区
-   ======================================== */
-
-.nav-zone {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 1vw 0;
-    margin-bottom: 2vw;
-    border-bottom: 1px dashed var(--cli-border);
-}
-
-.nav-breadcrumb {
-    display: flex;
-    align-items: center;
-    gap: 0.5vw;
-    color: var(--cli-fg-dim);
-    font-size: 0.9rem;
-}
-
-.nav-breadcrumb .material-icons {
-    font-size: 1.2rem;
-}
-
-.nav-separator {
-    opacity: 0.5;
-}
-
-.nav-item-current {
-    color: var(--cli-fg);
-}
-
-.nav-actions {
-    display: flex;
-    gap: 0.8vw;
-}
-
-.nav-btn {
-    display: flex;
-    align-items: center;
-    gap: 0.4vw;
-    padding: 0.5vw 1vw;
-    background: transparent;
-    border: 1px solid var(--cli-border);
-    color: var(--cli-fg-dim);
-    cursor: pointer;
-    font-family: inherit;
-    font-size: 0.85rem;
-    transition: all 0.15s;
-}
-
-.nav-btn:hover {
-    border-color: var(--cli-fg);
-    color: var(--cli-fg);
-}
-
-.nav-btn .material-icons {
-    font-size: 1.1rem;
-}
 
 /* ========================================
    内容区
@@ -75,48 +10,45 @@
 .content-zone {
     display: flex;
     flex-direction: column;
-    gap: 2.5vw;
+    gap: 2rem;
 }
 
 .content-header {
     display: flex;
     align-items: flex-start;
-    gap: 1.5vw;
-    padding-bottom: 2vw;
-    border-bottom: 1px dashed var(--cli-border);
+    gap: 1.5rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid var(--tool-border);
 }
 
 .header-icon {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 4vw;
-    height: 4vw;
+    width: 4rem;
+    height: 4rem;
     min-width: 50px;
     min-height: 50px;
-    background: rgba(0, 255, 0, 0.05);
-    border: 1px solid var(--cli-border);
+    background: var(--tool-surface);
+    border: 1px solid var(--tool-border);
+    border-radius: 12px;
 }
 
 .header-icon .material-icons {
-    font-size: 2vw;
-    color: var(--cli-fg);
+    font-size: 2rem;
+    color: var(--tool-accent);
 }
 
 .header-text h1 {
-    margin: 0 0 0.5vw 0;
+    margin: 0 0 0.5rem 0;
     font-size: 1.8rem;
     font-weight: normal;
-}
-
-.header-text h1::before {
-    content: '# ';
-    color: var(--cli-fg-dim);
+    color: var(--tool-fg);
 }
 
 .header-desc {
     margin: 0;
-    color: var(--cli-fg-dim);
+    color: var(--tool-fg-dim);
     font-size: 0.95rem;
 }
 
@@ -127,60 +59,72 @@
 .operation-zone {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 2vw;
+    gap: 2rem;
+}
+
+@media (max-width: 768px) {
+    .operation-zone {
+        grid-template-columns: 1fr;
+    }
 }
 
 .section-header {
     display: flex;
     align-items: center;
-    gap: 0.8vw;
-    margin-bottom: 1.2vw;
+    gap: 0.8rem;
+    margin-bottom: 1.2rem;
 }
 
 .section-header .material-icons {
     font-size: 1.3rem;
-    color: var(--cli-fg-dim);
+    color: var(--tool-accent);
 }
 
 .section-header h2 {
     margin: 0;
     font-size: 1rem;
     font-weight: normal;
-    color: var(--cli-fg);
+    color: var(--tool-fg);
 }
 
 .file-count {
     margin-left: auto;
-    padding: 0.2vw 0.8vw;
-    background: var(--cli-bg-alt);
-    border: 1px solid var(--cli-border);
+    padding: 0.2rem 0.8rem;
+    background: var(--tool-surface);
+    border: 1px solid var(--tool-border);
     font-size: 0.8rem;
-    color: var(--cli-fg-dim);
+    color: var(--tool-fg-dim);
+    border-radius: 20px;
 }
 
 /* ========================================
-   上传区
+   上传区 - Glass Panel
    ======================================== */
 
 .upload-section {
-    padding: 1.5vw;
-    border: 1px solid var(--cli-border);
-    background: rgba(0, 255, 0, 0.02);
+    padding: 1.5rem;
+    background: var(--tool-glass-bg);
+    border: 1px solid var(--tool-glass-border);
+    backdrop-filter: blur(var(--tool-glass-blur));
+    -webkit-backdrop-filter: blur(var(--tool-glass-blur));
+    border-radius: 16px;
 }
 
 .upload-area {
     position: relative;
-    border: 2px dashed var(--cli-border);
-    padding: 3vw 2vw;
+    border: 2px dashed var(--tool-border);
+    padding: 3rem 2rem;
     text-align: center;
-    transition: all 0.2s;
+    transition: all var(--tool-duration-normal, 250ms);
     cursor: pointer;
+    border-radius: 12px;
 }
 
 .upload-area:hover,
 .upload-area.dragover {
-    border-color: var(--cli-fg);
-    background: rgba(0, 255, 0, 0.05);
+    border-color: var(--tool-accent);
+    background: var(--tool-surface-hover);
+    box-shadow: inset 0 0 30px var(--tool-accent-glow);
 }
 
 .upload-area.dragover .upload-icon-wrapper {
@@ -195,57 +139,60 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 1vw;
+    gap: 1rem;
 }
 
 .upload-icon-wrapper {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 5vw;
-    height: 5vw;
+    width: 5rem;
+    height: 5rem;
     min-width: 60px;
     min-height: 60px;
-    background: var(--cli-bg-alt);
-    border: 1px solid var(--cli-border);
+    background: var(--tool-surface);
+    border: 1px solid var(--tool-border);
     transition: transform 0.2s;
+    border-radius: 12px;
 }
 
 .upload-icon {
-    font-size: 2.5vw !important;
-    color: var(--cli-fg);
+    font-size: 2.5rem !important;
+    color: var(--tool-accent);
 }
 
 .upload-text-primary {
     margin: 0;
     font-size: 1rem;
-    color: var(--cli-fg);
+    color: var(--tool-fg);
 }
 
 .upload-text-secondary {
     margin: 0;
     font-size: 0.85rem;
-    color: var(--cli-fg-dim);
+    color: var(--tool-fg-dim);
 }
 
 .upload-btn {
     display: inline-flex;
     align-items: center;
-    gap: 0.5vw;
-    padding: 0.8vw 2vw;
-    background: transparent;
-    color: var(--cli-fg);
-    border: 1px solid var(--cli-fg);
+    gap: 0.5rem;
+    padding: 0.8rem 2rem;
+    background: linear-gradient(135deg, var(--tool-accent) 0%, #8b5cf6 100%);
+    color: #fff;
+    border: none;
     cursor: pointer;
     font-family: inherit;
     font-size: 0.9rem;
-    transition: all 0.15s;
-    margin-top: 0.5vw;
+    transition: all var(--tool-duration-normal, 250ms);
+    margin-top: 0.5rem;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px var(--tool-accent-glow);
 }
 
 .upload-btn:hover {
-    background: var(--cli-fg);
-    color: var(--cli-bg);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px var(--tool-accent-glow);
 }
 
 .upload-btn .material-icons {
@@ -253,68 +200,75 @@
 }
 
 /* ========================================
-   选项区
+   选项区 - Glass Panel
    ======================================== */
 
 .options-section {
-    padding: 1.5vw;
-    border: 1px solid var(--cli-border);
-    background: rgba(0, 255, 0, 0.02);
+    padding: 1.5rem;
+    background: var(--tool-glass-bg);
+    border: 1px solid var(--tool-glass-border);
+    backdrop-filter: blur(var(--tool-glass-blur));
+    -webkit-backdrop-filter: blur(var(--tool-glass-blur));
+    border-radius: 16px;
 }
 
 .options-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 1.2vw;
-    margin-bottom: 1.2vw;
+    gap: 1.2rem;
+    margin-bottom: 1.2rem;
 }
 
 .option-group {
     display: flex;
     flex-direction: column;
-    gap: 0.5vw;
+    gap: 0.5rem;
 }
 
 .option-label {
     display: flex;
     align-items: center;
-    gap: 0.5vw;
-    color: var(--cli-fg-dim);
+    gap: 0.5rem;
+    color: var(--tool-fg-dim);
     font-size: 0.85rem;
 }
 
 .option-label .material-icons {
     font-size: 1rem;
+    color: var(--tool-accent);
 }
 
 .option-select {
-    padding: 0.6vw 2.5vw 0.6vw 1vw;
-    background: var(--cli-input-bg);
-    border: 1px solid var(--cli-border);
-    color: var(--cli-fg);
+    padding: 0.6rem 2.5rem 0.6rem 1rem;
+    background: var(--tool-surface);
+    border: 1px solid var(--tool-border);
+    color: var(--tool-fg);
     font-family: inherit;
     font-size: 0.9rem;
     cursor: pointer;
     appearance: none;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%2300ff00'%3E%3Cpath d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23a78bfa' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
     background-repeat: no-repeat;
-    background-position: right 0.8vw center;
+    background-position: right 1rem center;
+    border-radius: 10px;
+    transition: all var(--tool-duration-fast, 150ms);
 }
 
 .option-select:focus {
     outline: none;
-    border-color: var(--cli-fg);
+    border-color: var(--tool-accent);
+    box-shadow: 0 0 0 3px var(--tool-accent-glow);
 }
 
 .options-toggle {
-    padding-top: 1vw;
-    border-top: 1px dashed var(--cli-border);
+    padding-top: 1rem;
+    border-top: 1px solid var(--tool-border);
 }
 
 .toggle-label {
     display: flex;
     align-items: center;
-    gap: 1vw;
+    gap: 1rem;
     cursor: pointer;
 }
 
@@ -324,85 +278,91 @@
 
 .toggle-switch {
     position: relative;
-    width: 3vw;
+    width: 3rem;
     min-width: 40px;
-    height: 1.5vw;
+    height: 1.5rem;
     min-height: 20px;
-    background: var(--cli-border);
+    background: var(--tool-border);
     transition: all 0.2s;
+    border-radius: 10px;
 }
 
 .toggle-switch::after {
     content: '';
     position: absolute;
-    top: 0.15vw;
-    left: 0.2vw;
-    width: 1.2vw;
+    top: 0.15rem;
+    left: 0.2rem;
+    width: 1.2rem;
     min-width: 16px;
-    height: 1.2vw;
+    height: 1.2rem;
     min-height: 16px;
-    background: var(--cli-fg-dim);
+    background: var(--tool-fg-dim);
     transition: all 0.2s;
+    border-radius: 50%;
 }
 
 .toggle-input:checked + .toggle-switch {
-    background: var(--cli-fg);
+    background: var(--tool-accent);
 }
 
 .toggle-input:checked + .toggle-switch::after {
-    left: 1.5vw;
-    min-width: 16px;
-    background: var(--cli-bg);
+    left: 1.5rem;
+    background: #fff;
 }
 
 .toggle-text {
-    color: var(--cli-fg-dim);
+    color: var(--tool-fg-dim);
     font-size: 0.9rem;
 }
 
 /* ========================================
-   文件列表区
+   文件列表区 - Glass Panel
    ======================================== */
 
 .file-list-section {
-    padding: 1.5vw;
-    border: 1px solid var(--cli-border);
-    background: rgba(0, 255, 0, 0.02);
+    padding: 1.5rem;
+    background: var(--tool-glass-bg);
+    border: 1px solid var(--tool-glass-border);
+    backdrop-filter: blur(var(--tool-glass-blur));
+    -webkit-backdrop-filter: blur(var(--tool-glass-blur));
+    border-radius: 16px;
 }
 
 .file-list {
     display: flex;
     flex-direction: column;
-    gap: 0.8vw;
+    gap: 0.8rem;
     max-height: 30vh;
     overflow-y: auto;
-    margin-bottom: 1.2vw;
+    margin-bottom: 1.2rem;
 }
 
 .file-item {
     display: flex;
     align-items: center;
-    gap: 1vw;
-    padding: 1vw;
-    background: var(--cli-bg-alt);
-    border: 1px solid var(--cli-border);
+    gap: 1rem;
+    padding: 1rem;
+    background: var(--tool-surface);
+    border: 1px solid var(--tool-border);
+    border-radius: 10px;
 }
 
 .file-item-icon {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 3vw;
-    height: 3vw;
+    width: 3rem;
+    height: 3rem;
     min-width: 36px;
     min-height: 36px;
-    background: var(--cli-bg);
-    border: 1px solid var(--cli-border);
+    background: var(--tool-bg-alt);
+    border: 1px solid var(--tool-border);
+    border-radius: 8px;
 }
 
 .file-item-icon .material-icons {
-    font-size: 1.5vw;
-    color: var(--cli-fg);
+    font-size: 1.5rem;
+    color: var(--tool-accent);
 }
 
 .file-item-info {
@@ -413,55 +373,56 @@
 .file-item-name {
     margin: 0;
     font-size: 0.9rem;
-    color: var(--cli-fg);
+    color: var(--tool-fg);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
 
 .file-item-size {
-    margin: 0.2vw 0 0 0;
+    margin: 0.2rem 0 0 0;
     font-size: 0.8rem;
-    color: var(--cli-fg-dim);
+    color: var(--tool-fg-dim);
 }
 
 .file-item-status {
-    padding: 0.3vw 0.8vw;
+    padding: 0.3rem 0.8rem;
     font-size: 0.75rem;
     border: 1px solid;
+    border-radius: 20px;
 }
 
 .file-item-status.pending {
-    border-color: var(--cli-border);
-    color: var(--cli-fg-dim);
+    border-color: var(--tool-border);
+    color: var(--tool-fg-dim);
 }
 
 .file-item-status.processing {
-    border-color: var(--cli-warning);
-    color: var(--cli-warning);
+    border-color: var(--tool-accent-2);
+    color: var(--tool-accent-2);
 }
 
 .file-item-status.completed {
-    border-color: var(--cli-fg);
-    color: var(--cli-fg);
+    border-color: var(--tool-accent);
+    color: var(--tool-accent);
 }
 
 .file-item-status.error {
-    border-color: var(--cli-error);
-    color: var(--cli-error);
+    border-color: #ff5252;
+    color: #ff5252;
 }
 
 .file-item-remove {
     background: transparent;
     border: none;
-    color: var(--cli-fg-dim);
+    color: var(--tool-fg-dim);
     cursor: pointer;
-    padding: 0.3vw;
+    padding: 0.3rem;
     transition: color 0.15s;
 }
 
 .file-item-remove:hover {
-    color: var(--cli-error);
+    color: #ff5252;
 }
 
 .file-item-remove .material-icons {
@@ -471,30 +432,39 @@
 .file-list-actions {
     display: flex;
     justify-content: flex-end;
-    gap: 1vw;
+    gap: 1rem;
 }
 
 /* ========================================
-   进度区
+   进度区 - Glass Panel
    ======================================== */
 
 .progress-section {
-    padding: 1.5vw;
-    border: 1px solid var(--cli-border);
-    background: rgba(0, 255, 0, 0.02);
+    padding: 1.5rem;
+    background: var(--tool-glass-bg);
+    border: 1px solid var(--tool-glass-border);
+    backdrop-filter: blur(var(--tool-glass-blur));
+    -webkit-backdrop-filter: blur(var(--tool-glass-blur));
+    border-radius: 16px;
 }
 
 .progress-header {
     display: flex;
     align-items: center;
-    gap: 0.8vw;
-    margin-bottom: 1vw;
-    color: var(--cli-fg);
+    gap: 0.8rem;
+    margin-bottom: 1rem;
+    color: var(--tool-fg);
 }
 
 .progress-header .material-icons {
     font-size: 1.2rem;
+    color: var(--tool-accent);
     animation: spin 1.5s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
 }
 
 .progress-title {
@@ -504,115 +474,125 @@
 .progress-bar-wrapper {
     display: flex;
     align-items: center;
-    gap: 1vw;
-    margin-bottom: 0.8vw;
+    gap: 1rem;
+    margin-bottom: 0.8rem;
 }
 
 .progress-bar {
     flex: 1;
-    height: 1.2vw;
+    height: 1.2rem;
     min-height: 14px;
-    background: var(--cli-border);
+    background: var(--tool-border);
     overflow: hidden;
+    border-radius: 6px;
 }
 
 .progress-fill {
     height: 100%;
-    background: linear-gradient(90deg, var(--cli-fg-dim), var(--cli-fg));
+    background: linear-gradient(90deg, var(--tool-accent), #8b5cf6);
     width: 0%;
     transition: width 0.3s ease-out;
+    border-radius: 6px;
+    box-shadow: 0 0 10px var(--tool-accent-glow);
 }
 
 .progress-percent {
-    min-width: 4vw;
+    min-width: 4rem;
     text-align: right;
     font-size: 0.9rem;
-    color: var(--cli-fg);
+    color: var(--tool-accent);
 }
 
 .progress-detail {
     font-size: 0.85rem;
-    color: var(--cli-fg-dim);
+    color: var(--tool-fg-dim);
 }
 
 /* ========================================
-   结果区
+   结果区 - Glass Panel
    ======================================== */
 
 .result-section {
-    padding: 1.5vw;
-    border: 1px solid var(--cli-border);
-    background: rgba(0, 255, 0, 0.02);
+    padding: 1.5rem;
+    background: var(--tool-glass-bg);
+    border: 1px solid var(--tool-glass-border);
+    backdrop-filter: blur(var(--tool-glass-blur));
+    -webkit-backdrop-filter: blur(var(--tool-glass-blur));
+    border-radius: 16px;
 }
 
 .result-meta {
     display: flex;
-    gap: 2vw;
-    margin-bottom: 1.2vw;
-    padding: 1vw;
-    background: var(--cli-bg-alt);
-    border: 1px dashed var(--cli-border);
+    gap: 2rem;
+    margin-bottom: 1.2rem;
+    padding: 1rem;
+    background: var(--tool-surface);
+    border: 1px solid var(--tool-border);
     font-size: 0.85rem;
-    color: var(--cli-fg-dim);
+    color: var(--tool-fg-dim);
+    border-radius: 8px;
 }
 
 .result-meta-item {
     display: flex;
     align-items: center;
-    gap: 0.5vw;
+    gap: 0.5rem;
 }
 
 .result-meta-item .material-icons {
     font-size: 1rem;
+    color: var(--tool-accent);
 }
 
 .result-tabs {
     display: flex;
     gap: 0;
     margin-bottom: 0;
-    border-bottom: 1px solid var(--cli-border);
+    border-bottom: 1px solid var(--tool-border);
 }
 
 .result-tab {
-    padding: 0.8vw 1.5vw;
+    padding: 0.8rem 1.5rem;
     background: transparent;
-    border: 1px solid var(--cli-border);
+    border: 1px solid var(--tool-border);
     border-bottom: none;
-    color: var(--cli-fg-dim);
+    color: var(--tool-fg-dim);
     font-family: inherit;
     font-size: 0.9rem;
     cursor: pointer;
     transition: all 0.15s;
     margin-right: -1px;
+    border-radius: 8px 8px 0 0;
 }
 
 .result-tab:hover {
-    color: var(--cli-fg);
-    background: rgba(0, 255, 0, 0.03);
+    color: var(--tool-fg);
+    background: var(--tool-surface);
 }
 
 .result-tab-active {
-    color: var(--cli-fg);
-    background: rgba(0, 255, 0, 0.05);
-    border-color: var(--cli-fg);
+    color: var(--tool-fg);
+    background: var(--tool-surface);
+    border-color: var(--tool-accent);
 }
 
 .result-content-wrapper {
-    border: 1px solid var(--cli-border);
+    border: 1px solid var(--tool-border);
     border-top: none;
-    background: var(--cli-input-bg);
+    background: var(--tool-surface);
+    border-radius: 0 0 8px 8px;
 }
 
 .result-content {
-    padding: 1.5vw;
+    padding: 1.5rem;
     min-height: 25vh;
     max-height: 50vh;
     overflow-y: auto;
     white-space: pre-wrap;
-    font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+    font-family: 'SF Mono', 'Fira Code', 'Consolas', 'Monaco', monospace;
     font-size: 0.9rem;
     line-height: 1.6;
-    color: var(--cli-fg);
+    color: var(--tool-fg);
 }
 
 .result-details {
@@ -621,9 +601,9 @@
 }
 
 .result-details-item {
-    margin-bottom: 1vw;
-    padding-bottom: 1vw;
-    border-bottom: 1px dashed var(--cli-border);
+    margin-bottom: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--tool-border);
 }
 
 .result-details-item:last-child {
@@ -631,67 +611,69 @@
 }
 
 .result-details-label {
-    color: var(--cli-fg-dim);
-    margin-bottom: 0.3vw;
+    color: var(--tool-fg-dim);
+    margin-bottom: 0.3rem;
 }
 
 .result-details-value {
-    color: var(--cli-fg);
+    color: var(--tool-fg);
 }
 
 .result-actions {
     display: flex;
     justify-content: flex-end;
-    gap: 1vw;
-    margin-top: 1.2vw;
+    gap: 1rem;
+    margin-top: 1.2rem;
 }
 
 /* ========================================
    通用按钮
    ======================================== */
 
-.action-btn {
+.btn {
+    padding: 0.75rem 1.5rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    transition: all var(--tool-duration-normal, 250ms);
+    border: none;
+    border-radius: 10px;
+    text-decoration: none;
     display: inline-flex;
     align-items: center;
-    gap: 0.5vw;
-    padding: 0.7vw 1.5vw;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+}
+
+.btn:active {
+    transform: translateY(0);
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, var(--tool-accent) 0%, #8b5cf6 100%);
+    color: #fff;
+    box-shadow: 0 4px 20px var(--tool-accent-glow);
+}
+
+.btn-primary:hover {
+    box-shadow: 0 6px 30px var(--tool-accent-glow);
+    color: #fff;
+}
+
+.btn-secondary {
     background: transparent;
-    color: var(--cli-fg);
-    border: 1px solid var(--cli-fg);
-    cursor: pointer;
-    font-family: inherit;
-    font-size: 0.9rem;
-    transition: all 0.15s;
+    color: var(--tool-fg);
+    border: 1px solid var(--tool-border);
 }
 
-.action-btn:hover {
-    background: var(--cli-fg);
-    color: var(--cli-bg);
-}
-
-.action-btn .material-icons {
-    font-size: 1.1rem;
-}
-
-.action-btn-primary {
-    background: var(--cli-fg);
-    color: var(--cli-bg);
-}
-
-.action-btn-primary:hover {
-    background: transparent;
-    color: var(--cli-fg);
-}
-
-.action-btn-secondary {
-    border-color: var(--cli-border);
-    color: var(--cli-fg-dim);
-}
-
-.action-btn-secondary:hover {
-    border-color: var(--cli-fg);
-    color: var(--cli-fg);
-    background: transparent;
+.btn-secondary:hover {
+    border-color: var(--tool-accent);
+    box-shadow: 0 0 20px var(--tool-accent-glow);
 }
 
 /* ========================================
@@ -699,15 +681,16 @@
    ======================================== */
 
 .message-zone {
-    margin-top: 1vw;
+    margin-top: 1rem;
 }
 
 .message {
-    padding: 1vw 1.5vw;
-    margin: 0.8vw 0;
+    padding: 1rem 1.5rem;
+    margin: 0.8rem 0;
     text-align: left;
     display: none;
-    border: 1px dashed;
+    border-radius: 10px;
+    border: 1px solid;
 }
 
 .message::before {
@@ -716,31 +699,31 @@
 }
 
 .message.error-message {
-    border-color: var(--cli-error);
-    color: var(--cli-error);
-    background: rgba(255, 68, 68, 0.05);
+    border-color: #ff5252;
+    color: #ff5252;
+    background: rgba(255, 82, 82, 0.1);
 }
 
 .message.success-message {
-    border-color: var(--cli-fg);
-    color: var(--cli-fg);
-    background: rgba(0, 255, 0, 0.05);
+    border-color: var(--tool-accent);
+    color: var(--tool-accent);
+    background: rgba(167, 139, 250, 0.1);
 }
 
 .message.warning-message {
-    border-color: var(--cli-warning);
-    color: var(--cli-warning);
-    background: rgba(255, 170, 0, 0.05);
+    border-color: #ffc107;
+    color: #ffc107;
+    background: rgba(255, 193, 7, 0.1);
 }
 
 .message.info-message {
-    border-color: var(--cli-info);
-    color: var(--cli-info);
-    background: rgba(0, 170, 255, 0.05);
+    border-color: var(--tool-accent-2);
+    color: var(--tool-accent-2);
+    background: rgba(34, 211, 238, 0.1);
 }
 
 /* ========================================
-   模态框
+   Modal - Glass Blur
    ======================================== */
 
 .modal-overlay {
@@ -751,19 +734,23 @@
     top: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.85);
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
     justify-content: center;
     align-items: center;
 }
 
 .modal-content {
-    background: var(--cli-bg);
-    border: 1px solid var(--cli-fg);
+    background: var(--tool-bg-elevated);
+    border: 1px solid var(--tool-border);
     margin: 10% auto;
-    padding: 2vw;
+    padding: 2rem;
     width: 90%;
     max-width: 450px;
     text-align: center;
+    border-radius: 16px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
 }
 
 .modal-content-large {
@@ -776,36 +763,36 @@
 .modal-header {
     display: flex;
     align-items: center;
-    gap: 0.8vw;
-    margin-bottom: 1.5vw;
-    padding-bottom: 1vw;
-    border-bottom: 1px dashed var(--cli-border);
+    gap: 0.8rem;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--tool-border);
 }
 
 .modal-icon {
     font-size: 1.5rem;
-    color: var(--cli-fg);
+    color: var(--tool-accent);
 }
 
 .modal-header h2 {
     margin: 0;
     font-size: 1.1rem;
     font-weight: normal;
-    color: var(--cli-fg);
+    color: var(--tool-fg);
 }
 
 .modal-close {
     margin-left: auto;
     background: transparent;
     border: none;
-    color: var(--cli-fg-dim);
+    color: var(--tool-fg-dim);
     cursor: pointer;
-    padding: 0.3vw;
+    padding: 0.3rem;
     transition: color 0.15s;
 }
 
 .modal-close:hover {
-    color: var(--cli-fg);
+    color: var(--tool-accent);
 }
 
 .modal-close .material-icons {
@@ -813,8 +800,8 @@
 }
 
 .modal-body {
-    margin-bottom: 1.5vw;
-    color: var(--cli-fg-dim);
+    margin-bottom: 1.5rem;
+    color: var(--tool-fg-dim);
     font-size: 0.95rem;
     line-height: 1.5;
     text-align: left;
@@ -823,27 +810,28 @@
 .modal-footer {
     display: flex;
     justify-content: center;
-    gap: 1vw;
+    gap: 1rem;
     flex-wrap: wrap;
 }
 
 .modal-btn {
     display: inline-flex;
     align-items: center;
-    gap: 0.5vw;
-    padding: 0.7vw 1.5vw;
-    border: 1px solid var(--cli-fg);
+    gap: 0.5rem;
+    padding: 0.7rem 1.5rem;
+    border: 1px solid var(--tool-border);
     cursor: pointer;
     font-family: inherit;
     font-size: 0.9rem;
     transition: all 0.15s;
-    background: transparent;
-    color: var(--cli-fg);
+    background: var(--tool-surface);
+    color: var(--tool-fg);
+    border-radius: 10px;
 }
 
 .modal-btn:hover {
-    background: var(--cli-fg);
-    color: var(--cli-bg);
+    border-color: var(--tool-accent);
+    box-shadow: 0 0 15px var(--tool-accent-glow);
 }
 
 .modal-btn .material-icons {
@@ -851,34 +839,24 @@
 }
 
 .modal-btn-primary {
-    background: var(--cli-fg);
-    color: var(--cli-bg);
+    background: linear-gradient(135deg, var(--tool-accent) 0%, #8b5cf6 100%);
+    color: #fff;
+    border: none;
+    box-shadow: 0 4px 15px var(--tool-accent-glow);
 }
 
 .modal-btn-primary:hover {
-    background: transparent;
-    color: var(--cli-fg);
+    box-shadow: 0 6px 25px var(--tool-accent-glow);
 }
 
 .modal-btn-cancel {
-    border-color: var(--cli-border);
-    color: var(--cli-fg-dim);
+    border-color: var(--tool-border);
+    color: var(--tool-fg-dim);
 }
 
 .modal-btn-cancel:hover {
-    border-color: var(--cli-fg);
-    color: var(--cli-fg);
-    background: transparent;
-}
-
-.modal-btn-secondary {
-    border-color: var(--cli-border);
-    color: var(--cli-fg-dim);
-}
-
-.modal-btn-secondary:hover {
-    border-color: var(--cli-error);
-    color: var(--cli-error);
+    border-color: var(--tool-accent);
+    color: var(--tool-fg);
     background: transparent;
 }
 
@@ -895,15 +873,16 @@
 .history-item {
     display: flex;
     align-items: flex-start;
-    gap: 1vw;
-    padding: 1vw;
-    border-bottom: 1px dashed var(--cli-border);
+    gap: 1rem;
+    padding: 1rem;
+    border-bottom: 1px solid var(--tool-border);
     cursor: pointer;
     transition: background 0.15s;
+    border-radius: 8px;
 }
 
 .history-item:hover {
-    background: rgba(0, 255, 0, 0.03);
+    background: var(--tool-surface);
 }
 
 .history-item:last-child {
@@ -914,17 +893,18 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 3vw;
-    height: 3vw;
+    width: 3rem;
+    height: 3rem;
     min-width: 36px;
     min-height: 36px;
-    background: var(--cli-bg-alt);
-    border: 1px solid var(--cli-border);
+    background: var(--tool-surface);
+    border: 1px solid var(--tool-border);
+    border-radius: 8px;
 }
 
 .history-item-icon .material-icons {
-    font-size: 1.5vw;
-    color: var(--cli-fg);
+    font-size: 1.5rem;
+    color: var(--tool-accent);
 }
 
 .history-item-content {
@@ -933,9 +913,9 @@
 }
 
 .history-item-name {
-    margin: 0 0 0.3vw 0;
+    margin: 0 0 0.3rem 0;
     font-size: 0.9rem;
-    color: var(--cli-fg);
+    color: var(--tool-fg);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -944,38 +924,38 @@
 .history-item-time {
     margin: 0;
     font-size: 0.8rem;
-    color: var(--cli-fg-dim);
+    color: var(--tool-fg-dim);
 }
 
 .history-item-actions {
     display: flex;
-    gap: 0.5vw;
+    gap: 0.5rem;
 }
 
 .history-item-btn {
     background: transparent;
     border: none;
-    color: var(--cli-fg-dim);
+    color: var(--tool-fg-dim);
     cursor: pointer;
-    padding: 0.3vw;
+    padding: 0.3rem;
     transition: color 0.15s;
 }
 
 .history-item-btn:hover {
-    color: var(--cli-fg);
+    color: var(--tool-accent);
 }
 
 .history-item-btn.delete:hover {
-    color: var(--cli-error);
+    color: #ff5252;
 }
 
 .history-empty {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 1vw;
-    padding: 3vw;
-    color: var(--cli-fg-dim);
+    gap: 1rem;
+    padding: 3rem;
+    color: var(--tool-fg-dim);
 }
 
 .history-empty .material-icons {
@@ -989,64 +969,6 @@
 }
 
 /* ========================================
-   帮助内容
-   ======================================== */
-
-.help-content {
-    text-align: left;
-    overflow-y: auto;
-}
-
-.help-section {
-    margin-bottom: 1.5vw;
-    padding-bottom: 1.5vw;
-    border-bottom: 1px dashed var(--cli-border);
-}
-
-.help-section:last-child {
-    border-bottom: none;
-    margin-bottom: 0;
-    padding-bottom: 0;
-}
-
-.help-section h3 {
-    display: flex;
-    align-items: center;
-    gap: 0.5vw;
-    margin: 0 0 0.8vw 0;
-    font-size: 0.95rem;
-    font-weight: normal;
-    color: var(--cli-fg);
-}
-
-.help-section h3 .material-icons {
-    font-size: 1.1rem;
-    color: var(--cli-fg-dim);
-}
-
-.help-section p {
-    margin: 0 0 0.5vw 1.5vw;
-    color: var(--cli-fg-dim);
-    font-size: 0.9rem;
-    line-height: 1.5;
-}
-
-.help-section ul {
-    margin: 0 0 0.5vw 1.5vw;
-    padding-left: 1.5vw;
-    color: var(--cli-fg-dim);
-    font-size: 0.9rem;
-}
-
-.help-section li {
-    margin-bottom: 0.3vw;
-}
-
-.help-section strong {
-    color: var(--cli-fg);
-}
-
-/* ========================================
    Toast 提示
    ======================================== */
 
@@ -1056,23 +978,25 @@
     right: 20px;
     display: flex;
     align-items: center;
-    gap: 0.8vw;
-    padding: 1vw 1.5vw;
-    background: var(--cli-bg);
-    border: 1px solid var(--cli-fg);
-    color: var(--cli-fg);
+    gap: 0.8rem;
+    padding: 1rem 1.5rem;
+    background: var(--tool-bg-elevated);
+    border: 1px solid var(--tool-border);
+    color: var(--tool-fg);
     font-size: 0.9rem;
     z-index: 10000;
     animation: slideIn 0.3s ease-out;
+    border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
 }
 
 .toast.error {
-    border-color: var(--cli-error);
-    color: var(--cli-error);
+    border-color: #ff5252;
+    color: #ff5252;
 }
 
 .toast.success {
-    border-color: var(--cli-fg);
+    border-color: var(--tool-accent);
 }
 
 .toast .material-icons {
@@ -1090,77 +1014,64 @@
     }
 }
 
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}
-
 /* ========================================
    响应式
    ======================================== */
 
 @media (max-width: 768px) {
-    .operation-zone {
-        grid-template-columns: 1fr;
-    }
-    
     .options-grid {
         grid-template-columns: 1fr;
     }
-    
+
     .content-header {
         flex-direction: column;
-        gap: 1vw;
+        gap: 1rem;
     }
-    
+
     .header-icon {
         width: 50px;
         height: 50px;
     }
-    
+
     .header-icon .material-icons {
         font-size: 24px;
     }
-    
+
     .upload-icon-wrapper {
         width: 60px;
         height: 60px;
     }
-    
+
     .upload-icon {
         font-size: 28px !important;
     }
-    
-    .nav-btn-text {
-        display: none;
-    }
-    
+
     .result-actions {
         flex-direction: column;
     }
-    
-    .action-btn {
+
+    .btn {
         width: 100%;
         justify-content: center;
     }
-    
+
     .modal-footer {
         flex-direction: column;
     }
-    
+
     .modal-btn {
         width: 100%;
         justify-content: center;
     }
-    
+
     .toggle-switch {
         width: 40px;
     }
-    
+
     .toggle-switch::after {
         left: 2px;
     }
-    
+
     .toggle-input:checked + .toggle-switch::after {
         left: 22px;
     }

@@ -3,7 +3,8 @@ class TextFileReader {
         this.file = null;
         this.encoding = 'utf-8';
         this.totalLines = 0;
-        this.lineStartPositions = []; // 行首位置索引
+        this.lines = []; // 文件所有行内容
+        this.lineStartPositions = []; // 行首位置索引（保留用于兼容）
         this.cachedLines = new Map(); // 行内容缓存
         this.visibleStartLine = 0;
         this.visibleEndLine = 0;
@@ -201,77 +202,38 @@ class TextFileReader {
     
     async initializeFileReading() {
         if (!this.file) return;
-        
+
         try {
             // 自动检测编码
             await this.autoDetectEncoding();
-            
-            // 构建行索引
-            await this.buildLineIndex();
-            
+
+            // 读取整个文件内容
+            this.showMessage('正在读取文件...', 'info');
+            const fullText = await this.readBlobAsText(this.file);
+
+            // 按行分割（处理 \r\n 和 \n）
+            this.lines = fullText.split(/\r?\n/);
+            this.totalLines = this.lines.length;
+
+            // 预加载前几百行到缓存
+            const preloadEnd = Math.min(this.bufferSize, this.totalLines);
+            for (let i = 0; i < preloadEnd; i++) {
+                this.cachedLines.set(i, this.lines[i] || '');
+            }
+
             // 显示文件内容
             this.renderVisibleLines();
-            
+
             // 更新信息显示
             this.updateFileInfo();
-            
+
             // 检查并跳转到保存的阅读位置
             this.checkAndRestoreReadingPosition();
         } catch (error) {
             this.showMessage('初始化文件读取时出错: ' + error.message, 'error');
         }
     }
-    
-    async buildLineIndex() {
-        if (!this.file) return;
-        
-        this.lineStartPositions = [0]; // 第一行从位置0开始
-        let position = 0;
-        let offset = 0;
-        
-        this.showMessage('正在分析文件结构...', 'info');
-        
-        while (offset < this.file.size) {
-            // 读取文件块
-            const chunkEnd = Math.min(offset + this.chunkSize, this.file.size);
-            const chunk = this.file.slice(offset, chunkEnd);
-            
-            try {
-                const text = await this.readBlobAsText(chunk);
-                const lines = text.split('\n');
-                
-                // 处理块中的行（除了最后一行，因为可能不完整）
-                for (let i = 0; i < lines.length - 1; i++) {
-                    position += lines[i].length + 1; // +1 for \n
-                    this.lineStartPositions.push(position);
-                }
-                
-                // 最后一行的处理
-                const lastLine = lines[lines.length - 1];
-                position += lastLine.length;
-                
-                // 如果不是文件末尾，说明还有换行符
-                if (chunkEnd < this.file.size) {
-                    position += 1; // for \n
-                    this.lineStartPositions.push(position);
-                }
-                
-                offset = chunkEnd;
-                
-                // 更新进度信息
-                if (this.elements.loadedInfo) {
-                    this.elements.loadedInfo.textContent = `已索引: ${this.lineStartPositions.length} 行`;
-                }
-            } catch (error) {
-                this.showMessage(`读取文件时出错: ${error.message}，请尝试更改编码格式`, 'error');
-                throw new Error('读取文件时出错: ' + error.message);
-            }
-        }
-        
-        this.totalLines = this.lineStartPositions.length;
-        this.showMessage('文件分析完成!', 'success');
-    }
-    
+
     readBlobAsText(blob) {
         return new Promise((resolve, reject) => {
             const reader = new FileReader();
@@ -449,46 +411,22 @@ class TextFileReader {
     }
     
     async loadLines(startLine, endLine) {
-        if (!this.file || startLine < 0 || endLine >= this.totalLines) return;
-        
-        const promises = [];
-        
+        if (!this.lines || startLine < 0 || endLine >= this.totalLines) return;
+
+        // 直接从 this.lines 数组获取行内容
         for (let i = startLine; i <= endLine; i++) {
-            // 如果已经缓存，跳过
-            if (this.cachedLines.has(i)) continue;
-            
-            // 创建读取行内容的Promise
-            promises.push(this.loadLineContent(i));
+            if (!this.cachedLines.has(i)) {
+                this.cachedLines.set(i, this.lines[i] || '');
+            }
         }
-        
-        // 并行加载所有未缓存的行
-        await Promise.all(promises);
     }
-    
+
     async loadLineContent(lineNumber) {
-        if (!this.file || lineNumber < 0 || lineNumber >= this.totalLines) return '';
-        
-        const startPos = this.lineStartPositions[lineNumber];
-        const endPos = lineNumber + 1 < this.totalLines ? 
-            this.lineStartPositions[lineNumber + 1] - 1 : 
-            this.file.size;
-            
-        const lineLength = endPos - startPos;
-        if (lineLength <= 0) {
-            this.cachedLines.set(lineNumber, '');
-            return '';
-        }
-        
-        try {
-            const blob = this.file.slice(startPos, endPos);
-            const content = await this.readBlobAsText(blob);
-            this.cachedLines.set(lineNumber, content);
-            return content;
-        } catch (error) {
-            console.error(`读取第${lineNumber}行时出错:`, error);
-            this.cachedLines.set(lineNumber, '');
-            return '';
-        }
+        if (!this.lines || lineNumber < 0 || lineNumber >= this.totalLines) return '';
+
+        const content = this.lines[lineNumber] || '';
+        this.cachedLines.set(lineNumber, content);
+        return content;
     }
     
     async renderVisibleLines(skipScrollUpdate = false) {
@@ -658,6 +596,7 @@ class TextFileReader {
     // 重置阅读内容但不重置文件
     resetReadingContent() {
         this.totalLines = 0;
+        this.lines = [];
         this.lineStartPositions = [];
         this.cachedLines.clear();
         this.visibleStartLine = 0;

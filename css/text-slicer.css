@@ -1,11 +1,7 @@
 /*
  * 文本切片器样式
- * 适配 CLI 主题 - 优化版
+ * 适配 Liquid Glass 科幻主题
  */
-
-.docx-main {
-    padding: 0;
-}
 
 /* ========================================
    导航区
@@ -15,16 +11,16 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 1vw 0;
-    margin-bottom: 2vw;
-    border-bottom: 1px dashed var(--cli-border);
+    padding: 1rem 0;
+    margin-bottom: 2rem;
+    border-bottom: 1px solid var(--tool-border);
 }
 
 .nav-breadcrumb {
     display: flex;
     align-items: center;
-    gap: 0.5vw;
-    color: var(--cli-fg-dim);
+    gap: 0.5rem;
+    color: var(--tool-fg-dim);
     font-size: 0.9rem;
 }
 
@@ -37,12 +33,12 @@
 }
 
 .nav-item-current {
-    color: var(--cli-fg);
+    color: var(--tool-fg);
 }
 
 .nav-title-icon {
     font-size: 1rem !important;
-    color: var(--cli-fg-dim);
+    color: var(--tool-fg-dim);
 }
 
 /* ========================================
@@ -52,16 +48,16 @@
 .content-zone {
     display: flex;
     flex-direction: column;
-    gap: 2.5vw;
+    gap: 2rem;
 }
 
 .tool-desc {
-    margin-bottom: 0.5vw;
+    margin-bottom: 0.5rem;
 }
 
 .tool-desc p {
     margin: 0;
-    color: var(--cli-fg-dim);
+    color: var(--tool-fg-dim);
     font-size: 0.9rem;
 }
 
@@ -72,51 +68,62 @@
 .operation-zone {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 2vw;
+    gap: 2rem;
+}
+
+@media (max-width: 768px) {
+    .operation-zone {
+        grid-template-columns: 1fr;
+    }
 }
 
 .section-header {
     display: flex;
     align-items: center;
-    gap: 0.8vw;
-    margin-bottom: 1.2vw;
+    gap: 0.8rem;
+    margin-bottom: 1.2rem;
 }
 
 .section-header .material-icons {
     font-size: 1.3rem;
-    color: var(--cli-fg-dim);
+    color: var(--tool-accent);
 }
 
 .section-header h2 {
     margin: 0;
     font-size: 1rem;
     font-weight: normal;
-    color: var(--cli-fg);
+    color: var(--tool-fg);
 }
 
 /* ========================================
-   上传区
+   上传区 - Glass Panel
    ======================================== */
 
 .upload-section {
-    padding: 1.5vw;
-    border: 1px solid var(--cli-border);
-    background: rgba(0, 255, 0, 0.02);
+    padding: 1.5rem;
+    background: var(--tool-glass-bg);
+    border: 1px solid var(--tool-glass-border);
+    backdrop-filter: blur(var(--tool-glass-blur));
+    -webkit-backdrop-filter: blur(var(--tool-glass-blur));
+    border-radius: 16px;
 }
 
 .upload-area {
     position: relative;
-    border: 2px dashed var(--cli-border);
-    padding: 3vw 2vw;
+    border: 2px dashed var(--tool-border);
+    padding: 3rem 2rem;
     text-align: center;
-    transition: all 0.2s;
+    transition: all var(--tool-duration-normal, 250ms);
     cursor: pointer;
+    border-radius: 12px;
 }
 
 .upload-area:hover,
 .upload-area.dragover {
-    border-color: var(--cli-fg);
-    background: rgba(0, 255, 0, 0.05);
+    border-color: var(--tool-accent);
+    background: var(--tool-surface-hover);
+    box-shadow: inset 0 0 30px var(--tool-accent-glow);
 }
 
 .upload-area.dragover .upload-icon-wrapper {
@@ -131,57 +138,60 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 1vw;
+    gap: 1rem;
 }
 
 .upload-icon-wrapper {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 5vw;
-    height: 5vw;
+    width: 5rem;
+    height: 5rem;
     min-width: 60px;
     min-height: 60px;
-    background: var(--cli-bg-alt);
-    border: 1px solid var(--cli-border);
+    background: var(--tool-surface);
+    border: 1px solid var(--tool-border);
     transition: transform 0.2s;
+    border-radius: 12px;
 }
 
 .upload-icon {
-    font-size: 2.5vw !important;
-    color: var(--cli-fg);
+    font-size: 2.5rem !important;
+    color: var(--tool-accent);
 }
 
 .upload-text-primary {
     margin: 0;
     font-size: 1rem;
-    color: var(--cli-fg);
+    color: var(--tool-fg);
 }
 
 .upload-text-secondary {
     margin: 0;
     font-size: 0.85rem;
-    color: var(--cli-fg-dim);
+    color: var(--tool-fg-dim);
 }
 
 .upload-btn {
     display: inline-flex;
     align-items: center;
-    gap: 0.5vw;
-    padding: 0.8vw 2vw;
-    background: transparent;
-    color: var(--cli-fg);
-    border: 1px solid var(--cli-fg);
+    gap: 0.5rem;
+    padding: 0.8rem 2rem;
+    background: linear-gradient(135deg, var(--tool-accent) 0%, #8b5cf6 100%);
+    color: #fff;
+    border: none;
     cursor: pointer;
     font-family: inherit;
     font-size: 0.9rem;
-    transition: all 0.15s;
-    margin-top: 0.5vw;
+    transition: all var(--tool-duration-normal, 250ms);
+    margin-top: 0.5rem;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px var(--tool-accent-glow);
 }
 
 .upload-btn:hover {
-    background: var(--cli-fg);
-    color: var(--cli-bg);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px var(--tool-accent-glow);
 }
 
 .upload-btn .material-icons {
@@ -189,56 +199,62 @@
 }
 
 .file-info-display {
-    margin-top: 1vw;
-    padding: 0.8vw 1.2vw;
-    background: var(--cli-bg-alt);
-    border: 1px dashed var(--cli-border);
+    margin-top: 1rem;
+    padding: 0.8rem 1.2rem;
+    background: var(--tool-surface);
+    border: 1px solid var(--tool-border);
     font-size: 0.85rem;
-    color: var(--cli-fg-dim);
+    color: var(--tool-fg-dim);
     text-align: left;
+    border-radius: 8px;
 }
 
 /* ========================================
-   选项区
+   选项区 - Glass Panel
    ======================================== */
 
 .options-section {
-    padding: 1.5vw;
-    border: 1px solid var(--cli-border);
-    background: rgba(0, 255, 0, 0.02);
+    padding: 1.5rem;
+    background: var(--tool-glass-bg);
+    border: 1px solid var(--tool-glass-border);
+    backdrop-filter: blur(var(--tool-glass-blur));
+    -webkit-backdrop-filter: blur(var(--tool-glass-blur));
+    border-radius: 16px;
 }
 
 .options-grid {
     display: flex;
     flex-direction: column;
-    gap: 1vw;
-    margin-bottom: 1.2vw;
+    gap: 1rem;
+    margin-bottom: 1.2rem;
 }
 
 .option-group {
     display: flex;
     flex-direction: column;
-    gap: 0.5vw;
+    gap: 0.5rem;
 }
 
 .option-label {
     display: flex;
     align-items: center;
-    gap: 0.5vw;
-    color: var(--cli-fg-dim);
+    gap: 0.5rem;
+    color: var(--tool-fg-dim);
     font-size: 0.85rem;
 }
 
 .option-label .material-icons {
     font-size: 1rem;
+    color: var(--tool-accent);
 }
 
 .slice-options {
     display: none;
-    margin-top: 1vw;
-    padding: 1.2vw;
-    background: rgba(0, 255, 0, 0.02);
-    border: 1px solid var(--cli-border);
+    margin-top: 1rem;
+    padding: 1.2rem;
+    background: var(--tool-surface);
+    border: 1px solid var(--tool-border);
+    border-radius: 12px;
 }
 
 .slice-options.active {
@@ -246,7 +262,7 @@
 }
 
 .input-group {
-    margin-bottom: 1vw;
+    margin-bottom: 1rem;
 }
 
 .input-group:last-child {
@@ -255,70 +271,77 @@
 
 .input-group label {
     display: block;
-    margin-bottom: 0.5vw;
-    color: var(--cli-fg-dim);
+    margin-bottom: 0.5rem;
+    color: var(--tool-fg-dim);
     font-size: 0.85rem;
 }
 
 .input-group input {
     width: 100%;
-    padding: 0.6vw 1vw;
-    background: var(--cli-input-bg);
-    border: 1px solid var(--cli-border);
-    color: var(--cli-fg);
+    padding: 0.6rem 1rem;
+    background: var(--tool-surface);
+    border: 1px solid var(--tool-border);
+    color: var(--tool-fg);
     font-family: inherit;
     font-size: 0.9rem;
     box-sizing: border-box;
+    border-radius: 10px;
+    transition: all var(--tool-duration-fast, 150ms);
 }
 
 .input-group input:focus {
     outline: none;
-    border-color: var(--cli-fg);
+    border-color: var(--tool-accent);
+    box-shadow: 0 0 0 3px var(--tool-accent-glow);
 }
 
 .slice-type-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 1vw;
-    margin-bottom: 1vw;
+    gap: 1rem;
+    margin-bottom: 1rem;
 }
 
 .slice-type-item {
     display: flex;
     align-items: center;
-    gap: 0.6vw;
-    padding: 0.8vw 1vw;
-    border: 1px solid var(--cli-border);
+    gap: 0.6rem;
+    padding: 0.8rem 1rem;
+    border: 1px solid var(--tool-border);
     cursor: pointer;
     transition: all 0.15s;
     font-size: 0.9rem;
-    color: var(--cli-fg-dim);
+    color: var(--tool-fg-dim);
+    border-radius: 10px;
+    background: var(--tool-surface);
 }
 
 .slice-type-item:hover {
-    border-color: var(--cli-fg);
-    color: var(--cli-fg);
+    border-color: var(--tool-accent);
+    color: var(--tool-fg);
 }
 
 .slice-type-item input[type="radio"] {
     appearance: none;
-    width: 1vw;
-    height: 1vw;
+    width: 1rem;
+    height: 1rem;
     min-width: 14px;
     min-height: 14px;
-    border: 1px solid var(--cli-border);
+    border: 1px solid var(--tool-border);
     border-radius: 50%;
     cursor: pointer;
     flex-shrink: 0;
+    background: var(--tool-surface);
 }
 
 .slice-type-item input[type="radio"]:checked {
-    border-color: var(--cli-fg);
-    background: var(--cli-fg);
+    border-color: var(--tool-accent);
+    background: var(--tool-accent);
+    box-shadow: inset 0 0 0 3px var(--tool-surface);
 }
 
 .slice-type-item input[type="radio"]:checked + span {
-    color: var(--cli-fg);
+    color: var(--tool-fg);
 }
 
 /* ========================================
@@ -328,31 +351,40 @@
 .controls-zone {
     display: flex;
     justify-content: flex-start;
-    gap: 1vw;
+    gap: 1rem;
     flex-wrap: wrap;
 }
 
 /* ========================================
-   进度区
+   进度区 - Glass Panel
    ======================================== */
 
 .progress-section {
-    padding: 1.5vw;
-    border: 1px solid var(--cli-border);
-    background: rgba(0, 255, 0, 0.02);
+    padding: 1.5rem;
+    background: var(--tool-glass-bg);
+    border: 1px solid var(--tool-glass-border);
+    backdrop-filter: blur(var(--tool-glass-blur));
+    -webkit-backdrop-filter: blur(var(--tool-glass-blur));
+    border-radius: 16px;
 }
 
 .progress-header {
     display: flex;
     align-items: center;
-    gap: 0.8vw;
-    margin-bottom: 1vw;
-    color: var(--cli-fg);
+    gap: 0.8rem;
+    margin-bottom: 1rem;
+    color: var(--tool-fg);
 }
 
 .progress-header .material-icons {
     font-size: 1.2rem;
+    color: var(--tool-accent);
     animation: spin 1.5s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
 }
 
 .progress-title {
@@ -362,109 +394,118 @@
 .progress-bar-wrapper {
     display: flex;
     align-items: center;
-    gap: 1vw;
-    margin-bottom: 0.8vw;
+    gap: 1rem;
+    margin-bottom: 0.8rem;
 }
 
 .progress-bar {
     flex: 1;
-    height: 1.2vw;
+    height: 1.2rem;
     min-height: 14px;
-    background: var(--cli-border);
+    background: var(--tool-border);
     overflow: hidden;
+    border-radius: 6px;
 }
 
 .progress-fill {
     height: 100%;
-    background: linear-gradient(90deg, var(--cli-fg-dim), var(--cli-fg));
+    background: linear-gradient(90deg, var(--tool-accent), #8b5cf6);
     width: 0%;
     transition: width 0.3s ease-out;
+    border-radius: 6px;
+    box-shadow: 0 0 10px var(--tool-accent-glow);
 }
 
 .progress-percent {
-    min-width: 4vw;
+    min-width: 4rem;
     text-align: right;
     font-size: 0.9rem;
-    color: var(--cli-fg);
+    color: var(--tool-accent);
 }
 
 /* ========================================
-   结果区
+   结果区 - Glass Panel
    ======================================== */
 
 .result-section {
-    padding: 1.5vw;
-    border: 1px solid var(--cli-border);
-    background: rgba(0, 255, 0, 0.02);
+    padding: 1.5rem;
+    background: var(--tool-glass-bg);
+    border: 1px solid var(--tool-glass-border);
+    backdrop-filter: blur(var(--tool-glass-blur));
+    -webkit-backdrop-filter: blur(var(--tool-glass-blur));
+    border-radius: 16px;
 }
 
 .result-header {
     display: flex;
     align-items: center;
-    gap: 0.8vw;
-    margin-bottom: 1.2vw;
+    gap: 0.8rem;
+    margin-bottom: 1.2rem;
 }
 
 .result-header .material-icons {
     font-size: 1.3rem;
-    color: var(--cli-fg-dim);
+    color: var(--tool-accent);
 }
 
 .result-header h2 {
     margin: 0;
     font-size: 1rem;
     font-weight: normal;
-    color: var(--cli-fg);
+    color: var(--tool-fg);
 }
 
 .result-summary {
-    margin-bottom: 1.2vw;
-    padding: 1vw;
-    background: var(--cli-bg-alt);
-    border: 1px dashed var(--cli-border);
+    margin-bottom: 1.2rem;
+    padding: 1rem;
+    background: var(--tool-surface);
+    border: 1px solid var(--tool-border);
     font-size: 0.85rem;
-    color: var(--cli-fg-dim);
+    color: var(--tool-fg-dim);
+    border-radius: 8px;
 }
 
 .select-controls {
     display: flex;
-    gap: 0.8vw;
-    margin-bottom: 1vw;
+    gap: 0.8rem;
+    margin-bottom: 1rem;
     flex-wrap: wrap;
 }
 
 .select-controls button {
-    padding: 0.5vw 1.2vw;
-    background: transparent;
-    color: var(--cli-fg-dim);
-    border: 1px solid var(--cli-border);
+    padding: 0.5rem 1.2rem;
+    background: var(--tool-surface);
+    color: var(--tool-fg-dim);
+    border: 1px solid var(--tool-border);
     cursor: pointer;
     font-family: inherit;
     font-size: 0.85rem;
     transition: all 0.15s;
+    border-radius: 8px;
 }
 
 .select-controls button:hover {
-    border-color: var(--cli-fg);
-    color: var(--cli-fg);
+    border-color: var(--tool-accent);
+    color: var(--tool-fg);
 }
 
 .result-file-list {
     display: flex;
     flex-direction: column;
-    gap: 0.8vw;
+    gap: 0.8rem;
     max-height: 30vh;
     overflow-y: auto;
-    margin-bottom: 1.2vw;
+    margin-bottom: 1.2rem;
 }
 
 .file-item {
     display: flex;
     align-items: center;
-    gap: 1vw;
-    padding: 1vw;
-    background: var(--cli-bg-alt);
-    border: 1px solid var(--cli-border);
+    gap: 1rem;
+    padding: 1rem;
+    background: var(--tool-surface);
+    border: 1px solid var(--tool-border);
+    border-radius: 10px;
 }
 
 .file-item-info {
@@ -475,48 +516,49 @@
 .file-item-name {
     margin: 0;
     font-size: 0.9rem;
-    color: var(--cli-fg);
+    color: var(--tool-fg);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
 
 .file-item-size {
-    margin: 0.2vw 0 0 0;
+    margin: 0.2rem 0 0 0;
     font-size: 0.8rem;
-    color: var(--cli-fg-dim);
+    color: var(--tool-fg-dim);
 }
 
 .file-item-select {
     display: flex;
     align-items: center;
-    gap: 0.5vw;
+    gap: 0.5rem;
     cursor: pointer;
-    color: var(--cli-fg-dim);
+    color: var(--tool-fg-dim);
     font-size: 0.85rem;
 }
 
 .file-item-select input[type="checkbox"] {
     appearance: none;
-    width: 1vw;
-    height: 1vw;
+    width: 1rem;
+    height: 1rem;
     min-width: 14px;
     min-height: 14px;
-    border: 1px solid var(--cli-border);
-    background: var(--cli-input-bg);
+    border: 1px solid var(--tool-border);
+    background: var(--tool-surface);
     cursor: pointer;
+    border-radius: 4px;
 }
 
 .file-item-select input[type="checkbox"]:checked {
-    border-color: var(--cli-fg);
-    background: var(--cli-fg);
+    border-color: var(--tool-accent);
+    background: var(--tool-accent);
 }
 
 .file-item-download {
-    padding: 0.4vw 0.8vw;
-    background: transparent;
-    color: var(--cli-fg);
-    border: 1px solid var(--cli-fg);
+    padding: 0.4rem 0.8rem;
+    background: linear-gradient(135deg, var(--tool-accent) 0%, #8b5cf6 100%);
+    color: #fff;
+    border: none;
     cursor: pointer;
     font-family: inherit;
     font-size: 0.8rem;
@@ -524,68 +566,77 @@
     text-decoration: none;
     display: inline-flex;
     align-items: center;
-    gap: 0.3vw;
+    gap: 0.3rem;
+    border-radius: 6px;
+    box-shadow: 0 2px 10px var(--tool-accent-glow);
 }
 
 .file-item-download:hover {
-    background: var(--cli-fg);
-    color: var(--cli-bg);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px var(--tool-accent-glow);
 }
 
 .result-empty {
-    padding: 3vw 2vw;
+    padding: 3rem 2rem;
     text-align: center;
-    color: var(--cli-fg-dim);
+    color: var(--tool-fg-dim);
     font-size: 0.9rem;
-    border: 1px dashed var(--cli-border);
+    border: 1px dashed var(--tool-border);
+    border-radius: 12px;
 }
 
 /* ========================================
    通用按钮
    ======================================== */
 
-.action-btn {
+.btn {
+    padding: 0.75rem 1.5rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    transition: all var(--tool-duration-normal, 250ms);
+    border: none;
+    border-radius: 10px;
+    text-decoration: none;
     display: inline-flex;
     align-items: center;
-    gap: 0.5vw;
-    padding: 0.7vw 1.5vw;
-    background: transparent;
-    color: var(--cli-fg);
-    border: 1px solid var(--cli-fg);
-    cursor: pointer;
-    font-family: inherit;
-    font-size: 0.9rem;
-    transition: all 0.15s;
+    justify-content: center;
+    gap: 0.5rem;
 }
 
-.action-btn:hover {
-    background: var(--cli-fg);
-    color: var(--cli-bg);
-}
-
-.action-btn .material-icons {
+.btn .material-icons {
     font-size: 1.1rem;
 }
 
-.action-btn-primary {
-    background: var(--cli-fg);
-    color: var(--cli-bg);
+.btn:hover {
+    transform: translateY(-2px);
 }
 
-.action-btn-primary:hover {
+.btn:active {
+    transform: translateY(0);
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, var(--tool-accent) 0%, #8b5cf6 100%);
+    color: #fff;
+    box-shadow: 0 4px 20px var(--tool-accent-glow);
+}
+
+.btn-primary:hover {
+    box-shadow: 0 6px 30px var(--tool-accent-glow);
+    color: #fff;
+}
+
+.btn-secondary {
     background: transparent;
-    color: var(--cli-fg);
+    color: var(--tool-fg);
+    border: 1px solid var(--tool-border);
 }
 
-.action-btn-secondary {
-    border-color: var(--cli-border);
-    color: var(--cli-fg-dim);
-}
-
-.action-btn-secondary:hover {
-    border-color: var(--cli-fg);
-    color: var(--cli-fg);
-    background: transparent;
+.btn-secondary:hover {
+    border-color: var(--tool-accent);
+    box-shadow: 0 0 20px var(--tool-accent-glow);
 }
 
 /* ========================================
@@ -593,15 +644,16 @@
    ======================================== */
 
 .message-zone {
-    margin-top: 1vw;
+    margin-top: 1rem;
 }
 
 .message {
-    padding: 1vw 1.5vw;
-    margin: 0.8vw 0;
+    padding: 1rem 1.5rem;
+    margin: 0.8rem 0;
     text-align: left;
     display: none;
-    border: 1px dashed;
+    border-radius: 10px;
+    border: 1px solid;
 }
 
 .message::before {
@@ -610,36 +662,27 @@
 }
 
 .message.error-message {
-    border-color: var(--cli-error);
-    color: var(--cli-error);
-    background: rgba(255, 68, 68, 0.05);
+    border-color: var(--cli-error, #F44747);
+    color: var(--cli-error, #F44747);
+    background: rgba(244, 71, 71, 0.1);
 }
 
 .message.success-message {
-    border-color: var(--cli-fg);
-    color: var(--cli-fg);
-    background: rgba(0, 255, 0, 0.05);
+    border-color: var(--tool-accent);
+    color: var(--tool-accent);
+    background: rgba(167, 139, 250, 0.1);
 }
 
 .message.warning-message {
-    border-color: var(--cli-warning);
-    color: var(--cli-warning);
-    background: rgba(255, 170, 0, 0.05);
+    border-color: #ffc107;
+    color: #ffc107;
+    background: rgba(255, 193, 7, 0.1);
 }
 
 .message.info-message {
-    border-color: var(--cli-info);
-    color: var(--cli-info);
-    background: rgba(0, 170, 255, 0.05);
-}
-
-/* ========================================
-   动画
-   ======================================== */
-
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+    border-color: var(--tool-accent-2);
+    color: var(--tool-accent-2);
+    background: rgba(34, 211, 238, 0.1);
 }
 
 /* ========================================
@@ -647,10 +690,6 @@
    ======================================== */
 
 @media (max-width: 768px) {
-    .operation-zone {
-        grid-template-columns: 1fr;
-    }
-
     .upload-icon-wrapper {
         width: 60px;
         height: 60px;
@@ -668,7 +707,7 @@
         flex-direction: column;
     }
 
-    .action-btn {
+    .btn {
         width: 100%;
         justify-content: center;
     }
