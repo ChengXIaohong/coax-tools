@@ -1,0 +1,232 @@
+/*
+ * 图片转字符工具样式
+ * 配套 pages/image-to-ascii.html
+ */
+
+.upload-area {
+    background: var(--tool-glass-bg);
+    border: 1px solid var(--tool-glass-border);
+    border-radius: 16px;
+    padding: 48px 32px;
+    text-align: center;
+    cursor: pointer;
+    transition: all var(--tool-ease-out) var(--tool-duration-normal);
+    backdrop-filter: blur(var(--tool-glass-blur));
+}
+
+.upload-area:hover,
+.upload-area.drag-over {
+    border-color: var(--tool-accent);
+    background: var(--tool-surface-hover);
+    box-shadow: 0 0 30px var(--tool-accent-glow);
+}
+
+.upload-hint .upload-icon {
+    font-size: 48px;
+    display: block;
+    margin-bottom: 16px;
+}
+
+.upload-hint h3 {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: var(--tool-fg);
+}
+
+.upload-hint p {
+    font-size: 13px;
+    color: var(--tool-fg-dim);
+    margin-bottom: 24px;
+}
+
+.file-input-wrapper {
+    position: relative;
+    display: inline-block;
+    width: 140px;
+    height: 44px;
+}
+
+.file-input-wrapper input[type="file"] {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    cursor: pointer;
+    width: 100%;
+    height: 100%;
+}
+
+.file-info {
+    margin-top: 12px;
+    font-size: 13px;
+    color: var(--tool-fg-dim);
+}
+
+/* 预览缩略图 */
+.preview-thumb {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    background: var(--tool-surface);
+    border: 1px solid var(--tool-border);
+    border-radius: 10px;
+    margin-top: 16px;
+}
+
+.preview-thumb img {
+    width: 48px;
+    height: 48px;
+    object-fit: cover;
+    border-radius: 6px;
+}
+
+.preview-thumb span {
+    font-size: 13px;
+    color: var(--tool-fg-dim);
+}
+
+/* 配置区 */
+.config-section {
+    margin-top: 24px;
+}
+
+.config-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 16px;
+    background: var(--tool-glass-bg);
+    border: 1px solid var(--tool-glass-border);
+    border-radius: 12px;
+    padding: 20px;
+    backdrop-filter: blur(var(--tool-glass-blur));
+}
+
+.config-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.config-group label {
+    font-size: 13px;
+    color: var(--tool-fg-dim);
+    font-weight: 500;
+}
+
+.config-group select,
+.config-group input[type="number"] {
+    padding: 10px 12px;
+    background: var(--tool-bg-elevated);
+    border: 1px solid var(--tool-border);
+    border-radius: 8px;
+    color: var(--tool-fg);
+    font-size: 14px;
+    outline: none;
+    transition: border-color var(--tool-duration-fast);
+}
+
+.config-group select:focus,
+.config-group input[type="number"]:focus {
+    border-color: var(--tool-accent);
+}
+
+.config-group input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    accent-color: var(--tool-accent);
+}
+
+/* 操作按钮行 */
+.action-row {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 24px;
+}
+
+/* ASCII 输出区 */
+.output-section {
+    width: 100%;
+}
+
+.ascii-display {
+    background: var(--tool-bg);
+    border: 1px solid var(--tool-border);
+    border-radius: 12px;
+    padding: 24px;
+    overflow: auto;
+    max-height: 60vh;
+}
+
+.ascii-display pre {
+    font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+    font-size: 10px;
+    line-height: 1;
+    white-space: pre;
+    color: var(--tool-fg);
+    margin: 0;
+}
+
+/* 反色模式 */
+body.inverted .ascii-display {
+    background: #f5f5f5;
+    border-color: #e0e0e0;
+}
+
+body.inverted .ascii-display pre {
+    color: #1a1a1a;
+}
+
+/* 按钮样式 */
+.btn {
+    padding: 12px 24px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    transition: all var(--tool-ease-out) var(--tool-duration-fast);
+}
+
+.btn-primary {
+    background: var(--tool-accent);
+    color: #fff;
+}
+
+.btn-primary:hover:not(:disabled) {
+    box-shadow: 0 0 20px var(--tool-accent-glow);
+    transform: translateY(-1px);
+}
+
+.btn-primary:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.btn-secondary {
+    background: var(--tool-surface);
+    color: var(--tool-fg);
+    border: 1px solid var(--tool-border);
+}
+
+.btn-secondary:hover {
+    border-color: var(--tool-border-hover);
+    background: var(--tool-surface-hover);
+}
+
+.btn-ghost {
+    background: transparent;
+    color: var(--tool-fg-dim);
+    border: 1px solid var(--tool-border);
+}
+
+.btn-ghost:hover {
+    color: var(--tool-fg);
+    border-color: var(--tool-border-hover);
+}
+
+.btn-convert {
+    font-size: 16px;
+    padding: 14px 48px;
+}

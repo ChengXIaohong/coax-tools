@@ -112,6 +112,14 @@ const tools = [
         icon: "☁️",
         category: "data"
     },
+    {
+        id: 15,
+        title: "图转字",
+        description: "将图片转换为 ASCII 字符画，支持多种字符集和灰度调节。",
+        link: "pages/image-to-ascii.html",
+        icon: "💻",
+        category: "common"
+    },
 ];
 
 // 分类配置

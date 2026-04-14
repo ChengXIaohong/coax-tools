@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>图片转字符 - coax的小工具</title>
+    <!-- 主题初始化：防止 FOUC -->
+    <script>
+    (function() {
+        var saved = localStorage.getItem('coax-tools-mode');
+        var theme = saved === 'light' ? 'light' : 'sci-fi';
+        document.documentElement.setAttribute('data-theme', theme);
+    })();
+    </script>
+    <link rel="stylesheet" href="../styles/theme-base.css">
+    <link rel="stylesheet" href="../styles/theme-tool.css">
+    <link rel="stylesheet" href="../css/image-to-ascii.css">
+</head>
+<body data-theme="sci-fi">
+    <div class="bg-orbs"></div>
+    <div class="grid-pattern"></div>
+    <div class="container">
+        <!-- 顶栏 -->
+        <header class="tool-header-bar">
+            <a href="../index.html" class="back-btn">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M19 12H5M12 19l-7-7 7-7"/>
+                </svg>
+                返回首页
+            </a>
+            <div class="tool-title">
+                <div class="tool-icon">💻</div>
+                <span class="tool-name">图片转字符</span>
+            </div>
+            <span class="tool-desc">将图片转换为 ASCII 字符画</span>
+        </header>
+
+        <main>
+            <!-- 阶段一：输入区（默认全宽） -->
+            <div class="input-section" id="inputSection">
+                <div class="upload-area" id="uploadArea">
+                    <div class="upload-hint">
+                        <span class="upload-icon">☁️</span>
+                        <h3>拖拽图片到此处或点击上传</h3>
+                        <p>支持 JPG / PNG / WEBP / GIF</p>
+                    </div>
+                    <div class="file-input-wrapper">
+                        <button class="btn btn-primary">选择图片</button>
+                        <input type="file" id="imageInput" accept=".jpg,.jpeg,.png,.webp,.gif">
+                    </div>
+                    <p id="fileInfo" class="file-info"></p>
+                </div>
+
+                <!-- 图片预览（上传后显示） -->
+                <div class="preview-thumb" id="previewThumb" style="display:none;">
+                    <img id="thumbPreview" alt="预览">
+                    <span id="thumbName"></span>
+                </div>
+
+                <div class="action-row">
+                    <button class="btn btn-primary btn-convert" id="convertBtn" disabled>🔄 转换为 ASCII</button>
+                </div>
+            </div>
+
+            <!-- 配置区（转换后保留，实时渲染） -->
+            <div class="config-section" id="configSection" style="display:none;">
+                <div class="config-grid">
+                    <div class="config-group">
+                        <label for="charsetSelect">字符集</label>
+                        <select id="charsetSelect">
+                            <option value="standard">ASCII 标准</option>
+                            <option value="simple">@#% 简化</option>
+                            <option value="blocks">██ 极致</option>
+                        </select>
+                    </div>
+                    <div class="config-group">
+                        <label for="widthInput">输出宽度</label>
+                        <input type="number" id="widthInput" value="120" min="40" max="200">
+                    </div>
+                    <div class="config-group">
+                        <label for="invertToggle">
+                            <input type="checkbox" id="invertToggle">
+                            反色（白底黑字）
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 阶段二：输出区（转换成功前隐藏） -->
+            <div class="output-section" id="outputSection" style="display:none;">
+                <div class="ascii-display" id="asciiDisplay">
+                    <pre id="asciiOutput"></pre>
+                </div>
+                <div class="action-row">
+                    <button class="btn btn-primary" id="copyBtn">📋 复制纯文本</button>
+                    <button class="btn btn-secondary" id="downloadBtn">⬇️ 下载图片</button>
+                    <button class="btn btn-ghost" id="resetBtn">🔄 重新选择</button>
+                </div>
+            </div>
+        </main>
+
+        <footer>
+            <div class="footer-content">
+                <p>&copy; <span id="currentYear"></span> root@coax. 保留所有权利。</p>
+                <p>渝ICP备2025071398号</p>
+            </div>
+        </footer>
+    </div>
+
+    <script src="../js/theme-switcher.js"></script>
+    <script src="../js/image-to-ascii.js"></script>
+</body>
+</html>
