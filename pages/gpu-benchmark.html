@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="GPU性能基准测试工具，沉浸式全屏帧率测试，支持粒子爆炸、矩阵雨、粒子地球三种渲染场景。">
+    <meta name="keywords" content="GPU测试, 帧率测试, 性能基准, Canvas测试">
+    <meta name="author" content="coax">
+    <title>GPU基准测试 - coax的小工具</title>
+    <script>
+    (function() {
+        var saved = localStorage.getItem('coax-tools-mode');
+        var theme = saved === 'light' ? 'light' : 'sci-fi';
+        document.documentElement.setAttribute('data-theme', theme);
+    })();
+    </script>
+    <link rel="stylesheet" href="../styles/theme-base.css">
+    <link rel="stylesheet" href="../styles/theme-tool.css">
+    <link rel="stylesheet" href="../css/gpu-benchmark.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+</head>
+<body data-theme="sci-fi">
+    <div class="bg-orbs"></div>
+    <div class="grid-pattern"></div>
+
+    <!-- 全屏画布 -->
+    <canvas id="fsCanvas"></canvas>
+
+    <!-- 场景切换闪光 -->
+    <div class="scene-flash" id="sceneFlash"></div>
+
+    <!-- 全屏 HUD -->
+    <div class="fs-hud" id="fsHUD">
+        <div class="hud-left">
+            <div class="hud-scene-name">💥 粒子爆炸</div>
+            <div class="hud-progress-bar"><div class="hud-progress-fill" style="width:0%"></div></div>
+            <div class="hud-progress-text">0%</div>
+        </div>
+        <div class="hud-center">
+            <div class="hud-phase">阶段 1 / 3</div>
+        </div>
+        <div class="hud-right">
+            <div class="hud-fps-label">FPS</div>
+            <div class="hud-fps-value">-</div>
+            <div class="hud-fps-min">最低 -</div>
+        </div>
+    </div>
+
+    <!-- 全屏结果面板 -->
+    <div class="fs-result-panel" id="fsResultPanel"></div>
+
+    <!-- 普通页面内容 -->
+    <div class="container" id="normalUI">
+        <main class="benchmark-main">
+            <header class="tool-header-bar">
+                <a href="../index.html" class="back-btn">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M19 12H5M12 19l-7-7 7-7"/>
+                    </svg>
+                    返回首页
+                </a>
+                <div class="tool-title">
+                    <div class="tool-icon">⚡</div>
+                    <span class="tool-name">GPU基准测试</span>
+                </div>
+                <span class="tool-desc">沉浸式帧率性能测试</span>
+            </header>
+
+            <div class="content-zone">
+                <!-- 场景信息 -->
+                <div class="scene-selector">
+                    <h2 class="section-title">🎮 测试场景</h2>
+                    <div class="scene-cards">
+                        <div class="scene-card">
+                            <div class="scene-icon">💥</div>
+                            <div class="scene-name">粒子爆炸</div>
+                            <div class="scene-desc">3000粒子 · 带拖尾+发光+震屏</div>
+                        </div>
+                        <div class="scene-card">
+                            <div class="scene-icon">🟢</div>
+                            <div class="scene-name">矩阵雨</div>
+                            <div class="scene-desc">经典字符暴雨 · 混沌粒子叠加</div>
+                        </div>
+                        <div class="scene-card">
+                            <div class="scene-icon">🌍</div>
+                            <div class="scene-name">粒子地球</div>
+                            <div class="scene-desc">3D旋转 · 2500粒子点云</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 开始按钮 -->
+                <div class="benchmark-controls">
+                    <button class="btn btn-primary btn-large" id="startBtn">🚀 开始基准测试</button>
+                    <button class="btn btn-ghost" id="resetBtn" disabled>🔄 重置</button>
+                </div>
+
+                <!-- 说明 -->
+                <div class="benchmark-note">
+                    <p>自动运行三个测试场景，综合评分取平均值</p>
+                    <p class="note-small">💡 建议在性能稳定的环境下测试，按 ESC 可随时退出</p>
+                </div>
+            </div>
+        </main>
+
+        <footer>
+            <div class="footer-content">
+                <p>&copy; <span id="currentYear"></span> root@coax. 保留所有权利。</p>
+                <p>渝ICP备2025071398号</p>
+            </div>
+        </footer>
+    </div>
+
+    <!-- 扩展列表 Modal -->
+    <div class="ext-modal" id="extModal">
+        <div class="ext-modal-backdrop" id="extModalBackdrop"></div>
+        <div class="ext-modal-content">
+            <div class="ext-modal-header">
+                <span class="ext-modal-title">🔧 支持的 WebGL 扩展</span>
+                <span class="ext-modal-close" id="extModalClose">✕</span>
+            </div>
+            <div class="ext-modal-grid" id="extModalGrid"></div>
+        </div>
+    </div>
+
+    <script src="../js/theme-switcher.js"></script>
+    <script src="../js/gpu-benchmark.js"></script>
+</body>
+</html>

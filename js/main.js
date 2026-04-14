@@ -120,6 +120,14 @@ const tools = [
         icon: "💻",
         category: "common"
     },
+    {
+        id: 16,
+        title: "显卡测试",
+        description: "GPU基准测试工具，支持粒子爆炸、矩阵雨、几何变形三种渲染场景的帧率测试。",
+        link: "pages/gpu-benchmark.html",
+        icon: "🎮",
+        category: "dev"
+    },
 ];
 
 // 分类配置

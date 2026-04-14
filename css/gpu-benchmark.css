@@ -1,0 +1,123 @@
+/*
+ * GPU基准测试工具 v2.0 样式
+ */
+
+/* ===== 基础布局 ===== */
+.benchmark-main { padding: 2rem 1.5rem; min-height: calc(100vh - 200px); }
+.section-title { font-size: 1.25rem; font-weight: 600; color: var(--tool-fg); margin-bottom: 1.5rem; text-align: center; }
+.scene-selector { margin-bottom: 2rem; }
+.scene-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; max-width: 800px; margin: 0 auto; }
+.scene-card { background: var(--tool-surface); border: 1px solid var(--tool-border); border-radius: 12px; padding: 1.5rem 1rem; display: flex; flex-direction: column; align-items: center; gap: 0.75rem; transition: all 0.2s ease; }
+.scene-icon { font-size: 2.5rem; line-height: 1; }
+.scene-name { font-size: 1rem; font-weight: 600; color: var(--tool-fg); }
+.scene-desc { font-size: 0.8rem; color: var(--tool-fg-muted); text-align: center; }
+
+/* ===== 控制按钮 ===== */
+.benchmark-controls { display: flex; justify-content: center; gap: 1rem; margin-bottom: 1.5rem; }
+.benchmark-controls .btn { min-width: 140px; }
+.benchmark-controls .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.btn-large { padding: 1rem 3rem !important; font-size: 1.1rem !important; border-radius: 16px !important; }
+
+/* ===== 说明文字 ===== */
+.benchmark-note { text-align: center; color: var(--tool-fg-dim); font-size: 0.9rem; max-width: 600px; margin: 0 auto 2rem; }
+.benchmark-note p { margin: 0.3rem 0; }
+.note-small { font-size: 0.8rem; color: var(--tool-fg-muted); }
+
+/* ===== GPU 信息面板 ===== */
+.gpu-info-panel { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 1rem; margin-bottom: 2rem; max-width: 900px; margin-left: auto; margin-right: auto; }
+.gpu-info-card { background: var(--tool-surface); border: 1px solid var(--tool-border); border-radius: 12px; padding: 1rem; display: flex; flex-direction: column; align-items: center; gap: 0.5rem; transition: all 0.2s ease; }
+.gpu-info-card:hover { border-color: var(--tool-border-hover); transform: translateY(-1px); }
+.gpu-info-icon { font-size: 1.5rem; }
+.gpu-info-label { font-size: 0.75rem; color: var(--tool-fg-muted); text-transform: uppercase; letter-spacing: 1px; }
+.gpu-info-value { font-size: 0.9rem; font-weight: 600; color: var(--tool-fg); text-align: center; word-break: break-all; }
+
+/* ===== 扩展 Modal ===== */
+.extensions-card { cursor: pointer; }
+.extensions-card:hover { border-color: var(--tool-border-hover); }
+.ext-tag { font-size: 0.65rem; padding: 2px 6px; background: var(--tool-surface-hover); border-radius: 4px; color: var(--tool-fg-dim); white-space: nowrap; }
+.ext-modal { display: none; position: fixed; inset: 0; z-index: 2000; align-items: center; justify-content: center; }
+.ext-modal.active { display: flex; }
+.ext-modal-backdrop { position: absolute; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(4px); }
+.ext-modal-content { position: relative; background: var(--tool-bg-alt); border: 1px solid var(--tool-border); border-radius: 16px; padding: 1.5rem; max-width: 600px; width: 90%; max-height: 80vh; overflow: hidden; display: flex; flex-direction: column; box-shadow: 0 20px 60px rgba(0,0,0,0.5); }
+.ext-modal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; padding-bottom: 1rem; border-bottom: 1px solid var(--tool-border); }
+.ext-modal-title { font-size: 1rem; font-weight: 600; color: var(--tool-fg); }
+.ext-modal-close { cursor: pointer; font-size: 1.2rem; color: var(--tool-fg-muted); padding: 0.25rem 0.5rem; border-radius: 6px; transition: all 0.2s; }
+.ext-modal-close:hover { color: var(--tool-fg); background: var(--tool-surface-hover); }
+.ext-modal-grid { display: flex; flex-wrap: wrap; gap: 0.5rem; overflow-y: auto; padding-right: 0.5rem; }
+
+/* ===== 全屏画布 ===== */
+#fsCanvas { display: none; position: fixed; inset: 0; width: 100vw; height: 100vh; z-index: 100; background: #050510; }
+
+/* ===== 场景切换闪光 ===== */
+.scene-flash { display: none; position: fixed; inset: 0; background: #fff; z-index: 500; opacity: 0; pointer-events: none; }
+
+/* ===== 全屏 HUD ===== */
+.fs-hud {
+    display: none; position: fixed; top: 0; left: 0; right: 0;
+    z-index: 200; padding: 1rem 2rem;
+    background: linear-gradient(to bottom, rgba(0,0,0,0.8) 0%, transparent 100%);
+    color: #fff; font-family: 'Inter', sans-serif;
+    justify-content: space-between; align-items: flex-start;
+    pointer-events: none;
+}
+.fs-hud > div { display: flex; flex-direction: column; gap: 0.25rem; }
+.hud-left { align-items: flex-start; }
+.hud-scene-name { font-size: 1.1rem; font-weight: 700; letter-spacing: 1px; }
+.hud-progress-bar { width: 200px; height: 4px; background: rgba(255,255,255,0.2); border-radius: 2px; overflow: hidden; margin-top: 0.25rem; }
+.hud-progress-fill { height: 100%; background: linear-gradient(90deg, #667eea, #764ba2); border-radius: 2px; transition: width 0.1s linear; }
+.hud-progress-text { font-size: 0.75rem; opacity: 0.7; }
+.hud-center { align-items: center; font-size: 0.9rem; opacity: 0.6; }
+.hud-right { align-items: flex-end; }
+.hud-fps-label { font-size: 0.7rem; opacity: 0.6; letter-spacing: 2px; text-transform: uppercase; }
+.hud-fps-value { font-size: 2rem; font-weight: 800; font-family: monospace; background: linear-gradient(135deg, #667eea, #22d3ee); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; line-height: 1; }
+.hud-fps-min { font-size: 0.7rem; opacity: 0.5; }
+
+/* ===== 全屏结果面板 ===== */
+.fs-result-panel {
+    display: none; position: fixed; inset: 0; z-index: 300;
+    background: rgba(5, 5, 16, 0.95); backdrop-filter: blur(20px);
+    color: #fff; font-family: 'Inter', sans-serif;
+    padding: 2rem;
+    overflow-y: auto;
+}
+.fs-result-inner { max-width: 600px; margin: 0 auto; text-align: center; padding-top: 10vh; }
+.fs-grade { font-size: 8rem; font-weight: 900; line-height: 1; margin-bottom: 0.5rem; }
+.fs-grade-label { font-size: 1.5rem; opacity: 0.7; margin-bottom: 2rem; }
+.fs-score-counter { font-size: 3rem; font-weight: 800; font-family: monospace; color: var(--tool-accent); margin-bottom: 2rem; }
+.fs-divider { width: 100px; height: 1px; background: rgba(255,255,255,0.2); margin: 0 auto 2rem; }
+.fs-scene-results { display: flex; flex-direction: column; gap: 0.75rem; margin-bottom: 2rem; }
+.fs-scene-row {
+    display: grid; grid-template-columns: 140px 80px 1fr 60px; align-items: center; gap: 0.75rem;
+    background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 0.75rem 1rem;
+    font-size: 0.9rem; opacity: 0; transition: opacity 0.3s ease;
+}
+.fs-scene-icon { text-align: left; }
+.fs-scene-fps { font-family: monospace; font-weight: 700; }
+.fs-scene-bar { height: 6px; background: rgba(255,255,255,0.1); border-radius: 3px; overflow: hidden; }
+.fs-scene-fill { height: 100%; border-radius: 3px; background: linear-gradient(90deg, #667eea, #764ba2); width: 0; transition: width 0.6s ease-out; }
+.fs-scene-score { font-family: monospace; color: var(--tool-accent-2); font-weight: 600; }
+.fs-copy-btn {
+    display: inline-block; margin: 0 auto 1rem; padding: 0.75rem 2rem;
+    background: rgba(102, 126, 234, 0.2); border: 1px solid rgba(102, 126, 234, 0.5);
+    border-radius: 12px; color: #fff; font-size: 0.9rem; cursor: pointer;
+    transition: all 0.2s ease; opacity: 0;
+}
+.fs-copy-btn:hover { background: rgba(102, 126, 234, 0.4); border-color: #667eea; }
+.fs-exit-hint { font-size: 0.75rem; opacity: 0.3; margin-top: 0.5rem; }
+
+/* 等级颜色 */
+.fs-grade[style*="color:#ffd700"] { text-shadow: 0 0 60px rgba(255, 215, 0, 0.8); }
+.fs-grade[style*="color:#a78bfa"] { text-shadow: 0 0 40px rgba(167, 139, 250, 0.6); }
+
+/* ===== Toast ===== */
+.toast { display: none; position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%); background: var(--tool-accent); color: #fff; padding: 0.75rem 1.5rem; border-radius: 8px; font-size: 0.85rem; font-weight: 500; box-shadow: 0 4px 20px rgba(0,0,0,0.3); z-index: 3000; }
+.toast.show { display: block; animation: toast-in 0.3s ease; }
+@keyframes toast-in { from { opacity: 0; transform: translateX(-50%) translateY(10px); } to { opacity: 1; transform: translateX(-50%) translateY(0); } }
+
+/* ===== 响应式 ===== */
+@media (max-width: 768px) {
+    .scene-cards { grid-template-columns: 1fr; }
+    .fs-grade { font-size: 5rem; }
+    .fs-scene-row { grid-template-columns: 100px 60px 1fr 50px; font-size: 0.8rem; }
+    .hud-progress-bar { width: 120px; }
+}
