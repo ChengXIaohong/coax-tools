@@ -33,6 +33,7 @@ body {
     --tool-accent-2: #22d3ee;
     --tool-accent-2-glow: rgba(34, 211, 238, 0.4);
     --tool-accent-3: #f472b6;
+    --tool-accent-3-glow: rgba(244, 114, 182, 0.4);
 
     /* 玻璃效果 */
     --tool-glass-bg: rgba(255, 255, 255, 0.02);
