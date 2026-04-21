@@ -245,8 +245,8 @@ const JsonGraph3D = (function() {
 
     function createRenderer() {
         const graphArea = modal.querySelector('.modal-graph-area');
-        const width = graphArea.clientWidth;
-        const height = graphArea.clientHeight;
+        const width = graphArea.clientWidth || 800;
+        const height = graphArea.clientHeight || 600;
 
         renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
         renderer.setSize(width, height);
@@ -289,9 +289,9 @@ const JsonGraph3D = (function() {
 
     function createNodeMesh(node) {
         const baseRadius = CONFIG.NODE_RADIUS;
-        const childBonus = node.childCount * CONFIG.SIZE_INFLATION;
+        const childBonus = node.childCount * CONFIG.SIZE_INFLATION * 0.5;
         const decay = Math.pow(CONFIG.SIZE_DECAY, node.depth);
-        const radius = Math.max(baseRadius * decay + childBonus, 8);
+        const radius = Math.max(baseRadius * decay + childBonus, 6);
 
         const color = node.isRoot ? CONFIG.NODE_COLORS.root : CONFIG.NODE_COLORS[node.type] || 0x808080;
 
@@ -336,6 +336,8 @@ const JsonGraph3D = (function() {
         labelDiv.className = 'graph3d-node-label';
         labelDiv.textContent = displayText;
         labelDiv.style.color = '#' + CONFIG.THEME_COLORS[currentTheme].fg.toString(16).padStart(6, '0');
+        labelDiv.style.background = 'rgba(13, 17, 23, 0.75)';
+        labelDiv.style.backdropFilter = 'blur(4px)';
 
         const label = new CSS2DObject(labelDiv);
         label.position.set(0, radius + 12, 0);
@@ -351,9 +353,9 @@ const JsonGraph3D = (function() {
 
         const geometry = new THREE.BufferGeometry().setFromPoints(points);
         const material = new THREE.LineBasicMaterial({
-            color: CONFIG.THEME_COLORS[currentTheme].border,
+            color: CONFIG.THEME_COLORS[currentTheme].fg,
             transparent: true,
-            opacity: 0.4
+            opacity: 0.6
         });
 
         const line = new THREE.Line(geometry, material);
@@ -472,15 +474,15 @@ const JsonGraph3D = (function() {
         graphInstances.set(tabId, instance);
 
         setupModalEvents();
-        // Delay init until after layout so graphArea dimensions are computed
-        requestAnimationFrame(() => {
+        // Show modal first so graphArea gets computed dimensions
+        setTimeout(() => modal.classList.add('active'), 10);
+        // Then init Three.js after layout is computed
+        setTimeout(() => {
             initThreeJS();
             rebuildScene();
             updateStats(jsonData);
             applyTheme();
-        });
-
-        setTimeout(() => modal.classList.add('active'), 50);
+        }, 50);
     }
 
     function initThreeJS() {
@@ -903,8 +905,8 @@ const JsonGraph3D = (function() {
     function onWindowResize() {
         if (!camera || !renderer || !labelRenderer) return;
         const graphArea = modal.querySelector('.modal-graph-area');
-        const width = graphArea.clientWidth;
-        const height = graphArea.clientHeight;
+        const width = graphArea.clientWidth || 800;
+        const height = graphArea.clientHeight || 600;
         camera.aspect = width / height;
         camera.updateProjectionMatrix();
         renderer.setSize(width, height);
