@@ -50,3 +50,7 @@ test-results/
  vite.config.*.timestamp-*
  .claude
  AGENTS.md
+ CLAUDE.md
+ harness-progress.txt
+ harness-tasks.json
+ .harness
