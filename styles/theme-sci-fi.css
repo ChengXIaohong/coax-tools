@@ -1,0 +1,1086 @@
+/*
+ * Premium Liquid Glass 特效主题
+ * ================================
+ * 设计语言：流动玻璃 + 全局动效 + 极致交互
+ *
+ * 特效体系：
+ * 1. 全局背景光斑流动
+ * 2. 卡片入场动画（错开缩放）
+ * 3. 3D 悬浮 tilt 效果
+ * 4. 点击涟漪反馈
+ * 5. Hover 光泽扫过
+ * 6. 边框渐变流光
+ * 7. 滚动渐入动画
+ */
+
+/* ========================================
+   Liquid Glass 主题变量
+   ======================================== */
+
+body {
+    /* 核心色板 */
+    --tool-bg: #09090b;
+    --tool-bg-alt: #18181b;
+    --tool-bg-elevated: #27272a;
+    --tool-surface: rgba(255, 255, 255, 0.03);
+    --tool-surface-hover: rgba(255, 255, 255, 0.06);
+    --tool-border: rgba(255, 255, 255, 0.08);
+    --tool-border-hover: rgba(255, 255, 255, 0.15);
+    --tool-fg: #fafafa;
+    --tool-fg-dim: #a1a1aa;
+    --tool-fg-muted: #71717a;
+
+    /* 强调色 */
+    --tool-accent: #a78bfa;
+    --tool-accent-glow: rgba(167, 139, 250, 0.4);
+    --tool-accent-2: #22d3ee;
+    --tool-accent-2-glow: rgba(34, 211, 238, 0.4);
+    --tool-accent-3: #f472b6;
+    --tool-accent-3-glow: rgba(244, 114, 182, 0.4);
+
+    /* 玻璃效果 */
+    --tool-glass-bg: rgba(255, 255, 255, 0.02);
+    --tool-glass-border: rgba(255, 255, 255, 0.06);
+    --tool-glass-blur: 20px;
+
+    /* 动效参数 */
+    --tool-ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+    --tool-ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+    --tool-duration-fast: 150ms;
+    --tool-duration-normal: 250ms;
+    --tool-duration-slow: 400ms;
+}
+
+/* ========================================
+   基础布局
+   ======================================== */
+
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
+    font-size: 14px;
+    line-height: 1.5;
+    background: var(--tool-bg);
+    color: var(--tool-fg);
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    position: relative;
+    overflow-x: hidden;
+}
+
+/* ========================================
+   全局动态背景
+   ======================================== */
+
+/* 主背景层 */
+body {
+    background:
+        radial-gradient(ellipse 80% 50% at 20% 40%, rgba(167, 139, 250, 0.15) 0%, transparent 50%),
+        radial-gradient(ellipse 60% 40% at 80% 60%, rgba(34, 211, 238, 0.1) 0%, transparent 50%),
+        radial-gradient(ellipse 50% 30% at 50% 80%, rgba(244, 114, 182, 0.08) 0%, transparent 50%),
+        var(--tool-bg);
+}
+
+/* 动态光斑容器 */
+.bg-orbs {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    overflow: hidden;
+}
+
+/* 浮动光斑 */
+.orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(80px);
+    opacity: 0.5;
+    animation: orb-float 20s ease-in-out infinite;
+}
+
+.orb-1 {
+    width: 400px;
+    height: 400px;
+    background: var(--tool-accent-glow);
+    top: -100px;
+    left: -100px;
+    animation-delay: 0s;
+}
+
+.orb-2 {
+    width: 300px;
+    height: 300px;
+    background: var(--tool-accent-2-glow);
+    top: 50%;
+    right: -50px;
+    animation-delay: -5s;
+}
+
+.orb-3 {
+    width: 350px;
+    height: 350px;
+    background: var(--tool-accent-3-glow);
+    bottom: -100px;
+    left: 30%;
+    animation-delay: -10s;
+}
+
+@keyframes orb-float {
+    0%, 100% {
+        transform: translate(0, 0) scale(1);
+    }
+    25% {
+        transform: translate(30px, -30px) scale(1.05);
+    }
+    50% {
+        transform: translate(-20px, 20px) scale(0.95);
+    }
+    75% {
+        transform: translate(20px, 30px) scale(1.02);
+    }
+}
+
+/* 网格纹理 */
+.grid-pattern {
+    position: fixed;
+    inset: 0;
+    background-image:
+        linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+    background-size: 60px 60px;
+    pointer-events: none;
+    z-index: 0;
+}
+
+/* ========================================
+   容器
+   ======================================== */
+
+body .container {
+    width: 95vw;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 3vw 2vw;
+    min-height: 100vh;
+    position: relative;
+    z-index: 1;
+}
+
+/* ========================================
+   头部 - 简洁高端
+   ======================================== */
+
+body header {
+    background: transparent;
+    color: var(--tool-fg);
+    padding: 2vw 0 2.5vw;
+    border-bottom: 1px solid var(--tool-border);
+    margin-bottom: 3vw;
+    position: relative;
+}
+
+body .header-search {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 2vw;
+    flex-wrap: wrap;
+}
+
+body .header-content {
+    position: relative;
+}
+
+/* ========================================
+   标题 - 渐变文字
+   ======================================== */
+
+body .header-content::before {
+    content: 'root@coax';
+    color: var(--tool-fg-muted);
+    font-weight: 500;
+    margin-right: 0.5vw;
+}
+
+body .editable-title {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5vw;
+}
+
+body .title-text {
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 0.1vw 0.3vw;
+    border: 1px solid transparent;
+    background: linear-gradient(var(--tool-bg), var(--tool-bg)) padding-box,
+                linear-gradient(135deg, var(--tool-accent), var(--tool-accent-2), var(--tool-accent-3)) border-box;
+    color: var(--tool-fg);
+    letter-spacing: -0.02em;
+    transition: all var(--tool-duration-normal) var(--tool-ease-out);
+}
+
+body .title-text:hover {
+    background: linear-gradient(var(--tool-surface-hover), var(--tool-surface-hover)) padding-box,
+                linear-gradient(135deg, var(--tool-accent), var(--tool-accent-2), var(--tool-accent-3)) border-box;
+    box-shadow: 0 0 30px var(--tool-accent-glow);
+}
+
+body .title-text::after {
+    content: '_';
+    color: var(--tool-accent);
+    animation: title-blink 1s steps(1) infinite;
+}
+
+@keyframes title-blink {
+    0%, 60% { opacity: 1; }
+    61%, 100% { opacity: 0; }
+}
+
+body .title-input {
+    font-size: 1.5rem;
+    background: var(--tool-surface);
+    border: 1px solid var(--tool-accent);
+    color: var(--tool-fg);
+    padding: 0.1vw 0.3vw;
+    font-family: inherit;
+    width: 16vw;
+    border-radius: 8px;
+}
+
+body .title-input:focus {
+    outline: none;
+    box-shadow: 0 0 20px var(--tool-accent-glow);
+}
+
+body .title-edit-btn {
+    background: var(--tool-surface);
+    border: 1px solid var(--tool-border);
+    color: var(--tool-fg-dim);
+    cursor: pointer;
+    padding: 0.3vw 0.8vw;
+    font-family: inherit;
+    font-size: 0.8rem;
+    transition: all var(--tool-duration-fast) ease;
+    border-radius: 6px;
+    letter-spacing: 0.05em;
+}
+
+body .title-edit-btn:hover {
+    border-color: var(--tool-accent);
+    color: var(--tool-fg);
+    background: var(--tool-surface-hover);
+}
+
+/* ========================================
+   搜索框 - 玻璃态
+   ======================================== */
+
+body .search-box {
+    display: flex;
+    align-items: center;
+    background: var(--tool-glass-bg);
+    backdrop-filter: blur(var(--tool-glass-blur));
+    -webkit-backdrop-filter: blur(var(--tool-glass-blur));
+    border: 1px solid var(--tool-glass-border);
+    padding: 0.7vw 1.2vw;
+    min-width: 260px;
+    border-radius: 12px;
+    position: relative;
+    transition: all var(--tool-duration-normal) var(--tool-ease-out);
+}
+
+/* 搜索框左侧图标 */
+body .search-box::before {
+    content: '';
+    width: 16px;
+    height: 16px;
+    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23a1a1aa'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.35-4.35'/%3E%3C/svg%3E") center/contain no-repeat;
+    margin-right: 0.8vw;
+    flex-shrink: 0;
+    transition: all var(--tool-duration-fast) ease;
+}
+
+body .search-box:focus-within {
+    border-color: var(--tool-accent);
+    box-shadow: 0 0 0 3px var(--tool-accent-glow), 0 8px 32px rgba(0, 0, 0, 0.3);
+    transform: translateY(-1px);
+}
+
+body .search-box:focus-within::before {
+    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23a78bfa'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.35-4.35'/%3E%3C/svg%3E") center/contain no-repeat;
+}
+
+body .search-box input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    color: var(--tool-fg);
+    font-family: inherit;
+    font-size: 0.95rem;
+    padding: 0;
+    width: 100%;
+}
+
+body .search-box input:focus {
+    outline: none;
+    box-shadow: none;
+}
+
+body .search-box input::placeholder {
+    color: var(--tool-fg-muted);
+}
+
+body .search-hint {
+    color: var(--tool-fg-muted);
+    font-size: 0.75rem;
+    margin-left: 0.8vw;
+    padding: 0.2vw 0.5vw;
+    background: var(--tool-surface);
+    border-radius: 4px;
+    border: 1px solid var(--tool-border);
+}
+
+/* ========================================
+   无结果提示
+   ======================================== */
+
+body .no-results {
+    text-align: center;
+    padding: 6vw 2vw;
+    color: var(--tool-fg-dim);
+}
+
+body .no-results p {
+    font-size: 1rem;
+    opacity: 0.6;
+}
+
+/* ========================================
+   主内容
+   ======================================== */
+
+body main {
+    padding: 0;
+}
+
+/* ========================================
+   分类区块
+   ======================================== */
+
+body .tool-category {
+    margin-bottom: 3vw;
+    position: relative;
+}
+
+/* 分类间分隔 */
+body .tool-category + .tool-category {
+    padding-top: 1vw;
+}
+
+body .category-header {
+    color: var(--tool-fg);
+    font-size: 0.85rem;
+    padding: 0.6vw 0;
+    margin-bottom: 1.2vw;
+    display: flex;
+    align-items: center;
+    gap: 0.8vw;
+    font-weight: 500;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+}
+
+body .category-icon {
+    opacity: 0.8;
+    width: 20px;
+    height: 20px;
+}
+
+body .category-icon svg {
+    width: 100%;
+    height: 100%;
+}
+
+body .category-name {
+    color: var(--tool-fg);
+}
+
+body .category-count {
+    color: var(--tool-fg-muted);
+    font-size: 0.75rem;
+    margin-left: auto;
+    font-weight: 400;
+}
+
+/* ========================================
+   工具网格
+   ======================================== */
+
+body .category-tools-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.2vw;
+}
+
+body .tools-grid {
+    display: block;
+}
+
+/* ========================================
+   工具卡片 - 液态玻璃特效
+   ======================================== */
+
+body .tool-card {
+    position: relative;
+    background: var(--tool-glass-bg);
+    backdrop-filter: blur(var(--tool-glass-blur));
+    -webkit-backdrop-filter: blur(var(--tool-glass-blur));
+    border: 1px solid var(--tool-glass-border);
+    padding: 1.5vw;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.6vw;
+    border-radius: 16px;
+    transition:
+        transform var(--tool-duration-normal) var(--tool-ease-out),
+        box-shadow var(--tool-duration-normal) var(--tool-ease-out),
+        border-color var(--tool-duration-fast) ease,
+        background var(--tool-duration-fast) ease;
+    transform-style: preserve-3d;
+    perspective: 1000px;
+
+    /* 入场动画初始状态 */
+    opacity: 0;
+    transform: translateY(20px) scale(0.96);
+}
+
+/* 卡片入场动画 */
+body .tool-card.animate {
+    animation: card-enter var(--tool-duration-slow) var(--tool-ease-out) forwards;
+}
+
+@keyframes card-enter {
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* 3D 悬浮效果 */
+body .tool-card:hover,
+body .tool-card:focus {
+    background: var(--tool-surface-hover);
+    border-color: rgba(167, 139, 250, 0.3);
+    transform:
+        translateY(-4px)
+        scale(1.02);
+    box-shadow:
+        0 20px 40px rgba(0, 0, 0, 0.4),
+        0 0 60px rgba(167, 139, 250, 0.1);
+}
+
+/* 悬浮光效层 */
+body .tool-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 16px;
+    background: linear-gradient(
+        135deg,
+        rgba(255, 255, 255, 0.1) 0%,
+        transparent 50%
+    );
+    opacity: 0;
+    transition: opacity var(--tool-duration-normal) ease;
+    pointer-events: none;
+}
+
+body .tool-card:hover::before {
+    opacity: 1;
+}
+
+/* 点击涟漪效果 */
+body .tool-card::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 16px;
+    background: radial-gradient(
+        circle at var(--ripple-x, 50%) var(--ripple-y, 50%),
+        rgba(167, 139, 250, 0.4) 0%,
+        transparent 70%
+    );
+    opacity: 0;
+    transform: scale(0);
+    transition: transform 0.5s var(--tool-ease-out), opacity 0.5s ease;
+    pointer-events: none;
+}
+
+body .tool-card.ripple::after {
+    animation: ripple-effect 0.6s var(--tool-ease-out) forwards;
+}
+
+@keyframes ripple-effect {
+    to {
+        transform: scale(2);
+        opacity: 0;
+    }
+}
+
+/* 卡片标题 */
+body .tool-card h3 {
+    color: var(--tool-fg);
+    font-size: 1rem;
+    font-weight: 500;
+    margin: 0;
+    letter-spacing: -0.01em;
+    transition: color var(--tool-duration-fast) ease;
+}
+
+body .tool-card:hover h3 {
+    color: var(--tool-accent);
+}
+
+/* 卡片描述 */
+body .tool-card p {
+    color: var(--tool-fg-dim);
+    margin: 0;
+    font-size: 0.85rem;
+    line-height: 1.5;
+    opacity: 0.8;
+    transition: all var(--tool-duration-fast) ease;
+}
+
+body .tool-card:hover p {
+    opacity: 1;
+}
+
+/* 卡片图标 */
+body .tool-card .card-icon {
+    font-size: 1.8rem;
+    margin-bottom: 0.3vw;
+    display: block;
+    line-height: 1;
+    transition: transform var(--tool-duration-normal) var(--tool-ease-spring);
+}
+
+body .tool-card:hover .card-icon {
+    transform: scale(1.1) translateY(-2px);
+}
+
+body .tool-card .card-icon svg {
+    width: 28px;
+    height: 28px;
+}
+
+/* 卡片箭头 */
+body .tool-card .card-arrow {
+    position: absolute;
+    bottom: 1.2vw;
+    right: 1.2vw;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--tool-surface);
+    border-radius: 50%;
+    opacity: 0;
+    transform: translateX(-8px);
+    transition: all var(--tool-duration-normal) var(--tool-ease-out);
+}
+
+body .tool-card .card-arrow::after {
+    content: '→';
+    color: var(--tool-accent);
+    font-size: 0.9rem;
+}
+
+body .tool-card:hover .card-arrow {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+/* 打字机光标 */
+body .type-cursor {
+    background: var(--tool-accent);
+    box-shadow: 0 0 10px var(--tool-accent-glow);
+}
+
+/* ========================================
+   按钮 - 玻璃态 + 动效
+   ======================================== */
+
+body .btn,
+body button,
+body input[type="submit"],
+body input[type="button"] {
+    position: relative;
+    background: var(--tool-glass-bg);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid var(--tool-glass-border);
+    color: var(--tool-fg);
+    padding: 0.7vw 1.8vw;
+    font-family: inherit;
+    font-size: 0.9rem;
+    cursor: pointer;
+    border-radius: 10px;
+    transition: all var(--tool-duration-normal) var(--tool-ease-out);
+    overflow: hidden;
+}
+
+/* 按钮光效 */
+body .btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 255, 255, 0.1),
+        transparent
+    );
+    transition: left 0.5s ease;
+}
+
+body .btn:hover::before {
+    left: 100%;
+}
+
+body .btn:hover,
+body button:hover,
+body input[type="submit"]:hover,
+body input[type="button"]:hover {
+    background: var(--tool-surface-hover);
+    border-color: var(--tool-accent);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+}
+
+body .btn:active,
+body button:active {
+    transform: translateY(0) scale(0.98);
+}
+
+body .btn-primary {
+    background: linear-gradient(135deg, var(--tool-accent), #8b5cf6);
+    border-color: transparent;
+    color: white;
+}
+
+body .btn-primary:hover {
+    background: linear-gradient(135deg, #8b5cf6, var(--tool-accent));
+    box-shadow: 0 8px 30px var(--tool-accent-glow);
+}
+
+body .btn-secondary {
+    background: transparent;
+    border-color: var(--tool-border);
+}
+
+body .btn-secondary:hover {
+    border-color: var(--tool-fg-dim);
+}
+
+/* ========================================
+   表单元素 - 玻璃态
+   ======================================== */
+
+body input[type="text"],
+body input[type="number"],
+body input[type="password"],
+body input[type="email"],
+body input[type="url"],
+body input[type="search"],
+body input[type="date"],
+body input[type="datetime-local"],
+body textarea,
+body select {
+    background: var(--tool-glass-bg);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid var(--tool-glass-border);
+    color: var(--tool-fg);
+    font-family: inherit;
+    font-size: inherit;
+    padding: 0.8vw 1vw;
+    width: 100%;
+    border-radius: 10px;
+    transition: all var(--tool-duration-fast) ease;
+}
+
+body input:focus,
+body textarea:focus,
+body select:focus {
+    outline: none;
+    border-color: var(--tool-accent);
+    box-shadow: 0 0 0 3px var(--tool-accent-glow);
+}
+
+body input::placeholder,
+body textarea::placeholder {
+    color: var(--tool-fg-muted);
+}
+
+body select {
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='none' viewBox='0 0 24 24' stroke='%23a1a1aa'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 1vw center;
+    padding-right: 3vw;
+}
+
+body select option {
+    background: var(--tool-bg-alt);
+    color: var(--tool-fg);
+}
+
+body label {
+    color: var(--tool-fg-dim);
+    font-size: 0.85rem;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+}
+
+body .form-group {
+    margin-bottom: 1.5vw;
+}
+
+/* ========================================
+   消息提示
+   ======================================== */
+
+body .message {
+    background: var(--tool-glass-bg);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid var(--tool-glass-border);
+    color: var(--tool-fg);
+    padding: 1vw 1.5vw;
+    margin: 1.5vw 0;
+    font-family: inherit;
+    border-radius: 10px;
+}
+
+body .message-success {
+    border-color: rgba(34, 197, 94, 0.3);
+    background: rgba(34, 197, 94, 0.1);
+}
+
+body .message-error {
+    border-color: rgba(239, 68, 68, 0.3);
+    background: rgba(239, 68, 68, 0.1);
+}
+
+body .message-info {
+    border-color: rgba(59, 130, 246, 0.3);
+    background: rgba(59, 130, 246, 0.1);
+}
+
+/* ========================================
+   页脚
+   ======================================== */
+
+body footer {
+    background: transparent;
+    color: var(--tool-fg-muted);
+    border-top: 1px solid var(--tool-border);
+    padding: 2.5vw 0;
+    margin-top: 5vw;
+    font-size: 0.8rem;
+}
+
+body .footer-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1vw;
+}
+
+body .footer-content p {
+    margin: 0;
+    opacity: 0.6;
+}
+
+/* ========================================
+   主题切换器
+   ======================================== */
+
+body .theme-switcher {
+    position: fixed;
+    top: 1.5vw;
+    right: 1.5vw;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    background: var(--tool-glass-bg);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid var(--tool-glass-border);
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all var(--tool-duration-fast) ease;
+}
+
+body .theme-switcher:hover {
+    background: var(--tool-surface-hover);
+    border-color: var(--tool-accent);
+    transform: scale(1.05);
+}
+
+body .theme-switcher svg {
+    width: 18px;
+    height: 18px;
+    color: var(--tool-fg-dim);
+}
+
+body .theme-btn.active {
+    background: var(--tool-accent);
+    color: white;
+}
+
+body .theme-btn svg {
+    width: 16px;
+    height: 16px;
+}
+
+/* ========================================
+   滚动条
+   ======================================== */
+
+body ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+body ::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+body ::-webkit-scrollbar-thumb {
+    background: var(--tool-border-hover);
+    border-radius: 4px;
+}
+
+body ::-webkit-scrollbar-thumb:hover {
+    background: var(--tool-fg-muted);
+}
+
+/* ========================================
+   文本选择
+   ======================================== */
+
+body ::selection {
+    background: var(--tool-accent);
+    color: white;
+}
+
+/* ========================================
+   工具页面
+   ======================================== */
+
+body .tool-container {
+    padding: 0;
+    width: 95vw;
+    max-width: 1200px;
+}
+
+body .tool-header {
+    margin-bottom: 2.5vw;
+    padding-bottom: 1.5vw;
+    border-bottom: 1px solid var(--tool-border);
+}
+
+body .tool-header h1 {
+    font-size: 1.8rem;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+}
+
+body .tool-header p {
+    color: var(--tool-fg-dim);
+    margin-top: 0.5vw;
+}
+
+/* ========================================
+   面板
+   ======================================== */
+
+body .input-output-container {
+    display: flex;
+    gap: 1.5vw;
+    margin: 2vw 0;
+}
+
+body .panel {
+    flex: 1;
+    background: var(--tool-glass-bg);
+    backdrop-filter: blur(var(--tool-glass-blur));
+    -webkit-backdrop-filter: blur(var(--tool-glass-blur));
+    border: 1px solid var(--tool-glass-border);
+    padding: 1.5vw;
+    border-radius: 16px;
+}
+
+body .panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1vw;
+    padding-bottom: 1vw;
+    border-bottom: 1px solid var(--tool-border);
+}
+
+body .panel-title {
+    color: var(--tool-fg-dim);
+    font-size: 0.85rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+body textarea {
+    width: 100%;
+    min-height: 25vw;
+    resize: vertical;
+    background: transparent;
+    border: none;
+    color: var(--tool-fg);
+    font-family: inherit;
+}
+
+body textarea:focus {
+    outline: none;
+}
+
+/* ========================================
+   结果显示
+   ======================================== */
+
+body .result {
+    background: var(--tool-glass-bg);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid var(--tool-accent);
+    padding: 1.5vw;
+    margin: 1.5vw 0;
+    border-radius: 12px;
+    box-shadow: 0 0 30px var(--tool-accent-glow);
+}
+
+/* ========================================
+   减少动画偏好
+   ======================================== */
+
+@media (prefers-reduced-motion: reduce) {
+    body *,
+    body *::before,
+    body *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* ========================================
+   响应式
+   ======================================== */
+
+@media (max-width: 768px) {
+    body .container {
+        padding: 20px 16px;
+        width: 100vw;
+    }
+
+    body header {
+        padding: 16px 0 20px;
+    }
+
+    body .header-search {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    body .header-content {
+        margin-bottom: 16px;
+    }
+
+    body .search-box {
+        width: 100%;
+        min-width: unset;
+    }
+
+    body .category-tools-grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+
+    body .tool-card {
+        padding: 16px;
+    }
+
+    body .tool-card:hover,
+    body .tool-card:focus {
+        transform: translateY(-2px);
+    }
+
+    body .input-output-container {
+        flex-direction: column;
+        gap: 16px;
+    }
+
+    body textarea {
+        min-height: 200px;
+    }
+
+    body footer {
+        margin-top: 40px;
+        padding: 20px 0;
+    }
+
+    body .footer-content {
+        flex-direction: column;
+        text-align: center;
+    }
+}
+
+/* ========================================
+   Light Mode 变量覆盖
+   ======================================== */
+
+body[data-theme="light"] {
+    --tool-bg: #f8f9fc;
+    --tool-bg-alt: #eef0f5;
+    --tool-bg-elevated: #ffffff;
+    --tool-surface: rgba(255, 255, 255, 0.7);
+    --tool-surface-hover: rgba(167, 139, 250, 0.08);
+    --tool-border: rgba(0, 0, 0, 0.08);
+    --tool-border-hover: rgba(167, 139, 250, 0.3);
+    --tool-fg: #1a1a2e;
+    --tool-fg-dim: #4a4a6a;
+    --tool-fg-muted: #8888aa;
+
+    --tool-accent: #7c5bf5;
+    --tool-accent-glow: rgba(124, 91, 245, 0.3);
+    --tool-accent-2: #06b6d4;
+    --tool-accent-2-glow: rgba(6, 182, 212, 0.3);
+    --tool-accent-3: #ec4899;
+    --tool-accent-3-glow: rgba(236, 72, 153, 0.3);
+
+    --tool-glass-bg: rgba(255, 255, 255, 0.5);
+    --tool-glass-border: rgba(167, 139, 250, 0.2);
+    --tool-glass-blur: 16px;
+}
