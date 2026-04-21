@@ -20,6 +20,7 @@
     <link rel="stylesheet" href="../styles/theme-tool.css">
     <link rel="stylesheet" href="../css/json-formatter.css">
     <link rel="stylesheet" href="../css/json-graph.css">
+    <link rel="stylesheet" href="../css/json-graph-3d.css">
 </head>
 <body data-theme="tool">
     <div class="bg-orbs" aria-hidden="true"></div>
@@ -36,6 +37,7 @@
                         <div class="output-actions">
                             <button class="action-btn" id="actionToggle" title="操作">☰</button>
                             <button class="action-btn" id="graphToggle" title="图谱视图">🔗</button>
+                            <button class="action-btn" id="graph3dToggle" title="3D图谱视图">🧊</button>
                             <div class="action-menu" id="actionMenu">
                                 <button class="action-item" id="yamlConvert">转YAML</button>
                                 <button class="action-item" id="toonConvert">转TOON</button>
@@ -52,8 +54,13 @@
     </div>
 
     <script src="https://d3js.org/d3.v7.min.js"></script>
+    <!-- Three.js CDN for 3D Graph -->
+    <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/examples/js/controls/OrbitControls.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/examples/js/renderers/CSS2DRenderer.js"></script>
     <script src="../js/theme-switcher.js"></script>
     <script src="../js/json-formatter.js"></script>
     <script src="../js/json-graph.js"></script>
+    <script src="../js/json-graph-3d.js"></script>
 </body>
 </html>

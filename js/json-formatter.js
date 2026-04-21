@@ -4,7 +4,9 @@ const DEFAULT_INDENT = 2;
 // DOM 元素
 let inputJson, outputJson, outputJsonData, actionToggle, actionMenu, graphToggle;
 let yamlConvertBtn, toonConvertBtn, extractStructureBtn, compressJsonBtn;
+let graph3dToggle;
 let isGraphView = false;
+let isGraph3dView = false;
 
 // 图谱按钮状态管理
 const GraphButtonManager = {
@@ -681,6 +683,7 @@ document.addEventListener('DOMContentLoaded', function() {
     actionToggle = document.getElementById('actionToggle');
     actionMenu = document.getElementById('actionMenu');
     graphToggle = document.getElementById('graphToggle');
+    graph3dToggle = document.getElementById('graph3dToggle');
     yamlConvertBtn = document.getElementById('yamlConvert');
     toonConvertBtn = document.getElementById('toonConvert');
     extractStructureBtn = document.getElementById('extractStructure');
@@ -695,7 +698,8 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // 图谱视图切换
     graphToggle.addEventListener('click', toggleGraphView);
-    
+    graph3dToggle.addEventListener('click', toggleGraph3dView);
+
     // Ctrl+G 快捷键打开图谱
     document.addEventListener('keydown', (e) => {
         if ((e.ctrlKey || e.metaKey) && e.key === 'g') {
@@ -809,6 +813,36 @@ function toggleGraphView() {
         GraphButtonManager.recordFailure(e);
         GraphButtonManager.setLoading(false);
         showMessage('图谱渲染失败: ' + e.message, 'error');
+    }
+}
+
+function toggleGraph3dView() {
+    const jsonString = outputJsonData.value.trim();
+
+    if (!jsonString) {
+        showMessage('JSON数据为空，请先输入数据', 'warning');
+        graph3dToggle.classList.add('error');
+        setTimeout(() => graph3dToggle.classList.remove('error'), 500);
+        return;
+    }
+
+    try {
+        const parsed = JSON.parse(jsonString);
+        if (typeof parsed !== 'object' || parsed === null) {
+            showMessage('JSON结构无效，必须为对象或数组', 'error');
+            return;
+        }
+
+        if (JsonGraph3D.isOpen()) {
+            JsonGraph3D.close();
+            isGraph3dView = false;
+            return;
+        }
+
+        JsonGraph3D.open(parsed);
+        isGraph3dView = true;
+    } catch (e) {
+        showMessage('JSON语法错误，无法打开3D图谱', 'error');
     }
 }
 
