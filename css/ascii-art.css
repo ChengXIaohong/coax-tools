@@ -85,8 +85,12 @@
 
 .config-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: 1.5rem;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    padding: 1.25rem;
+    background: var(--tool-surface);
+    border: 1px solid var(--tool-border);
+    border-radius: 12px;
 }
 
 .form-group {
@@ -104,6 +108,48 @@
     margin-top: 0;
 }
 
+.config-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.config-group label {
+    display: block;
+    margin-bottom: 0.25rem;
+    color: var(--tool-fg);
+    font-size: 0.8rem;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+}
+
+.config-group select,
+.config-group input[type="number"] {
+    width: 100%;
+    padding: 0.6rem 0.85rem;
+    font-size: 0.9rem;
+    font-family: inherit;
+    color: var(--tool-fg);
+    background: var(--tool-bg);
+    border: 1px solid var(--tool-border);
+    border-radius: 8px;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    cursor: pointer;
+}
+
+.config-group select:hover,
+.config-group input[type="number"]:hover {
+    border-color: var(--tool-accent);
+}
+
+.config-group select:focus,
+.config-group input[type="number"]:focus {
+    outline: none;
+    border-color: var(--tool-accent);
+    box-shadow: 0 0 0 3px var(--tool-accent-glow);
+}
+
 .checkbox-group label {
     display: flex;
     align-items: center;
@@ -111,39 +157,46 @@
     cursor: pointer;
 }
 
-.form-group input[type="checkbox"] {
-    width: 1.2rem;
-    height: 1.2rem;
-    min-width: 18px;
-    min-height: 18px;
+.config-group input[type="checkbox"] {
+    width: 1.1rem;
+    height: 1.1rem;
     appearance: none;
-    border: 1px solid var(--tool-border);
-    background: var(--tool-surface);
+    border: 2px solid var(--tool-border);
+    background: var(--tool-bg);
     cursor: pointer;
     position: relative;
-    transition: all 0.15s;
+    transition: all 0.2s;
     border-radius: 4px;
 }
 
-.form-group input[type="checkbox"]:checked {
-    border-color: var(--tool-accent);
+.config-group input[type="checkbox"]:checked {
     background: var(--tool-accent);
+    border-color: var(--tool-accent);
 }
 
-.form-group input[type="checkbox"]:checked::after {
+.config-group input[type="checkbox"]:checked::after {
     content: '✓';
     position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    color: white;
-    font-size: 0.8rem;
+    color: #fff;
+    font-size: 0.75rem;
     font-weight: bold;
 }
 
-.form-group input[type="checkbox"]:focus {
+.config-group input[type="checkbox"]:focus {
     outline: none;
     box-shadow: 0 0 0 3px var(--tool-accent-glow);
+}
+
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    font-size: 0.9rem;
+    color: var(--tool-fg);
 }
 
 /* 预览区 - Glass Panel */
@@ -309,6 +362,92 @@
 .btn-secondary:hover {
     border-color: var(--tool-accent);
     box-shadow: 0 0 20px var(--tool-accent-glow);
+}
+
+/* ========================================
+   输入区字符计数
+   ======================================== */
+
+.input-content {
+    position: relative;
+}
+
+.input-content input {
+    width: 100%;
+    padding-right: 3.5rem;
+}
+
+.char-count {
+    position: absolute;
+    right: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 0.75rem;
+    color: var(--tool-fg-muted);
+    pointer-events: none;
+}
+
+.char-count.warning {
+    color: var(--tool-accent);
+}
+
+/* ========================================
+   Toggle Button
+   ======================================== */
+
+.toggle-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: transparent;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    font-family: inherit;
+}
+
+.toggle-track {
+    position: relative;
+    width: 44px;
+    height: 24px;
+    background: var(--tool-border);
+    border-radius: 12px;
+    transition: background 0.2s;
+    flex-shrink: 0;
+}
+
+.toggle-thumb {
+    position: absolute;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: white;
+    top: 50%;
+    right: 3px;
+    transform: translateY(-50%);
+    transition: right 0.2s;
+}
+
+.toggle-btn[aria-pressed="true"] .toggle-track {
+    background: var(--tool-accent);
+}
+
+.toggle-btn[aria-pressed="true"] .toggle-thumb {
+    right: 23px;
+}
+
+.toggle-btn:focus {
+    outline: none;
+}
+
+.toggle-btn:focus .toggle-track {
+    box-shadow: 0 0 0 3px var(--tool-accent-glow);
+}
+
+.toggle-label-text {
+    font-size: 0.9rem;
+    color: var(--tool-fg);
+    user-select: none;
 }
 
 /* ========================================

@@ -18,7 +18,7 @@
     <link rel="stylesheet" href="../styles/theme-base.css">
     <link rel="stylesheet" href="../styles/theme-tool.css">
     <link rel="stylesheet" href="../css/ascii-art.css">
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎨</text></svg>">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23a78bfa' stroke-width='2'><path d='M12 19l7-7 3 3-7 7-3-3z'/><path d='M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z'/></svg>">
 </head>
 <body data-theme="sci-fi">
     <div class="bg-orbs"></div>
@@ -32,7 +32,14 @@
                 返回首页
             </a>
             <div class="tool-title">
-                <div class="tool-icon">🎨</div>
+                <div class="tool-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 19l7-7 3 3-7 7-3-3z"/>
+                    <path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/>
+                    <path d="M2 2l7.586 7.586"/>
+                    <circle cx="11" cy="11" r="2"/>
+                </svg>
+            </div>
                 <span class="tool-name">字符画生成器</span>
             </div>
             <span class="tool-desc">将文字转换为炫酷的 ASCII Art</span>
@@ -43,7 +50,8 @@
             <div class="input-section">
                 <div class="panel">
                     <div class="input-content">
-                        <input type="text" id="asciiInput" placeholder="输入要转换的文字（支持英文、数字、常用符号）..." maxlength="50" autocomplete="off">
+                        <input type="text" id="asciiInput" placeholder="输入英文、数字或符号，回车确认..." maxlength="50" autocomplete="off" aria-label="输入要转换的文字">
+                        <span class="char-count"><span id="charCurrent">0</span>/50</span>
                     </div>
                 </div>
 
@@ -71,10 +79,12 @@
                         </div>
                         <div class="config-group">
                             <label>边框</label>
-                            <div class="checkbox-group">
-                                <input type="checkbox" id="borderToggle" checked>
-                                <label for="borderToggle">启用边框</label>
-                            </div>
+                            <button type="button" id="borderToggle" class="toggle-btn" aria-pressed="true">
+                                <span class="toggle-track">
+                                    <span class="toggle-thumb"></span>
+                                </span>
+                                <span class="toggle-label-text">启用边框</span>
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -92,11 +102,20 @@
                 <div class="panel">
                     <div class="panel-body">
                         <div class="export-buttons">
-                            <button class="btn btn-primary" id="copyBtn">
-                                📋 复制纯文本
+                            <button class="btn btn-primary" id="copyBtn" aria-label="复制纯文本">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+                                </svg>
+                                复制纯文本
                             </button>
-                            <button class="btn btn-secondary" id="downloadBtn">
-                                📥 下载为图片
+                            <button class="btn btn-secondary" id="downloadBtn" aria-label="下载为图片">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                                    <polyline points="7 10 12 15 17 10"/>
+                                    <line x1="12" y1="15" x2="12" y2="3"/>
+                                </svg>
+                                下载为图片
                             </button>
                         </div>
                         <div id="copyStatus" class="copy-status" style="display:none;"></div>

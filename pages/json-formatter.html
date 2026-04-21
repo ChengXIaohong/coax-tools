@@ -12,7 +12,7 @@
     (function() {
         var saved = localStorage.getItem('coax-tools-mode');
         if (saved === 'light') {
-            document.body.setAttribute('data-mode', 'light');
+            document.documentElement.setAttribute('data-mode', 'light');
         }
     })();
     </script>

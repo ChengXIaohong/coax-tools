@@ -70,6 +70,10 @@ const JsonGraph = (function() {
     let historyIndex = -1;
     let layoutAlgorithm = 'tree';
     let isCompactMode = false;
+    let isFamilyCompactMode = false;
+    const FAMILY_COMPACT_CHILDREN_THRESHOLD = 10;
+    const FAMILY_COMPACT_CHILD_SPACING = 40;
+    const FAMILY_COMPACT_ROW_HEIGHT = 35;
     let tabs = [];
     let activeTabId = null;
     let graphInstances = new Map();
@@ -126,6 +130,7 @@ const JsonGraph = (function() {
                     <div class="modal-toolbar">
                         <button class="toolbar-btn" data-action="reset-layout" title="重置布局">🔄</button>
                         <button class="toolbar-btn" data-action="toggle-theme" title="切换主题">🌓</button>
+                        <button class="toolbar-btn" data-action="toggle-family-compact" title="族压缩模式">🔲</button>
                         <button class="toolbar-btn" data-action="export-png" title="导出PNG">📷</button>
                         <button class="toolbar-btn" data-action="export-svg" title="导出SVG">📐</button>
                         <button class="toolbar-btn" data-action="fullscreen" title="全屏">⛶</button>
@@ -463,6 +468,7 @@ const JsonGraph = (function() {
         instance.currentPage = currentPage;
         instance.history = [...layoutHistory];
         instance.historyIndex = historyIndex;
+        instance.isFamilyCompactMode = isFamilyCompactMode;
     }
 
     function restoreInstanceState(instance) {
@@ -475,6 +481,10 @@ const JsonGraph = (function() {
         currentPage = instance.currentPage;
         layoutHistory = instance.history;
         historyIndex = instance.historyIndex;
+        isFamilyCompactMode = instance.isFamilyCompactMode || false;
+
+        const familyBtn = modal?.querySelector('[data-action="toggle-family-compact"]');
+        if (familyBtn) familyBtn.classList.toggle('active', isFamilyCompactMode);
 
         layout();
         render();
@@ -602,6 +612,14 @@ const JsonGraph = (function() {
                 applyTheme();
                 render();
                 break;
+            case 'toggle-family-compact':
+                isFamilyCompactMode = !isFamilyCompactMode;
+                const familyBtn = modal.querySelector('[data-action="toggle-family-compact"]');
+                if (familyBtn) familyBtn.classList.toggle('active', isFamilyCompactMode);
+                layout();
+                saveLayout();
+                render();
+                break;
             case 'export-png':
                 exportPNG();
                 break;
@@ -665,6 +683,7 @@ const JsonGraph = (function() {
             .graph-modal .modal-tab.active { background: ${colors.border}; color: ${colors.fg}; }
             .graph-modal .toolbar-btn { background: transparent; border: 1px solid ${colors.border}; color: ${colors.fg}; }
             .graph-modal .toolbar-btn:hover { background: ${colors.highlight}; }
+            .graph-modal .toolbar-btn.active { background: ${colors.selected}; color: ${colors.bg}; }
             .graph-modal .modal-sidebar { background: ${colors.bg}; border-left: 1px solid ${colors.border}; }
             .graph-modal .modal-sidebar.collapsed .sidebar-toggle { background: ${colors.border}; color: ${colors.fg}; }
             .graph-modal .stat-label, .graph-modal .section-title { color: ${colors.fgDim}; }
@@ -1005,11 +1024,11 @@ const JsonGraph = (function() {
                 toggleMarkNode(node.id);
                 break;
             case 'collapse-children':
-                getChildNodes(node.id).forEach(c => collapsedNodes.add(c.id));
+                collapsedNodes.add(node.id);
                 rebuildAndRender();
                 break;
             case 'expand-children':
-                getChildNodes(node.id).forEach(c => collapsedNodes.delete(c.id));
+                collapsedNodes.delete(node.id);
                 rebuildAndRender();
                 break;
         }
@@ -1209,7 +1228,7 @@ const JsonGraph = (function() {
         });
 
         const maxDepth = Math.max(...nodes.map(n => n.depth));
-        const levelHeight = isCompactMode 
+        const levelHeight = isCompactMode
             ? Math.min(50, height * 0.5 / (maxDepth + 1))
             : Math.min(80, height * 0.6 / (maxDepth + 1));
 
@@ -1220,20 +1239,71 @@ const JsonGraph = (function() {
 
         Object.entries(levels).forEach(([depth, levelNodes]) => {
             if (parseInt(depth) === 0) return;
-            const y = isCompactMode 
+            const y = isCompactMode
                 ? height * 0.1 + parseInt(depth) * levelHeight
                 : height * 0.1 + parseInt(depth) * levelHeight;
-            
+
             const nodeSpacing = isCompactMode ? 60 : 100;
             const totalWidth = levelNodes.length * nodeSpacing;
             let x = (width - totalWidth) / 2 + nodeSpacing / 2;
-            
+
             levelNodes.forEach((node) => {
                 node.y = y;
                 node.x = x;
                 x += nodeSpacing;
             });
         });
+
+        if (isFamilyCompactMode) {
+            applyFamilyCompactLayout(width, height);
+        }
+    }
+
+    function applyFamilyCompactLayout(width, height) {
+        nodes.forEach(node => {
+            if (!node.hasChildren) return;
+            const children = getChildNodes(node.id);
+            const childCount = children.length;
+            if (childCount < FAMILY_COMPACT_CHILDREN_THRESHOLD) return;
+
+            const compactRows = Math.ceil(Math.sqrt(childCount));
+            const compactCols = Math.ceil(childCount / compactRows);
+            const startX = node.x - (compactCols * FAMILY_COMPACT_CHILD_SPACING) / 2;
+            const baseY = node.y + FAMILY_COMPACT_ROW_HEIGHT;
+
+            children.forEach((child, idx) => {
+                const row = Math.floor(idx / compactCols);
+                const col = idx % compactCols;
+                child.x = startX + col * FAMILY_COMPACT_CHILD_SPACING + FAMILY_COMPACT_CHILD_SPACING / 2;
+                child.y = baseY + row * FAMILY_COMPACT_ROW_HEIGHT;
+            });
+
+            node.y = baseY - FAMILY_COMPACT_ROW_HEIGHT * 1.5;
+        });
+
+        nodes.forEach(n => {
+            if (n.isRoot) return;
+            if (n.y < height * 0.05) {
+                const offset = height * 0.05 - n.y;
+                const descendants = getDescendants(n.id);
+                n.y += offset;
+                descendants.forEach(d => d.y += offset);
+            }
+        });
+    }
+
+    function getDescendants(nodeId) {
+        const result = [];
+        const stack = [nodeId];
+        while (stack.length > 0) {
+            const current = stack.pop();
+            const children = getChildNodes(current);
+            children.forEach(child => {
+                result.push(child);
+                stack.push(child.id);
+            });
+        }
+        return result;
     }
 
     function render() {
@@ -1258,17 +1328,31 @@ const JsonGraph = (function() {
 
             const isHighlighted = highlightedNodes.has(source.id) && highlightedNodes.has(target.id);
 
-            const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-            line.setAttribute('x1', source.x);
-            line.setAttribute('y1', source.y);
-            line.setAttribute('x2', target.x);
-            line.setAttribute('y2', target.y);
-            line.setAttribute('stroke', isHighlighted ? 'var(--graph-selected, #58a6ff)' : 'var(--graph-border, #30363d)');
-            line.setAttribute('stroke-width', isHighlighted ? 2 : 1);
-            line.setAttribute('stroke-opacity', isHighlighted ? 0.8 : 0.4);
-            line.dataset.sourceId = sourceId;
-            line.dataset.targetId = targetId;
-            mainGroup.insertBefore(line, mainGroup.firstChild);
+            if (isFamilyCompactMode) {
+                const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                const midY = (source.y + target.y) / 2;
+                const d = `M ${source.x} ${source.y} Q ${source.x} ${midY} ${target.x} ${target.y}`;
+                path.setAttribute('d', d);
+                path.setAttribute('stroke', isHighlighted ? 'var(--graph-selected, #58a6ff)' : 'var(--graph-border, #30363d)');
+                path.setAttribute('stroke-width', isHighlighted ? 2 : 1);
+                path.setAttribute('fill', 'none');
+                path.setAttribute('stroke-opacity', isHighlighted ? 0.8 : 0.4);
+                path.dataset.sourceId = sourceId;
+                path.dataset.targetId = targetId;
+                mainGroup.insertBefore(path, mainGroup.firstChild);
+            } else {
+                const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                line.setAttribute('x1', source.x);
+                line.setAttribute('y1', source.y);
+                line.setAttribute('x2', target.x);
+                line.setAttribute('y2', target.y);
+                line.setAttribute('stroke', isHighlighted ? 'var(--graph-selected, #58a6ff)' : 'var(--graph-border, #30363d)');
+                line.setAttribute('stroke-width', isHighlighted ? 2 : 1);
+                line.setAttribute('stroke-opacity', isHighlighted ? 0.8 : 0.4);
+                line.dataset.sourceId = sourceId;
+                line.dataset.targetId = targetId;
+                mainGroup.insertBefore(line, mainGroup.firstChild);
+            }
         });
 
         highlightedNodes.clear();
@@ -1445,7 +1529,7 @@ const JsonGraph = (function() {
         lineEls.forEach(line => {
             const sourceId = line.dataset.sourceId;
             const targetId = line.dataset.targetId;
-            
+
             if (sourceId === node.id || targetId === node.id) {
                 const source = nodes.find(n => n.id === sourceId);
                 const target = nodes.find(n => n.id === targetId);
@@ -1454,6 +1538,22 @@ const JsonGraph = (function() {
                     line.setAttribute('y1', source.y);
                     line.setAttribute('x2', target.x);
                     line.setAttribute('y2', target.y);
+                }
+            }
+        });
+
+        const pathEls = mainGroup.querySelectorAll('path');
+        pathEls.forEach(path => {
+            const sourceId = path.dataset.sourceId;
+            const targetId = path.dataset.targetId;
+
+            if (sourceId === node.id || targetId === node.id) {
+                const source = nodes.find(n => n.id === sourceId);
+                const target = nodes.find(n => n.id === targetId);
+                if (source && target) {
+                    const midY = (source.y + target.y) / 2;
+                    const d = `M ${source.x} ${source.y} Q ${source.x} ${midY} ${target.x} ${target.y}`;
+                    path.setAttribute('d', d);
                 }
             }
         });
