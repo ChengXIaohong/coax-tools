@@ -817,6 +817,7 @@ function toggleGraphView() {
 }
 
 function toggleGraph3dView() {
+    console.log('[3D Graph] toggleGraph3dView called, JsonGraph3D:', typeof window.JsonGraph3D);
     let jsonString = outputJsonData.value.trim();
 
     if (!jsonString) {
@@ -839,13 +840,14 @@ function toggleGraph3dView() {
             return;
         }
 
-        if (JsonGraph3D.isOpen()) {
-            JsonGraph3D.close();
+        if (window.JsonGraph3D && window.JsonGraph3D.isOpen()) {
+            window.JsonGraph3D.close();
             isGraph3dView = false;
             return;
         }
 
-        JsonGraph3D.open(parsed);
+        console.log('[3D Graph] Calling JsonGraph3D.open with', Object.keys(parsed).length, 'keys');
+        window.JsonGraph3D.open(parsed);
         isGraph3dView = true;
     } catch (e) {
         console.error('[3D Graph] Error:', e);

@@ -7,6 +7,19 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { CSS2DRenderer, CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
 
+// Listen for module import errors
+window.addEventListener('error', function(e) {
+    if (e.message && (e.message.includes('Import') || e.message.includes('module') || e.message.includes('three'))) {
+        console.error('[JsonGraph3D] Module/import error:', e.message, 'at', e.filename, ':', e.lineno);
+    }
+});
+
+window.addEventListener('unhandledrejection', function(e) {
+    console.error('[JsonGraph3D] Unhandled rejection:', e.reason);
+});
+
+console.log('[JsonGraph3D] Module loaded, THREE:', typeof THREE, 'OrbitControls:', typeof OrbitControls, 'CSS2DRenderer:', typeof CSS2DRenderer);
+
 const JsonGraph3D = (function() {
     const CONFIG = {
         SPHERE_LAYER_SPACING: 120,
@@ -377,6 +390,7 @@ const JsonGraph3D = (function() {
     }
 
     function createModal(jsonData) {
+        console.log('[JsonGraph3D] createModal called, json keys:', jsonData ? Object.keys(jsonData) : 'null');
         if (modal) closeModal();
 
         const colors = CONFIG.THEME_COLORS[currentTheme];
@@ -458,22 +472,30 @@ const JsonGraph3D = (function() {
         graphInstances.set(tabId, instance);
 
         setupModalEvents();
-        initThreeJS();
-        rebuildScene();
-        updateStats(jsonData);
-        applyTheme();
+        // Delay init until after layout so graphArea dimensions are computed
+        requestAnimationFrame(() => {
+            initThreeJS();
+            rebuildScene();
+            updateStats(jsonData);
+            applyTheme();
+        });
 
         setTimeout(() => modal.classList.add('active'), 50);
     }
 
     function initThreeJS() {
+        console.log('[JsonGraph3D] initThreeJS start');
         createScene();
+        console.log('[JsonGraph3D] scene created, scene:', !!scene);
         createCamera();
         createRenderer();
+        console.log('[JsonGraph3D] renderer created, renderer:', !!renderer);
         createLights();
         createControls();
+        console.log('[JsonGraph3D] controls created, controls:', !!controls);
         setupRaycaster();
         animate();
+        console.log('[JsonGraph3D] initThreeJS complete');
     }
 
     function setupRaycaster() {
@@ -492,6 +514,14 @@ const JsonGraph3D = (function() {
         }
         if (labelRenderer && scene && camera) {
             labelRenderer.render(scene, camera);
+        }
+    }
+
+    let _animateRan = false;
+    function _ensureAnimateRuns() {
+        if (!_animateRan) {
+            console.log('[JsonGraph3D] First animate tick');
+            _animateRan = true;
         }
     }
 
@@ -951,3 +981,4 @@ const JsonGraph3D = (function() {
 
 // Expose to global window for non-module scripts
 window.JsonGraph3D = JsonGraph3D;
+console.log('[JsonGraph3D] Exposed to window, is function:', typeof window.JsonGraph3D);
