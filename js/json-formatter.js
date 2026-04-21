@@ -817,7 +817,13 @@ function toggleGraphView() {
 }
 
 function toggleGraph3dView() {
-    const jsonString = outputJsonData.value.trim();
+    let jsonString = outputJsonData.value.trim();
+
+    if (!jsonString) {
+        // 如果没有数据，加载示例数据后重试
+        loadSampleData();
+        jsonString = outputJsonData.value.trim();
+    }
 
     if (!jsonString) {
         showMessage('JSON数据为空，请先输入数据', 'warning');
@@ -842,7 +848,8 @@ function toggleGraph3dView() {
         JsonGraph3D.open(parsed);
         isGraph3dView = true;
     } catch (e) {
-        showMessage('JSON语法错误，无法打开3D图谱', 'error');
+        console.error('[3D Graph] Error:', e);
+        showMessage('JSON语法错误：' + e.message, 'error');
     }
 }
 

@@ -3,6 +3,10 @@
  * MIT License - Copyright (c) 2025 coax
  */
 
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { CSS2DRenderer, CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
+
 const JsonGraph3D = (function() {
     const CONFIG = {
         SPHERE_LAYER_SPACING: 120,
@@ -239,7 +243,7 @@ const JsonGraph3D = (function() {
         renderer.domElement.style.top = '0';
         renderer.domElement.style.left = '0';
 
-        labelRenderer = new THREE.CSS2DRenderer();
+        labelRenderer = new CSS2DRenderer();
         labelRenderer.setSize(width, height);
         labelRenderer.domElement.style.position = 'absolute';
         labelRenderer.domElement.style.top = '0';
@@ -262,7 +266,7 @@ const JsonGraph3D = (function() {
     }
 
     function createControls() {
-        controls = new THREE.OrbitControls(camera, renderer.domElement);
+        controls = new OrbitControls(camera, renderer.domElement);
         controls.enableDamping = true;
         controls.dampingFactor = 0.08;
         controls.minDistance = CONFIG.MIN_ZOOM * 100;
@@ -320,7 +324,7 @@ const JsonGraph3D = (function() {
         labelDiv.textContent = displayText;
         labelDiv.style.color = '#' + CONFIG.THEME_COLORS[currentTheme].fg.toString(16).padStart(6, '0');
 
-        const label = new THREE.CSS2DObject(labelDiv);
+        const label = new CSS2DObject(labelDiv);
         label.position.set(0, radius + 12, 0);
         label.userData = { isLabel: true };
         return label;

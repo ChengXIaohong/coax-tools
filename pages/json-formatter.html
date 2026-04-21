@@ -54,13 +54,18 @@
     </div>
 
     <script src="https://d3js.org/d3.v7.min.js"></script>
-    <!-- Three.js CDN for 3D Graph -->
-    <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/examples/js/controls/OrbitControls.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/examples/js/renderers/CSS2DRenderer.js"></script>
+    <!-- Three.js ES Modules for 3D Graph (r160+) -->
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+            "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+        }
+    }
+    </script>
     <script src="../js/theme-switcher.js"></script>
     <script src="../js/json-formatter.js"></script>
     <script src="../js/json-graph.js"></script>
-    <script src="../js/json-graph-3d.js"></script>
+    <script type="module" src="../js/json-graph-3d.js"></script>
 </body>
 </html>
