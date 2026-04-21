@@ -948,3 +948,6 @@ const JsonGraph3D = (function() {
         reset
     };
 })();
+
+// Expose to global window for non-module scripts
+window.JsonGraph3D = JsonGraph3D;
