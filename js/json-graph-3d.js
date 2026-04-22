@@ -113,7 +113,7 @@ const JsonGraph3D = (function() {
             x: 0, y: 0, z: 0
         });
 
-        function addChildren(parentId, obj, depth) {
+        function addChildren(parentId, obj, depth, ancestorCollapsed) {
             const type = getValueType(obj);
 
             if (type === 'object' && obj !== null) {
@@ -121,6 +121,7 @@ const JsonGraph3D = (function() {
                     const childId = `node-${nodeId++}`;
                     const childType = getValueType(value);
                     const hasChildren = childType === 'object' || childType === 'array';
+                    const isCollapsed = collapsedNodes.has(childId);
 
                     nodes.push({
                         id: childId,
@@ -137,8 +138,8 @@ const JsonGraph3D = (function() {
 
                     links.push({ source: parentId, target: childId });
 
-                    if (hasChildren && !collapsedNodes.has(childId)) {
-                        addChildren(childId, value, depth + 1);
+                    if (hasChildren && !isCollapsed && !ancestorCollapsed) {
+                        addChildren(childId, value, depth + 1, isCollapsed);
                     }
                 });
             } else if (type === 'array') {
@@ -146,6 +147,7 @@ const JsonGraph3D = (function() {
                     const childId = `node-${nodeId++}`;
                     const childType = getValueType(item);
                     const hasChildren = childType === 'object' || childType === 'array';
+                    const isCollapsed = collapsedNodes.has(childId);
 
                     nodes.push({
                         id: childId,
@@ -162,14 +164,14 @@ const JsonGraph3D = (function() {
 
                     links.push({ source: parentId, target: childId });
 
-                    if (hasChildren && !collapsedNodes.has(childId)) {
-                        addChildren(childId, item, depth + 1);
+                    if (hasChildren && !isCollapsed && !ancestorCollapsed) {
+                        addChildren(childId, item, depth + 1, isCollapsed);
                     }
                 });
             }
         }
 
-        addChildren(rootId, json, 0);
+        addChildren(rootId, json, 0, false);
     }
 
     function applySphericalLayout() {
@@ -241,6 +243,7 @@ const JsonGraph3D = (function() {
         camera = new THREE.PerspectiveCamera(60, width / height, 1, 5000);
         camera.position.set(0, 200, 800);
         camera.lookAt(0, 0, 0);
+        camera.userData.zoom = 1;
     }
 
     function createRenderer() {
@@ -329,7 +332,20 @@ const JsonGraph3D = (function() {
     }
 
     function createNodeLabel(node, radius) {
-        const labelText = node.isRoot ? 'root' : (typeof node.key === 'number' ? `[${node.key}]` : String(node.key));
+        let labelText;
+        if (node.isRoot) {
+            labelText = 'root';
+        } else if (typeof node.key === 'number') {
+            // Array element: show value for leaf nodes, otherwise show index
+            if (!node.hasChildren && node.value !== undefined && node.value !== null) {
+                const v = String(node.value);
+                labelText = v.length > 8 ? v.slice(0, 6) + '..' : v;
+            } else {
+                labelText = `[${node.key}]`;
+            }
+        } else {
+            labelText = String(node.key);
+        }
         const displayText = labelText.length > 8 ? labelText.slice(0, 6) + '..' : labelText;
 
         const labelDiv = document.createElement('div');
@@ -353,7 +369,7 @@ const JsonGraph3D = (function() {
 
         const geometry = new THREE.BufferGeometry().setFromPoints(points);
         const material = new THREE.LineBasicMaterial({
-            color: CONFIG.THEME_COLORS[currentTheme].fg,
+            color: CONFIG.NODE_COLORS[targetNode.type] || CONFIG.THEME_COLORS[currentTheme].fg,
             transparent: true,
             opacity: 0.6
         });
@@ -370,8 +386,33 @@ const JsonGraph3D = (function() {
     }
 
     function rebuildScene() {
-        nodeMeshes.forEach(mesh => scene.remove(mesh));
-        linkLines.forEach(line => scene.remove(line));
+        nodeMeshes.forEach(mesh => {
+            // Remove children (like glow mesh on root) before removing
+            while (mesh.children.length > 0) {
+                const child = mesh.children[0];
+                if (child.geometry) child.geometry.dispose();
+                if (child.material) child.material.dispose();
+                mesh.remove(child);
+            }
+            scene.remove(mesh);
+            mesh.geometry.dispose();
+            if (Array.isArray(mesh.material)) {
+                mesh.material.forEach(m => m.dispose());
+            } else {
+                mesh.material.dispose();
+            }
+        });
+        linkLines.forEach(line => {
+            while (line.children.length > 0) {
+                const child = line.children[0];
+                if (child.geometry) child.geometry.dispose();
+                if (child.material) child.material.dispose();
+                line.remove(child);
+            }
+            scene.remove(line);
+            line.geometry.dispose();
+            line.material.dispose();
+        });
         nodeMeshes = [];
         linkLines = [];
 
@@ -549,6 +590,7 @@ const JsonGraph3D = (function() {
         graphArea.addEventListener('contextmenu', onGraphContextMenu);
 
         window.addEventListener('resize', onWindowResize);
+        document.addEventListener('fullscreenchange', onFullscreenChange);
         document.addEventListener('keydown', handleKeydown);
     }
 
@@ -584,15 +626,16 @@ const JsonGraph3D = (function() {
 
     function handleZoomAction(action) {
         const factor = action === 'zoom-in' ? 1.2 : 0.8;
-        const newZoom = Math.max(CONFIG.MIN_ZOOM, Math.min(CONFIG.MAX_ZOOM, camera.userData.zoom || 1 * factor));
+        const newZoom = Math.max(CONFIG.MIN_ZOOM, Math.min(CONFIG.MAX_ZOOM, (camera.userData.zoom || 1) * factor));
         camera.userData.zoom = newZoom;
 
-        const distance = 800 / newZoom;
-        camera.position.set(
-            camera.position.x * factor,
-            camera.position.y * factor,
-            camera.position.z * factor
-        );
+        // Move camera along its look direction (toward target at origin)
+        const direction = new THREE.Vector3();
+        camera.getWorldDirection(direction);
+        const currentDistance = camera.position.distanceTo(controls.target);
+        const newDistance = currentDistance / factor;
+        camera.position.copy(controls.target).addScaledVector(direction, newDistance);
+
         controls.update();
 
         modal.querySelector('#zoom-display').textContent = Math.round(newZoom * 100) + '%';
@@ -690,9 +733,10 @@ const JsonGraph3D = (function() {
         }
 
         contextMenu.style.display = 'block';
+        const graphAreaRect = modal.querySelector('.modal-graph-area').getBoundingClientRect();
         const menuRect = contextMenu.getBoundingClientRect();
-        contextMenu.style.left = Math.min(x - modal.getBoundingClientRect().left, rect.width - menuRect.width - 10) + 'px';
-        contextMenu.style.top = Math.min(y - modal.getBoundingClientRect().top, rect.height - menuRect.height - 10) + 'px';
+        contextMenu.style.left = Math.min(x - graphAreaRect.left, graphAreaRect.width - menuRect.width - 10) + 'px';
+        contextMenu.style.top = Math.min(y - graphAreaRect.top, graphAreaRect.height - menuRect.height - 10) + 'px';
 
         contextMenu.querySelectorAll('.menu-item').forEach(item => {
             item.onclick = () => {
@@ -911,6 +955,13 @@ const JsonGraph3D = (function() {
         camera.updateProjectionMatrix();
         renderer.setSize(width, height);
         labelRenderer.setSize(width, height);
+    }
+
+    function onFullscreenChange() {
+        // Delay to let fullscreen transition complete
+        setTimeout(() => {
+            onWindowResize();
+        }, 100);
     }
 
     function closeModal() {
