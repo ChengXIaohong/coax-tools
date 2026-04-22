@@ -609,6 +609,10 @@ const JsonGraph3D = (function() {
         };
         graphInstances.set(tabId, instance);
 
+        // Initialize breadcrumb navigation with root JSON
+        rootJson = jsonData;
+        navigationStack = ['$'];
+
         setupModalEvents();
         // Show modal first so graphArea gets computed dimensions
         setTimeout(() => modal.classList.add('active'), 10);
@@ -1090,10 +1094,10 @@ const JsonGraph3D = (function() {
                 saveAndRebuild();
                 break;
             case 'open-subgraph':
-                // Open the selected node's value as a new 3D graph
+                // Navigate to the selected node's path as new root
                 if (node.hasChildren && (node.type === 'object' || node.type === 'array')) {
-                    JsonGraph3D.open(node.value);
-                    showNotification('已打开下级图谱');
+                    navigateTo(node.path);
+                    showNotification('已切换到: ' + node.path);
                 } else {
                     showNotification('该节点无下级数据');
                 }

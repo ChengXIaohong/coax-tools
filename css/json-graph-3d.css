@@ -28,3 +28,55 @@
 #graph3d-area:active {
     cursor: grabbing;
 }
+
+/* Breadcrumb navigation */
+.breadcrumb-nav {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    flex: 1;
+    justify-content: center;
+}
+
+.breadcrumb-btn {
+    background: transparent;
+    border: 1px solid #30363d;
+    color: #c9d1d9;
+    cursor: pointer;
+    font-size: 12px;
+    padding: 4px 8px;
+    border-radius: 4px;
+}
+
+.breadcrumb-btn:hover {
+    background: #30363d;
+}
+
+.breadcrumb-trail {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    font-size: 12px;
+    color: #8b949e;
+}
+
+.breadcrumb-item {
+    cursor: pointer;
+    padding: 2px 4px;
+    border-radius: 3px;
+    color: #58a6ff;
+}
+
+.breadcrumb-item:hover {
+    background: #30363d;
+}
+
+.breadcrumb-item.active {
+    color: #c9d1d9;
+    cursor: default;
+}
+
+.breadcrumb-sep {
+    color: #484f58;
+    margin: 0 2px;
+}

@@ -1,0 +1,98 @@
+[
+  {
+    "code": "GENERAL",
+    "image": "https://hximg.yucunkeji.com/sc/saas/download/20250515/435dd9af-f9f3-4275-916e-eed1b1ef2be7.png",
+    "name": "通用样式",
+    "agent": false,
+    "sysDefault": true
+  },
+  {
+    "code": "SERVICE",
+    "image": "https://hximg.yucunkeji.com/sc/saas/download/20250515/ce7048d3-23df-4dfd-ba78-326f977957af.png",
+    "name": "服务样式",
+    "agent": false,
+    "sysDefault": false
+  },
+  {
+    "code": "CARD",
+    "image": "https://hximg.yucunkeji.com/sc/saas/download/20250515/46ad4807-5960-40a9-a22f-b23df0611738.png",
+    "name": "卡片样式",
+    "agent": false,
+    "sysDefault": false
+  },
+  {
+    "code": "MALL",
+    "image": "https://hximg.yucunkeji.com/sc/saas/download/20250515/f0e9ac0b-1651-4215-82ef-df38a9848f7c.png",
+    "name": "商城样式",
+    "agent": false,
+    "sysDefault": false
+  },
+  {
+    "code": "COMMUNITY",
+    "image": "https://hximg.yucunkeji.com/sc/saas/download/20250515/a1a24459-0ed5-4dee-8dc2-dc9ffb453a9d.png",
+    "name": "社区样式",
+    "agent": false,
+    "sysDefault": false
+  },
+  {
+    "code": "INFORMATION",
+    "image": "https://hximg.yucunkeji.com/sc/saas/download/20250515/13463519-814b-459d-a2c2-90997486a80b.png",
+    "name": "资讯样式",
+    "agent": false,
+    "sysDefault": false
+  },
+  {
+    "code": "AGENT",
+    "image": "https://hximg.yucunkeji.com/sc/saas/download/20250515/0636ecab-ab01-461b-9dc1-dca1ff2b5a05.png",
+    "name": "经代样式",
+    "agent": true,
+    "sysDefault": false
+  },
+  {
+    "code": "STYLE_7",
+    "image": "https://hximg.yucunkeji.com/sc/saas/download/20251201/8159d95b-c780-4490-ad0e-f534a69b112c.jpg",
+    "name": "STYLE_7",
+    "agent": false,
+    "sysDefault": false
+  },
+  {
+    "code": "STYLE_8",
+    "image": "https://hximg.yucunkeji.com/sc/saas/download/20251201/f6bd7c30-b711-42c7-bcb2-eaf6ab8f48b1.jpg",
+    "name": "STYLE_8",
+    "agent": false,
+    "sysDefault": false
+  },
+  {
+    "code": "STYLE_9",
+    "image": "https://hximg.yucunkeji.com/sc/saas/download/20251201/27c4bc7c-eb6c-4483-bb1a-6c19820400a1.jpg",
+    "name": "其他服务勿用",
+    "agent": false,
+    "sysDefault": false
+  },
+  {
+    "code": "STYLE_10",
+    "image": "https://hximg.yucunkeji.com/sc/saas/download/20251201/9649681b-5d27-4387-95e9-ba9043d98be0.jpg",
+    "name": "STYLE_10",
+    "agent": false,
+    "sysDefault": false
+  },
+  {
+    "code": "STYLE_11",
+    "image": "https://hximg.yucunkeji.com/sc/saas/download/20251201/b78e7343-d9ad-422e-9520-45323e9df549.jpg",
+    "name": "STYLE_11",
+    "agent": false,
+    "sysDefault": false
+  },
+  {
+    "code": "STYLE_12",
+    "image": "https://hximg.yucunkeji.com/sc/saas/download/20251201/e365edda-b05a-4ce8-bd29-c02cc393a407.jpg",
+    "name": "STYLE_12",
+    "agent": false,
+    "sysDefault": false
+  },
+  {
+    "code": "STYLE_13",
+    "name": "STYLE_13",
+    "image": "https://hximg.yucunkeji.com/sc/saas/download/20260422/92b0c409-4afe-42cc-b617-3180c34f2914.png"
+  }
+]

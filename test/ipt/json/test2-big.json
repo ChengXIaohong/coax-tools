@@ -1,0 +1,548 @@
+[
+  {
+    "code": "GENERAL",
+    "image": "https://hximg.yucunkeji.com/sc/saas/download/20250515/435dd9af-f9f3-4275-916e-eed1b1ef2be7.png",
+    "name": "通用样式",
+    "agent": false,
+    "sysDefault": true
+  },
+  {
+    "code": "SERVICE",
+    "image": "https://hximg.yucunkeji.com/sc/saas/download/20250515/ce7048d3-23df-4dfd-ba78-326f977957af.png",
+    "name": "服务样式",
+    "agent": false,
+    "sysDefault": false
+  },
+  {
+    "code": "CARD",
+    "image": "https://hximg.yucunkeji.com/sc/saas/download/20250515/46ad4807-5960-40a9-a22f-b23df0611738.png",
+    "name": "卡片样式",
+    "agent": false,
+    "sysDefault": false
+  },
+  {
+    "code": "MALL",
+    "image": "https://hximg.yucunkeji.com/sc/saas/download/20250515/f0e9ac0b-1651-4215-82ef-df38a9848f7c.png",
+    "name": "商城样式",
+    "agent": false,
+    "sysDefault": false
+  },
+  {
+    "code": "COMMUNITY",
+    "image": "https://hximg.yucunkeji.com/sc/saas/download/20250515/a1a24459-0ed5-4dee-8dc2-dc9ffb453a9d.png",
+    "name": "社区样式",
+    "agent": false,
+    "sysDefault": false
+  },
+  {
+    "code": "INFORMATION",
+    "image": "https://hximg.yucunkeji.com/sc/saas/download/20250515/13463519-814b-459d-a2c2-90997486a80b.png",
+    "name": "资讯样式",
+    "agent": false,
+    "sysDefault": false
+  },
+  {
+    "code": "AGENT",
+    "image": "https://hximg.yucunkeji.com/sc/saas/download/20250515/0636ecab-ab01-461b-9dc1-dca1ff2b5a05.png",
+    "name": "经代样式",
+    "agent": true,
+    "sysDefault": false
+  },
+  {
+    "code": "STYLE_7",
+    "image": "https://hximg.yucunkeji.com/sc/saas/download/20251201/8159d95b-c780-4490-ad0e-f534a69b112c.jpg",
+    "name": "STYLE_7",
+    "agent": false,
+    "sysDefault": false
+  },
+  {
+    "code": "STYLE_8",
+    "image": "https://hximg.yucunkeji.com/sc/saas/download/20251201/f6bd7c30-b711-42c7-bcb2-eaf6ab8f48b1.jpg",
+    "name": "STYLE_8",
+    "agent": false,
+    "sysDefault": false
+  },
+  {
+    "code": "STYLE_9",
+    "image": "https://hximg.yucunkeji.com/sc/saas/download/20251201/27c4bc7c-eb6c-4483-bb1a-6c19820400a1.jpg",
+    "name": "其他服务勿用",
+    "agent": false,
+    "sysDefault": false
+  },
+  {
+    "code": "STYLE_10",
+    "image": "https://hximg.yucunkeji.com/sc/saas/download/20251201/9649681b-5d27-4387-95e9-ba9043d98be0.jpg",
+    "name": "STYLE_10",
+    "agent": false,
+    "sysDefault": false
+  },
+  {
+    "code": "STYLE_11",
+    "image": "https://hximg.yucunkeji.com/sc/saas/download/20251201/b78e7343-d9ad-422e-9520-45323e9df549.jpg",
+    "name": "STYLE_11",
+    "agent": false,
+    "sysDefault": false
+  },
+  {
+    "code": "STYLE_12",
+    "image": "https://hximg.yucunkeji.com/sc/saas/download/20251201/e365edda-b05a-4ce8-bd29-c02cc393a407.jpg",
+    "name": "STYLE_12",
+    "agent": false,
+    "sysDefault": false,
+    "todos": {
+      "version": 2,
+      "created": "2026-04-20T16:52:00+08:00",
+      "session_config": {
+        "concurrency_mode": "exclusive",
+        "max_tasks_per_session": 20,
+        "max_sessions": 50
+      },
+      "tasks": [
+        {
+          "id": "task-001",
+          "title": "检查全局样式是否统一，输出文档到 opt/report/css-audit.md",
+          "status": "completed",
+          "priority": "P0",
+          "depends_on": [],
+          "attempts": 1,
+          "max_attempts": 3,
+          "started_at_commit": null,
+          "validation": {
+            "command": "test -f test/opt/report/css-audit.md && wc -l test/opt/report/css-audit.md | awk '{print $1}' | xargs -I {} test {} -gt 50",
+            "timeout_seconds": 60
+          },
+          "on_failure": {
+            "cleanup": null
+          },
+          "error_log": [],
+          "checkpoints": [
+            {
+              "step": 1,
+              "total": 3,
+              "description": "扫描 styles/ 目录，识别6个主题文件",
+              "timestamp": "2026-04-20T16:53:00+08:00"
+            },
+            {
+              "step": 2,
+              "total": 3,
+              "description": "扫描 css/ 目录，识别19个工具样式文件",
+              "timestamp": "2026-04-20T16:54:00+08:00"
+            },
+            {
+              "step": 3,
+              "total": 3,
+              "description": "分析样式冲突、重复、命名不一致，生成审计报告",
+              "timestamp": "2026-04-20T16:55:00+08:00"
+            }
+          ],
+          "completed_at": "2026-04-20T16:55:00+08:00"
+        },
+        {
+          "id": "task-002",
+          "title": "修复 css/style.css 硬编码背景色",
+          "status": "completed",
+          "priority": "P0",
+          "depends_on": [],
+          "attempts": 0,
+          "max_attempts": 3,
+          "started_at_commit": "07a2d8aacbfabef4e81e22885863e793b9c866df",
+          "validation": {
+            "command": "! grep -n 'background-color:\\s*#f5f5f5' css/style.css",
+            "timeout_seconds": 30
+          },
+          "on_failure": {
+            "cleanup": null
+          },
+          "error_log": [],
+          "checkpoints": [
+            {
+              "step": 1,
+              "total": 3,
+              "description": "调研 style.css 使用范围（仅 404.html），确认硬编码影响有限",
+              "timestamp": "2026-04-20T17:11:00+08:00"
+            },
+            {
+              "step": 2,
+              "total": 3,
+              "description": "添加 :root CSS变量定义，将硬编码色值变量化",
+              "timestamp": "2026-04-20T17:13:00+08:00"
+            },
+            {
+              "step": 3,
+              "total": 3,
+              "description": "验证 grep 无 #f5f5f5，git commit 完成",
+              "timestamp": "2026-04-20T17:15:00+08:00"
+            }
+          ],
+          "completed_at": "2026-04-20T17:15:00+08:00",
+          "claimed_by": "SESSION-2",
+          "lease_expires_at": "2026-04-20T18:00:00+08:00"
+        },
+        {
+          "id": "task-003",
+          "title": "去除 styles/theme-sci-fi.css 与 theme-tool.css 的冗余",
+          "status": "completed",
+          "priority": "P0",
+          "depends_on": [],
+          "attempts": 0,
+          "max_attempts": 3,
+          "started_at_commit": "a845151",
+          "validation": {
+            "command": "! test -f styles/theme-sci-fi.css || grep -r 'theme-sci-fi.css' pages/ index.html | grep -q .",
+            "timeout_seconds": 30
+          },
+          "on_failure": {
+            "cleanup": null
+          },
+          "error_log": [],
+          "checkpoints": [
+            {
+              "step": 1,
+              "total": 3,
+              "description": "扫描 HTML 确认仅 index.html 引用 theme-sci-fi.css",
+              "timestamp": "2026-04-20T17:16:00+08:00"
+            },
+            {
+              "step": 2,
+              "total": 3,
+              "description": "将 --tool-accent-3-glow 合并到 theme-tool.css，更新 index.html 引用",
+              "timestamp": "2026-04-20T17:18:00+08:00"
+            },
+            {
+              "step": 3,
+              "total": 3,
+              "description": "删除 theme-sci-fi.css，git commit 完成",
+              "timestamp": "2026-04-20T17:20:00+08:00"
+            }
+          ],
+          "completed_at": "2026-04-20T17:20:00+08:00",
+          "claimed_by": "SESSION-2",
+          "lease_expires_at": "2026-04-20T18:00:00+08:00"
+        },
+        {
+          "id": "task-004",
+          "title": "删除 theme-base.css 内部重复的 fadeIn keyframes",
+          "status": "completed",
+          "priority": "P1",
+          "depends_on": [],
+          "attempts": 0,
+          "max_attempts": 3,
+          "started_at_commit": "087c733",
+          "validation": {
+            "command": "test $(grep -c '@keyframes fadeIn' styles/theme-base.css) -le 1",
+            "timeout_seconds": 30
+          },
+          "on_failure": {
+            "cleanup": null
+          },
+          "error_log": [],
+          "checkpoints": [
+            {
+              "step": 1,
+              "total": 3,
+              "description": "定位 theme-base.css 两个 fadeIn (L108/L294)",
+              "timestamp": "2026-04-20T17:21:00+08:00"
+            },
+            {
+              "step": 2,
+              "total": 3,
+              "description": "删除 id-generator.css 和 json-graph.css 的本地 fadeIn",
+              "timestamp": "2026-04-20T17:23:00+08:00"
+            },
+            {
+              "step": 3,
+              "total": 3,
+              "description": "验证 grep fadeIn count=1，提交完成",
+              "timestamp": "2026-04-20T17:25:00+08:00"
+            }
+          ],
+          "completed_at": "2026-04-20T17:25:00+08:00",
+          "claimed_by": "SESSION-2",
+          "lease_expires_at": "2026-04-20T18:00:00+08:00"
+        },
+        {
+          "id": "task-005",
+          "title": "集中 spin keyframes 到 theme-base.css，删除9处重复定义",
+          "status": "in_progress",
+          "priority": "P1",
+          "depends_on": [
+            "task-004"
+          ],
+          "attempts": 0,
+          "max_attempts": 3,
+          "started_at_commit": "6a1ff66",
+          "validation": {
+            "command": "test $(grep -rl '@keyframes spin' styles/ css/ | wc -l) -le 2",
+            "timeout_seconds": 30
+          },
+          "on_failure": {
+            "cleanup": null
+          },
+          "error_log": [],
+          "checkpoints": [],
+          "completed_at": null,
+          "claimed_by": "SESSION-2",
+          "lease_expires_at": "2026-04-20T18:00:00+08:00"
+        },
+        {
+          "id": "task-006",
+          "title": "创建 js/json-graph-3d.js 基础结构和球形树布局算法",
+          "status": "completed",
+          "priority": "P0",
+          "depends_on": [],
+          "attempts": 0,
+          "max_attempts": 3,
+          "started_at_commit": "32755ccb67f16823f19386b52da67f8066167361",
+          "validation": {
+            "command": "test -f js/json-graph-3d.js && grep -c 'JsonGraph3D' js/json-graph-3d.js",
+            "timeout_seconds": 30
+          },
+          "on_failure": {
+            "cleanup": null
+          },
+          "error_log": [],
+          "checkpoints": [
+            {
+              "step": 1,
+              "total": 1,
+              "description": "创建 json-graph-3d.js: JsonGraph3D IIFE, buildGraph, 球形树布局, Three.js 渲染器, OrbitControls, CSS2DRenderer, 节点点击/双击/右键菜单",
+              "timestamp": "2026-04-21T00:00:00+08:00"
+            }
+          ],
+          "completed_at": "2026-04-21T00:00:00+08:00"
+        },
+        {
+          "id": "task-007",
+          "title": "实现 Three.js 渲染器：球体+连线+CSS2D 标签+主题光效",
+          "status": "completed",
+          "priority": "P0",
+          "depends_on": [
+            "task-006"
+          ],
+          "attempts": 0,
+          "max_attempts": 3,
+          "started_at_commit": "d493cd2",
+          "validation": {
+            "command": "test -f js/json-graph-3d.js && grep -c 'CSS2DRenderer' js/json-graph-3d.js",
+            "timeout_seconds": 30
+          },
+          "on_failure": {
+            "cleanup": null
+          },
+          "error_log": [],
+          "checkpoints": [
+            {
+              "step": 1,
+              "total": 1,
+              "description": "已在task-006中一并实现",
+              "timestamp": "2026-04-21T00:00:00+08:00"
+            }
+          ],
+          "completed_at": "2026-04-21T00:00:00+08:00"
+        },
+        {
+          "id": "task-008",
+          "title": "实现 OrbitControls 交互：旋转/缩放/平移/聚焦动画",
+          "status": "completed",
+          "priority": "P0",
+          "depends_on": [
+            "task-007"
+          ],
+          "attempts": 0,
+          "max_attempts": 3,
+          "started_at_commit": "d493cd2",
+          "validation": {
+            "command": "grep -c 'OrbitControls' js/json-graph-3d.js",
+            "timeout_seconds": 30
+          },
+          "on_failure": {
+            "cleanup": null
+          },
+          "error_log": [],
+          "checkpoints": [
+            {
+              "step": 1,
+              "total": 1,
+              "description": "已在task-006中一并实现",
+              "timestamp": "2026-04-21T00:00:00+08:00"
+            }
+          ],
+          "completed_at": "2026-04-21T00:00:00+08:00"
+        },
+        {
+          "id": "task-009",
+          "title": "实现节点点击选中+双击折叠+侧边栏同步",
+          "status": "completed",
+          "priority": "P0",
+          "depends_on": [
+            "task-008"
+          ],
+          "attempts": 0,
+          "max_attempts": 3,
+          "started_at_commit": "d493cd2",
+          "validation": {
+            "command": "grep -c 'selectedNode' js/json-graph-3d.js",
+            "timeout_seconds": 30
+          },
+          "on_failure": {
+            "cleanup": null
+          },
+          "error_log": [],
+          "checkpoints": [
+            {
+              "step": 1,
+              "total": 1,
+              "description": "已在task-006中一并实现",
+              "timestamp": "2026-04-21T00:00:00+08:00"
+            }
+          ],
+          "completed_at": "2026-04-21T00:00:00+08:00"
+        },
+        {
+          "id": "task-010",
+          "title": "实现右键上下文菜单：复制路径/提取JSON/标记/折叠子节点",
+          "status": "completed",
+          "priority": "P1",
+          "depends_on": [
+            "task-009"
+          ],
+          "attempts": 0,
+          "max_attempts": 3,
+          "started_at_commit": "d493cd2",
+          "validation": {
+            "command": "grep -c 'contextmenu' js/json-graph-3d.js",
+            "timeout_seconds": 30
+          },
+          "on_failure": {
+            "cleanup": null
+          },
+          "error_log": [],
+          "checkpoints": [
+            {
+              "step": 1,
+              "total": 1,
+              "description": "已在task-006中一并实现",
+              "timestamp": "2026-04-21T00:00:00+08:00"
+            }
+          ],
+          "completed_at": "2026-04-21T00:00:00+08:00"
+        },
+        {
+          "id": "task-011",
+          "title": "在 json-formatter.html 中添加 3D 图谱入口和 CDN 引入",
+          "status": "completed",
+          "priority": "P0",
+          "depends_on": [
+            "task-006"
+          ],
+          "attempts": 0,
+          "max_attempts": 3,
+          "started_at_commit": "32755ccb67f16823f19386b52da67f8066167361",
+          "validation": {
+            "command": "grep -c 'three' pages/json-formatter.html",
+            "timeout_seconds": 30
+          },
+          "on_failure": {
+            "cleanup": null
+          },
+          "error_log": [],
+          "checkpoints": [
+            {
+              "step": 1,
+              "total": 1,
+              "description": "添加 Three.js CDN (three@0.160.0, OrbitControls, CSS2DRenderer), 3D按钮🧊, json-graph-3d.css, toggleGraph3dView事件处理",
+              "timestamp": "2026-04-21T00:00:00+08:00"
+            }
+          ],
+          "completed_at": "2026-04-21T00:00:00+08:00"
+        }
+      ],
+      "session_count": 3,
+      "last_session": "2026-04-21T00:00:00+08:00"
+    }
+  },
+  {
+    "code": "STYLE_13",
+    "name": "STYLE_13",
+    "image": "https://hximg.yucunkeji.com/sc/saas/download/20260422/92b0c409-4afe-42cc-b617-3180c34f2914.png",
+    "permissions": {
+      "allow": [
+        "Bash(mkdir -p ~/.pua)",
+        "Bash(~/.pua/config.json)",
+        "Read(//Users/chengxiaohong/.pua/**)",
+        "Bash(curl -sI \"https://cdn.jsdelivr.net/npm/jsnes@0.1.0/dist/jsnes.min.js\")",
+        "Bash(curl -s \"https://cdn.jsdelivr.net/npm/jsnes@0.1.0/dist/jsnes.min.js\")",
+        "mcp__MiniMax__web_search",
+        "WebFetch(domain:github.com)",
+        "WebFetch(domain:jsnes.fir.sh)",
+        "Bash(curl -sI \"https://cdn.jsdelivr.net/npm/jsnes@2/dist/jsnes.min.js\")",
+        "Bash(curl -s \"https://cdn.jsdelivr.net/npm/jsnes@2/dist/jsnes.min.js\")",
+        "Bash(grep -oE \"loadROM.{0,100}\")",
+        "Bash(grep -oE 'class j.{0,200}')",
+        "Bash(grep -oE \"loadROM\\\\\\([^\\)]{0,50}\\\\\\)\")",
+        "Bash(grep -oE \"loadROM[a-zA-Z \\(\\)\\\\[\\\\]]{0,50}\")",
+        "Bash(curl -s \"https://cdn.jsdelivr.net/npm/jsnes@2/index.d.ts\")",
+        "Bash(curl -s \"https://cdn.jsdelivr.net/npm/jsnes@2/src/nes.d.ts\")",
+        "Bash(curl -s https://cdn.jsdelivr.net/npm/jsnes@2/src/screen.js)",
+        "Bash(curl -s \"https://data.jsdelivr.com/v1/package/npm/jsnes@2/flat\")",
+        "Bash(curl -s \"https://cdn.jsdelivr.net/npm/jsnes@2/\")",
+        "Bash(curl -s \"https://cdn.jsdelivr.net/npm/jsnes@2/package.json\")",
+        "Bash(curl -s \"https://cdn.jsdelivr.net/npm/jsnes@2/src/index.js\")",
+        "Bash(curl -s \"https://cdn.jsdelivr.net/npm/jsnes@2/src/nes.js\")",
+        "Bash(curl -s \"https://cdn.jsdelivr.net/npm/jsnes@2/src/ppu/index.js\")",
+        "Bash(curl -s https://cdn.jsdelivr.net/npm/jsnes@2/src/ppu/palette-table.js)",
+        "Bash(curl -s https://cdn.jsdelivr.net/npm/jsnes@2/src/ppu/index.js)",
+        "Bash(node:*)",
+        "Bash(git:*)",
+        "WebFetch(domain:cdn.jsdelivr.net)",
+        "WebFetch(domain:raw.githubusercontent.com)",
+        "WebFetch(domain:www.jsdelivr.com)",
+        "Bash(curl -s https://unpkg.com/jsnes@1/dist/jsnes.min.js)",
+        "Bash(curl -sL https://unpkg.com/jsnes@1.2.1/dist/jsnes.min.js)",
+        "Bash(grep -oE \".load=function[^}]{1,200}\")",
+        "Bash(tr ';' '\\\\n')",
+        "Bash(grep -oE \"NES[^,;]{0,30}\")",
+        "Bash(tr '{}' '\\\\n')",
+        "Bash(grep -oE \"indexOf.{0,50}\")",
+        "Bash(grep -oE \"NES[^,;]{0,100}\")",
+        "Bash(curl -sL https://unpkg.com/jsnes@2/dist/jsnes.min.js)",
+        "Bash(grep -oE \"NES[^,;]{0,80}\")",
+        "WebFetch(domain:unpkg.com)",
+        "Bash(curl -s https://raw.githubusercontent.com/sehugg/jsnes/master/src/jsnes.js)",
+        "Bash(curl -s https://api.github.com/repos/sehugg/jsnes/contents/src)",
+        "mcp__MiniMax__understand_image",
+        "Bash(curl -sI https://unpkg.com/jsnes@1/dist/jsnes.min.js)",
+        "Bash(curl -s https://unpkg.com/jsnes@1.2.1/dist/jsnes.min.js)",
+        "Bash(curl -s \"https://unpkg.com/jsnes@1.2.1/src/ppu.js\")",
+        "Bash(curl:*)",
+        "Bash(python3:*)",
+        "Bash(grep -l theme-tool /Users/chengxiaohong/webstorm/coax-tools/pages/*.html)",
+        "Bash(xargs -I{} basename {})",
+        "Bash(grep -l tool-header-bar /Users/chengxiaohong/webstorm/coax-tools/pages/*.html)",
+        "Bash(grep -l root@coax /Users/chengxiaohong/webstorm/coax-tools/pages/*.html)",
+        "Bash(grep:*)",
+        "Bash(for f:*)",
+        "Bash(do)",
+        "Bash(sed -i '' '/theme-switcher/d' \"$f\")",
+        "Bash(done)",
+        "Bash(lsof -ti:3456)",
+        "Bash(xargs kill:*)",
+        "Bash(grep -l 'data-theme=\"\"\"\"sci-fi\"\"\"\">' /Users/chengxiaohong/webstorm/coax-tools/pages/*.html)",
+        "Read(//Users/chengxiaohong/.claude/skills/**)",
+        "Read(//Users/chengxiaohong/.claude/**)",
+        "Bash(ls -la ~/.claude/skills/*/)",
+        "Bash(ls -la /private/tmp/claude-501/-Users-chengxiaohong-webstorm-coax-tools/8d132140-44b0-4d11-82e3-2a0cfdee2982/tasks/*.output)",
+        "Bash(ls -lt /Users/chengxiaohong/webstorm/coax-tools/css/*.css)",
+        "Read(//Users/chengxiaohong/Documents/text/**)",
+        "Bash(xxd)",
+        "WebFetch(domain:localhost)",
+        "Bash(find /Users/chengxiaohong/.claude/sessions -name *.md)",
+        "Bash(mkdir -p /tmp/harness-$$lock)",
+        "Bash(echo $$)",
+        "Bash(/tmp/harness-$$lock/pid)",
+        "Bash(trap 'rm -rf /tmp/harness-$$' EXIT)",
+        "Bash(/Users/chengxiaohong/webstorm/coax-tools/harness-progress.txt:*)"
+      ]
+    }
+  }
+]
