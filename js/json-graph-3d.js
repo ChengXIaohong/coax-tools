@@ -31,6 +31,10 @@ const JsonGraph3D = (function() {
         FAMILY_COMPACT_CHILDREN_THRESHOLD: 10,
         FAMILY_COMPACT_CHILD_SPACING: 40,
         WEBGL_THRESHOLD: 1000,
+        // Tree-aware layout params
+        MAX_VISIBLE_NODES: 150,
+        AUTO_COLLAPSE_THRESHOLD: 10,
+        LAYER_ANGLE_SPAN: Math.PI * 2,  // 每个节点的子树在全部角度范围内展开
         NODE_COLORS: {
             string: 0x4EC9B0,
             number: 0x569CD6,
@@ -78,9 +82,14 @@ const JsonGraph3D = (function() {
     let graphInstances = new Map();
     let animationMixers = [];
 
+    // Breadcrumb navigation state
+    let navigationStack = ['$'];  // ['$', '$.tasks', '$.tasks[0]']
+    let rootJson = null;  // Original root JSON for navigation
+
     // Three.js objects
     let raycaster = null;
     let mouse = null;
+    let _ignoreCollapsedNodes = false;  // Flag to ignore collapsed state during rebuild
 
     function getValueType(value) {
         if (value === null) return 'null';
@@ -113,21 +122,26 @@ const JsonGraph3D = (function() {
             x: 0, y: 0, z: 0
         });
 
-        function addChildren(parentId, obj, depth, ancestorCollapsed) {
+        // addChildren: uses PATH instead of nodeId for collapse state
+        // parentPath format: $.address, $.hobbies[1], etc.
+        function addChildren(parentId, parentPath, obj, depth, ancestorCollapsed) {
             const type = getValueType(obj);
 
             if (type === 'object' && obj !== null) {
                 Object.entries(obj).forEach(([key, value]) => {
                     const childId = `node-${nodeId++}`;
+                    const childPath = `${parentPath}.${key}`;
                     const childType = getValueType(value);
                     const hasChildren = childType === 'object' || childType === 'array';
-                    const isCollapsed = collapsedNodes.has(childId);
+                    // KEY FIX: check collapse state by PATH instead of nodeId
+                    const isCollapsed = collapsedNodes.has(childPath);
 
                     nodes.push({
                         id: childId,
                         type: childType,
                         value: value,
                         key: key,
+                        path: childPath,  // Store stable path on node
                         depth: depth + 1,
                         isRoot: false,
                         hasChildren: hasChildren,
@@ -139,21 +153,24 @@ const JsonGraph3D = (function() {
                     links.push({ source: parentId, target: childId });
 
                     if (hasChildren && !isCollapsed && !ancestorCollapsed) {
-                        addChildren(childId, value, depth + 1, isCollapsed);
+                        addChildren(childId, childPath, value, depth + 1, isCollapsed);
                     }
                 });
             } else if (type === 'array') {
                 obj.forEach((item, index) => {
                     const childId = `node-${nodeId++}`;
+                    const childPath = `${parentPath}[${index}]`;
                     const childType = getValueType(item);
                     const hasChildren = childType === 'object' || childType === 'array';
-                    const isCollapsed = collapsedNodes.has(childId);
+                    // KEY FIX: check collapse state by PATH instead of nodeId
+                    const isCollapsed = collapsedNodes.has(childPath);
 
                     nodes.push({
                         id: childId,
                         type: childType,
                         value: item,
                         key: index,
+                        path: childPath,  // Store stable path on node
                         depth: depth + 1,
                         isRoot: false,
                         hasChildren: hasChildren,
@@ -165,51 +182,72 @@ const JsonGraph3D = (function() {
                     links.push({ source: parentId, target: childId });
 
                     if (hasChildren && !isCollapsed && !ancestorCollapsed) {
-                        addChildren(childId, item, depth + 1, isCollapsed);
+                        addChildren(childId, childPath, item, depth + 1, isCollapsed);
                     }
                 });
             }
         }
 
-        addChildren(rootId, json, 0, false);
+        addChildren(rootId, '$', json, 0, false);
     }
 
     function applySphericalLayout() {
-        const rootNodes = nodes.filter(n => n.isRoot);
-        if (rootNodes.length === 0) return;
-
-        const depthGroups = {};
-        nodes.forEach(n => {
-            if (!depthGroups[n.depth]) depthGroups[n.depth] = [];
-            depthGroups[n.depth].push(n);
-        });
-
-        const maxDepth = Math.max(...nodes.map(n => n.depth));
-        const maxRadius = maxDepth * CONFIG.SPHERE_LAYER_SPACING;
-
-        rootNodes.forEach(root => {
-            root.x = 0;
-            root.y = 0;
-            root.z = 0;
-        });
-
-        Object.entries(depthGroups).forEach(([depth, levelNodes]) => {
-            if (parseInt(depth) === 0) return;
-
-            const radius = parseInt(depth) * CONFIG.SPHERE_LAYER_SPACING;
-            const count = levelNodes.length;
-
-            if (isFamilyCompactMode && count >= CONFIG.FAMILY_COMPACT_CHILDREN_THRESHOLD) {
-                applyFamilyCompactLayout(levelNodes, radius);
-            } else {
-                levelNodes.forEach((node, idx) => {
-                    const angle = (2 * Math.PI * idx) / count - Math.PI / 2;
-                    node.x = radius * Math.cos(angle);
-                    node.y = radius * Math.sin(angle) * 0.5;
-                    node.z = radius * Math.sin(angle);
-                });
+        // 构建 parent -> children 映射
+        const parentChildrenMap = {};
+        nodes.forEach(n => parentChildrenMap[n.id] = []);
+        links.forEach(link => {
+            const parentId = typeof link.source === 'object' ? link.source.id : link.source;
+            const childId = typeof link.target === 'object' ? link.target.id : link.target;
+            if (parentChildrenMap[parentId]) {
+                parentChildrenMap[parentId].push(childId);
             }
         });
+
+        const root = nodes.find(n => n.isRoot);
+        if (!root) return;
+
+        // 根节点在中心
+        root.x = 0;
+        root.y = 0;
+        root.z = 0;
+
+        // 递归布局：从根开始，每个节点将自己的角度范围分配给孩子
+        const CHILD_ANGLE_SPREAD = Math.PI / 3; // 每个子树占 60° 范围
+        const LAYER_Y_SPACING = 100; // 每层 y 方向间距
+
+        function layoutSubtree(nodeId, startAngle, endAngle, depth) {
+            const node = nodes.find(n => n.id === nodeId);
+            if (!node) return;
+
+            const children = parentChildrenMap[nodeId] || [];
+            const childNodes = children
+                .map(cid => nodes.find(n => n.id === cid))
+                .filter(Boolean);
+
+            if (childNodes.length === 0) return;
+
+            // 每个孩子分配的角度范围
+            const totalAngle = endAngle - startAngle;
+            const perChildAngle = totalAngle / childNodes.length;
+
+            childNodes.forEach((child, idx) => {
+                const childAngle = startAngle + idx * perChildAngle + perChildAngle / 2;
+                const radius = CONFIG.SPHERE_LAYER_SPACING;
+
+                // 位置：相对于父节点，沿子节点角度方向偏移
+                child.x = node.x + radius * Math.cos(childAngle);
+                child.y = depth * LAYER_Y_SPACING; // y 按深度分层
+                child.z = node.z + radius * Math.sin(childAngle);
+
+                // 递归布局子树
+                const childStartAngle = childAngle - perChildAngle / 2;
+                const childEndAngle = childAngle + perChildAngle / 2;
+                layoutSubtree(child.id, childStartAngle, childEndAngle, depth + 1);
+            });
+        }
+
+        // 从根节点开始布局
+        layoutSubtree(root.id, -Math.PI, Math.PI, 1);
     }
 
     function applyFamilyCompactLayout(levelNodes, baseRadius) {
@@ -385,38 +423,90 @@ const JsonGraph3D = (function() {
         return line;
     }
 
+    function autoCollapse() {
+        if (nodes.length <= CONFIG.MAX_VISIBLE_NODES) {
+            return;
+        }
+
+        // Find candidates: nodes with many children, not already collapsed
+        // Sort by childCount descending - collapse biggest subtrees first
+        // KEY FIX: use node.path instead of node.id
+        const candidates = nodes
+            .filter(n => n.childCount > CONFIG.AUTO_COLLAPSE_THRESHOLD && !collapsedNodes.has(n.path))
+            .sort((a, b) => b.childCount - a.childCount);
+
+        // Collapse until under limit (use 90% of MAX as target)
+        const target = Math.floor(CONFIG.MAX_VISIBLE_NODES * 0.9);
+        for (const node of candidates) {
+            if (nodes.length <= target) break;
+            collapsedNodes.add(node.path);
+        }
+
+        // Save auto-collapsed state to instance before recursive rebuildScene
+        const instance = graphInstances.get(activeTabId);
+        if (instance) {
+            instance.collapsedNodes = new Set(collapsedNodes);
+        }
+
+        // Trigger proper rebuildScene cycle to handle disposal correctly
+        _autoCollapsing = true;
+        rebuildScene();
+        _autoCollapsing = false;
+    }
+
     function rebuildScene() {
-        nodeMeshes.forEach(mesh => {
-            // Remove children (like glow mesh on root) before removing
-            while (mesh.children.length > 0) {
-                const child = mesh.children[0];
-                if (child.geometry) child.geometry.dispose();
-                if (child.material) child.material.dispose();
-                mesh.remove(child);
-            }
-            scene.remove(mesh);
-            mesh.geometry.dispose();
-            if (Array.isArray(mesh.material)) {
-                mesh.material.forEach(m => m.dispose());
-            } else {
-                mesh.material.dispose();
-            }
-        });
-        linkLines.forEach(line => {
-            while (line.children.length > 0) {
-                const child = line.children[0];
-                if (child.geometry) child.geometry.dispose();
-                if (child.material) child.material.dispose();
-                line.remove(child);
-            }
-            scene.remove(line);
-            line.geometry.dispose();
-            line.material.dispose();
-        });
+        // Skip disposal when called from autoCollapse (meshes already disposed or will be)
+        if (!_autoCollapsing) {
+            nodeMeshes.forEach(mesh => {
+                while (mesh.children.length > 0) {
+                    const child = mesh.children[0];
+                    if (child.geometry) child.geometry.dispose();
+                    if (child.material) child.material.dispose();
+                    mesh.remove(child);
+                }
+                scene.remove(mesh);
+                mesh.geometry.dispose();
+                if (Array.isArray(mesh.material)) {
+                    mesh.material.forEach(m => m.dispose());
+                } else {
+                    mesh.material.dispose();
+                }
+            });
+            linkLines.forEach(line => {
+                while (line.children.length > 0) {
+                    const child = line.children[0];
+                    if (child.geometry) child.geometry.dispose();
+                    if (child.material) child.material.dispose();
+                    line.remove(child);
+                }
+                scene.remove(line);
+                line.geometry.dispose();
+                line.material.dispose();
+            });
+        }
         nodeMeshes = [];
         linkLines = [];
 
+        // CRITICAL: Clean up stale collapsedNode IDs BEFORE buildGraph
+        // At this point, 'nodes' still has the OLD valid IDs from previous render
+        // Restore per-instance collapsed state
+        const instance = graphInstances.get(activeTabId);
+        if (instance) {
+            collapsedNodes = new Set(instance.collapsedNodes || []);
+        }
+
+        // Now clear nodes/links before buildGraph creates new IDs
+        nodes = [];
+        links = [];
+
         buildGraph(graphInstances.get(activeTabId)?.json || {});
+
+        // Auto-collapse if over limit and this is first render (no prior collapsed state)
+        if (!_autoCollapsing && collapsedNodes.size === 0 && nodes.length > CONFIG.MAX_VISIBLE_NODES) {
+            autoCollapse();
+            return;  // autoCollapse triggers rebuildScene recursively with proper state
+        }
+
         applySphericalLayout();
 
         links.forEach(link => {
@@ -493,6 +583,11 @@ const JsonGraph3D = (function() {
                         <span class="zoom-display" id="zoom-display">100%</span>
                         <button class="zoom-btn" data-action="zoom-in">➕</button>
                     </div>
+                    <div class="breadcrumb-nav" id="breadcrumb-nav">
+                        <button class="breadcrumb-btn" data-action="breadcrumb-root" title="返回根节点">🏠</button>
+                        <button class="breadcrumb-btn" data-action="breadcrumb-back" title="返回上级">←</button>
+                        <span class="breadcrumb-trail" id="breadcrumb-trail">$</span>
+                    </div>
                     <div class="pagination-info" id="pagination-info">3D 图谱模式</div>
                 </div>
             </div>
@@ -560,6 +655,7 @@ const JsonGraph3D = (function() {
         }
     }
 
+    let _autoCollapsing = false;
     let _animateRan = false;
     function _ensureAnimateRuns() {
         if (!_animateRan) {
@@ -578,6 +674,10 @@ const JsonGraph3D = (function() {
 
         modal.querySelectorAll('.zoom-btn').forEach(btn => {
             btn.addEventListener('click', () => handleZoomAction(btn.dataset.action));
+        });
+
+        modal.querySelectorAll('.breadcrumb-btn').forEach(btn => {
+            btn.addEventListener('click', () => handleBreadcrumbAction(btn.dataset.action));
         });
 
         modal.querySelector('.sidebar-toggle').addEventListener('click', () => {
@@ -624,14 +724,229 @@ const JsonGraph3D = (function() {
         }
     }
 
+    function handleBreadcrumbAction(action) {
+        switch (action) {
+            case 'breadcrumb-root':
+                navigateToRoot();
+                break;
+            case 'breadcrumb-back':
+                navigateBack();
+                break;
+        }
+    }
+
+    // Navigate to root and rebuild scene
+    function navigateToRoot() {
+        navigationStack = ['$'];
+        collapsedNodes.clear();
+        rebuildSceneForPath('$');
+        updateBreadcrumbDisplay();
+    }
+
+    // Navigate back one level
+    function navigateBack() {
+        if (navigationStack.length <= 1) return;
+        navigationStack.pop();
+        collapsedNodes.clear();
+        rebuildSceneForPath(navigationStack[navigationStack.length - 1]);
+        updateBreadcrumbDisplay();
+    }
+
+    // Navigate to a specific path
+    function navigateTo(path) {
+        if (!navigationStack.includes(path)) {
+            navigationStack.push(path);
+        }
+        collapsedNodes.clear();
+        rebuildSceneForPath(path);
+        updateBreadcrumbDisplay();
+    }
+
+    // Rebuild scene using a specific path as root
+    function rebuildSceneForPath(path) {
+        if (!rootJson) return;
+
+        // Get the sub-json at this path
+        const targetJson = getValueAtPath(rootJson, path);
+        if (!targetJson) return;
+
+        // Clear current scene meshes and links
+        nodeMeshes.forEach(mesh => {
+            while (mesh.children.length > 0) {
+                const child = mesh.children[0];
+                if (child.geometry) child.geometry.dispose();
+                if (child.material) child.material.dispose();
+                mesh.remove(child);
+            }
+            scene.remove(mesh);
+            mesh.geometry.dispose();
+            if (Array.isArray(mesh.material)) {
+                mesh.material.forEach(m => m.dispose());
+            } else {
+                mesh.material.dispose();
+            }
+        });
+        linkLines.forEach(line => {
+            scene.remove(line);
+            line.geometry.dispose();
+            line.material.dispose();
+        });
+        nodeMeshes = [];
+        linkLines = [];
+
+        // Reset camera for new context
+        resetCamera();
+
+        // Build graph from the target sub-json
+        nodes = [];
+        links = [];
+        let nodeId = 0;
+        const rootId = `node-${nodeId++}`;
+
+        nodes.push({
+            id: rootId,
+            type: getValueType(targetJson),
+            value: targetJson,
+            key: path.split('.').pop() || 'root',
+            path: path,
+            depth: 0,
+            isRoot: true,
+            childCount: countChildren(targetJson),
+            x: 0, y: 0, z: 0
+        });
+
+        function addChildren(parentId, parentPath, obj, depth, ancestorCollapsed) {
+            const type = getValueType(obj);
+
+            if (type === 'object' && obj !== null) {
+                Object.entries(obj).forEach(([key, value]) => {
+                    const childId = `node-${nodeId++}`;
+                    const childPath = `${parentPath}.${key}`;
+                    const childType = getValueType(value);
+                    const hasChildren = childType === 'object' || childType === 'array';
+                    const isCollapsed = collapsedNodes.has(childPath);
+
+                    nodes.push({
+                        id: childId,
+                        type: childType,
+                        value: value,
+                        key: key,
+                        path: childPath,
+                        depth: depth + 1,
+                        isRoot: false,
+                        hasChildren: hasChildren,
+                        childCount: hasChildren ? countChildren(value) : 0,
+                        x: 0, y: 0, z: 0,
+                        parentId: parentId
+                    });
+
+                    links.push({ source: parentId, target: childId });
+
+                    if (hasChildren && !isCollapsed && !ancestorCollapsed) {
+                        addChildren(childId, childPath, value, depth + 1, isCollapsed);
+                    }
+                });
+            } else if (type === 'array') {
+                obj.forEach((item, index) => {
+                    const childId = `node-${nodeId++}`;
+                    const childPath = `${parentPath}[${index}]`;
+                    const childType = getValueType(item);
+                    const hasChildren = childType === 'object' || childType === 'array';
+                    const isCollapsed = collapsedNodes.has(childPath);
+
+                    nodes.push({
+                        id: childId,
+                        type: childType,
+                        value: item,
+                        key: index,
+                        path: childPath,
+                        depth: depth + 1,
+                        isRoot: false,
+                        hasChildren: hasChildren,
+                        childCount: hasChildren ? countChildren(item) : 0,
+                        x: 0, y: 0, z: 0,
+                        parentId: parentId
+                    });
+
+                    links.push({ source: parentId, target: childId });
+
+                    if (hasChildren && !isCollapsed && !ancestorCollapsed) {
+                        addChildren(childId, childPath, item, depth + 1, isCollapsed);
+                    }
+                });
+            }
+        }
+
+        addChildren(rootId, path, targetJson, 0, false);
+
+        // Apply layout and create meshes
+        applySphericalLayout();
+
+        links.forEach(link => {
+            const source = nodes.find(n => n.id === (link.source.id || link.source));
+            const target = nodes.find(n => n.id === (link.target.id || link.target));
+            if (source && target) {
+                createLinkLine(source, target);
+            }
+        });
+
+        nodes.forEach(node => {
+            createNodeMesh(node);
+        });
+
+        updateStats(targetJson);
+    }
+
+    // Get value at JSON path
+    function getValueAtPath(json, path) {
+        if (path === '$' || path === '$root') return json;
+
+        const parts = path.replace(/^\$\.?/, '').split(/\.|\[/).filter(Boolean);
+        let current = json;
+
+        for (const part of parts) {
+            const key = part.replace(/\]/g, '');
+            if (current === null || current === undefined) return undefined;
+            current = current[key];
+        }
+
+        return current;
+    }
+
+    // Update breadcrumb display
+    function updateBreadcrumbDisplay() {
+        const trail = modal?.querySelector('#breadcrumb-trail');
+        if (!trail) return;
+
+        trail.innerHTML = navigationStack.map((path, idx) => {
+            const label = path === '$' ? '$' : path.split('.').pop().replace(/\[(\d+)\]/g, '[$1]');
+            const isLast = idx === navigationStack.length - 1;
+            return `<span class="breadcrumb-item ${isLast ? 'active' : ''}" data-path="${path}">${label}</span>`;
+        }).join('<span class="breadcrumb-sep"> › </span>');
+
+        // Add click handlers to breadcrumb items
+        trail.querySelectorAll('.breadcrumb-item:not(.active)').forEach(item => {
+            item.addEventListener('click', () => {
+                const path = item.dataset.path;
+                // Truncate stack to this point
+                const idx = navigationStack.indexOf(path);
+                if (idx >= 0) {
+                    navigationStack = navigationStack.slice(0, idx + 1);
+                    collapsedNodes.clear();
+                    rebuildSceneForPath(path);
+                    updateBreadcrumbDisplay();
+                }
+            });
+        });
+    }
+
     function handleZoomAction(action) {
         const factor = action === 'zoom-in' ? 1.2 : 0.8;
         const newZoom = Math.max(CONFIG.MIN_ZOOM, Math.min(CONFIG.MAX_ZOOM, (camera.userData.zoom || 1) * factor));
         camera.userData.zoom = newZoom;
 
-        // Move camera along its look direction (toward target at origin)
-        const direction = new THREE.Vector3();
-        camera.getWorldDirection(direction);
+        // Move camera along the direction from target to camera (away/toward target)
+        const direction = new THREE.Vector3().subVectors(camera.position, controls.target).normalize();
         const currentDistance = camera.position.distanceTo(controls.target);
         const newDistance = currentDistance / factor;
         camera.position.copy(controls.target).addScaledVector(direction, newDistance);
@@ -725,6 +1040,8 @@ const JsonGraph3D = (function() {
             <div class="menu-divider"></div>
             <div class="menu-item" data-action="collapse-children">➖ 折叠子节点</div>
             <div class="menu-item" data-action="expand-children">➕ 展开子节点</div>
+            <div class="menu-divider"></div>
+            <div class="menu-item" data-action="open-subgraph">🔍 查看下级图谱</div>
         `;
 
         const markItem = contextMenu.querySelector('[data-action="mark-important"]');
@@ -765,12 +1082,21 @@ const JsonGraph3D = (function() {
                 rebuildScene();
                 break;
             case 'collapse-children':
-                collapsedNodes.add(node.id);
-                rebuildScene();
+                collapsedNodes.add(node.path);
+                saveAndRebuild();
                 break;
             case 'expand-children':
-                collapsedNodes.delete(node.id);
-                rebuildScene();
+                collapsedNodes.delete(node.path);
+                saveAndRebuild();
+                break;
+            case 'open-subgraph':
+                // Open the selected node's value as a new 3D graph
+                if (node.hasChildren && (node.type === 'object' || node.type === 'array')) {
+                    JsonGraph3D.open(node.value);
+                    showNotification('已打开下级图谱');
+                } else {
+                    showNotification('该节点无下级数据');
+                }
                 break;
         }
     }
@@ -798,12 +1124,35 @@ const JsonGraph3D = (function() {
         modal.querySelector('.selected-stats').style.display = 'none';
     }
 
-    function toggleCollapse(nodeId) {
-        if (collapsedNodes.has(nodeId)) {
-            collapsedNodes.delete(nodeId);
-        } else {
-            collapsedNodes.add(nodeId);
+    // Helper: save collapsed state to instance, then rebuild
+    function saveAndRebuild() {
+        const instance = graphInstances.get(activeTabId);
+        if (instance) {
+            instance.collapsedNodes = new Set(collapsedNodes);
         }
+        rebuildScene();
+    }
+
+    function toggleCollapse(nodeId) {
+        // Find the node to get its path
+        const node = nodes.find(n => n.id === nodeId);
+        if (!node) {
+            return;
+        }
+
+        const nodePath = node.path;
+        if (collapsedNodes.has(nodePath)) {
+            collapsedNodes.delete(nodePath);
+        } else {
+            collapsedNodes.add(nodePath);
+        }
+
+        // Save to instance before rebuildScene restores from instance
+        const instance = graphInstances.get(activeTabId);
+        if (instance) {
+            instance.collapsedNodes = new Set(collapsedNodes);
+        }
+
         rebuildScene();
     }
 
@@ -846,7 +1195,13 @@ const JsonGraph3D = (function() {
         traverse(json, 0);
         document.getElementById('stat-nodes').textContent = totalNodes;
         document.getElementById('stat-depth').textContent = maxDepth;
-        document.getElementById('pagination-info').textContent = `${totalNodes} 节点 · 3D 图谱模式`;
+        if (collapsedNodes.size > 0) {
+            document.getElementById('pagination-info').textContent =
+                `${totalNodes} 节点 · ${collapsedNodes.size} 已折叠 · 3D 图谱模式`;
+        } else {
+            document.getElementById('pagination-info').textContent =
+                `${totalNodes} 节点 · 3D 图谱模式`;
+        }
     }
 
     function applyTheme() {
