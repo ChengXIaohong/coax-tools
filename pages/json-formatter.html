@@ -43,6 +43,7 @@
                                 <button class="action-item" id="toonConvert">转TOON</button>
                                 <button class="action-item" id="extractStructure">提取结构</button>
                                 <button class="action-item" id="compressJson">压缩JSON</button>
+                                <button class="action-item" id="importFile">📂 导入文件</button>
                             </div>
                         </div>
                         <div id="outputJson" contenteditable="true" spellcheck="false"></div>
@@ -53,19 +54,127 @@
         </main>
     </div>
 
-    <script src="https://d3js.org/d3.v7.min.js"></script>
-    <!-- Three.js ES Modules for 3D Graph (r160+) -->
-    <script type="importmap">
-    {
-        "imports": {
-            "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
-            "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
-        }
-    }
-    </script>
+    <!-- 图谱懒加载状态 -->
+    <div id="graph-loader" class="graph-loader" style="display:none;">
+        <div class="loader-spinner"></div>
+        <span>图谱加载中...</span>
+    </div>
+
     <script src="../js/theme-switcher.js"></script>
+    <script src="../js/json-import.js"></script>
     <script src="../js/json-formatter.js"></script>
-    <script src="../js/json-graph.js"></script>
-    <script type="module" src="../js/json-graph-3d.js"></script>
+    <script src="../js/json-graph.js" defer></script>
+    <script type="module">
+        // 3D图谱懒加载 - 仅当用户点击3D图谱按钮时加载
+        window.JsonGraph3DLoader = {
+            loaded: false,
+            loading: false,
+            callbacks: [],
+
+            load() {
+                if (this.loaded) {
+                    return Promise.resolve();
+                }
+                if (this.loading) {
+                    return new Promise((resolve) => {
+                        this.callbacks.push(resolve);
+                    });
+                }
+
+                this.loading = true;
+                const loader = document.getElementById('graph-loader');
+                if (loader) loader.style.display = 'flex';
+
+                // 动态加载 importmap
+                const importmap = document.createElement('script');
+                importmap.type = 'importmap';
+                importmap.textContent = JSON.stringify({
+                    imports: {
+                        "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+                        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+                    }
+                });
+                document.head.appendChild(importmap);
+
+                // 动态加载 D3 和 3D 图谱模块
+                Promise.all([
+                    new Promise((resolve, reject) => {
+                        const d3Script = document.createElement('script');
+                        d3Script.src = 'https://d3js.org/d3.v7.min.js';
+                        d3Script.onload = resolve;
+                        d3Script.onerror = reject;
+                        document.head.appendChild(d3Script);
+                    }),
+                    import('../js/json-graph-3d.js')
+                ]).then(([d3]) => {
+                    this.loaded = true;
+                    this.loading = false;
+                    if (loader) loader.style.display = 'none';
+                    this.callbacks.forEach(cb => cb());
+                    this.callbacks = [];
+                }).catch(err => {
+                    this.loading = false;
+                    if (loader) loader.style.display = 'none';
+                    console.error('[3D Graph] Load failed:', err);
+                    throw err;
+                });
+
+                return new Promise((resolve) => {
+                    this.callbacks.push(resolve);
+                });
+            }
+        };
+
+        // 拦截 toggleGraph3dView 函数，实现懒加载
+        // 由于 isGraph3dView 是 json-formatter.js 的局部变量，需要完整替换逻辑
+        window.toggleGraph3dView = async function() {
+            const graph3dToggle = document.getElementById('graph3dToggle');
+            const outputJsonData = document.getElementById('outputJsonData');
+
+            console.log('[3D Graph] toggleGraph3dView called, JsonGraph3D:', typeof window.JsonGraph3D);
+            let jsonString = outputJsonData.value.trim();
+
+            if (!jsonString) {
+                // 如果没有数据，加载示例数据后重试
+                if (typeof loadSampleData === 'function') loadSampleData();
+                jsonString = outputJsonData.value.trim();
+            }
+
+            if (!jsonString) {
+                if (typeof showMessage === 'function') showMessage('JSON数据为空，请先输入数据', 'warning');
+                graph3dToggle.classList.add('error');
+                setTimeout(() => graph3dToggle.classList.remove('error'), 500);
+                return;
+            }
+
+            try {
+                const parsed = JSON.parse(jsonString);
+                if (typeof parsed !== 'object' || parsed === null) {
+                    if (typeof showMessage === 'function') showMessage('JSON结构无效，必须为对象或数组', 'error');
+                    return;
+                }
+
+                // 如果已经加载且已打开，直接关闭
+                if (typeof window.JsonGraph3D !== 'undefined' && window.JsonGraph3D.isOpen()) {
+                    window.JsonGraph3D.close();
+                    window.JsonGraph3DLoader._isOpen = false;
+                    return;
+                }
+
+                // 先显示加载状态
+                const loader = document.getElementById('graph-loader');
+                if (loader) loader.style.display = 'flex';
+
+                await window.JsonGraph3DLoader.load();
+
+                console.log('[3D Graph] Calling JsonGraph3D.open with', Object.keys(parsed).length, 'keys');
+                window.JsonGraph3D.open(parsed);
+                window.JsonGraph3DLoader._isOpen = true;
+            } catch (e) {
+                console.error('[3D Graph] Error:', e);
+                if (typeof showMessage === 'function') showMessage('JSON语法错误：' + e.message, 'error');
+            }
+        };
+    </script>
 </body>
 </html>

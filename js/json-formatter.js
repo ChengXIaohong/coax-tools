@@ -4,6 +4,7 @@ const DEFAULT_INDENT = 2;
 // DOM 元素
 let inputJson, outputJson, outputJsonData, actionToggle, actionMenu, graphToggle;
 let yamlConvertBtn, toonConvertBtn, extractStructureBtn, compressJsonBtn;
+let importFileBtn;
 let graph3dToggle;
 let isGraphView = false;
 let isGraph3dView = false;
@@ -688,6 +689,7 @@ document.addEventListener('DOMContentLoaded', function() {
     toonConvertBtn = document.getElementById('toonConvert');
     extractStructureBtn = document.getElementById('extractStructure');
     compressJsonBtn = document.getElementById('compressJson');
+    importFileBtn = document.getElementById('importFile');
     // 自动格式化
     inputJson.addEventListener('input', autoFormat);
     inputJson.addEventListener('paste', () => setTimeout(autoFormat, 0));
@@ -699,6 +701,13 @@ document.addEventListener('DOMContentLoaded', function() {
     // 图谱视图切换
     graphToggle.addEventListener('click', toggleGraphView);
     graph3dToggle.addEventListener('click', toggleGraph3dView);
+
+    // 导入文件按钮
+    importFileBtn.addEventListener('click', () => {
+        if (window.JsonImportModal) {
+            window.JsonImportModal.open();
+        }
+    });
 
     // Ctrl+G 快捷键打开图谱
     document.addEventListener('keydown', (e) => {

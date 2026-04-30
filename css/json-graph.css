@@ -186,29 +186,6 @@
     width: 30px;
 }
 
-.sidebar-toggle {
-    position: absolute;
-    right: 0;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 20px;
-    height: 40px;
-    background: #30363d;
-    border: none;
-    color: #c9d1d9;
-    cursor: pointer;
-    font-size: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 4px 0 0 4px;
-    z-index: 10;
-}
-
-.modal-sidebar.collapsed .sidebar-toggle {
-    right: 0;
-}
-
 .sidebar-content {
     flex: 1;
     overflow-y: auto;

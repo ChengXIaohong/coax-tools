@@ -31,6 +31,7 @@ const JsonGraph3D = (function() {
         FAMILY_COMPACT_CHILDREN_THRESHOLD: 10,
         FAMILY_COMPACT_CHILD_SPACING: 40,
         WEBGL_THRESHOLD: 1000,
+        OUTLINE_EXPAND_THRESHOLD: 5000,
         // Tree-aware layout params
         MAX_VISIBLE_NODES: 150,
         AUTO_COLLAPSE_THRESHOLD: 10,
@@ -706,12 +707,13 @@ const JsonGraph3D = (function() {
                         <button class="toolbar-btn" data-action="toggle-family-compact" title="族压缩模式">🔲</button>
                         <button class="toolbar-btn" data-action="fullscreen" title="全屏">⛶</button>
                         <button class="toolbar-btn" data-action="close" title="关闭">✕</button>
+                        <span class="toolbar-divider"></span>
+                        <button class="toolbar-btn" id="toolbar-toggle-outline" title="切换大纲">☰</button>
                     </div>
                 </div>
                 <div class="modal-body">
                     <div class="modal-graph-area" id="graph3d-area"></div>
                     <div class="modal-sidebar collapsed">
-                        <button class="sidebar-toggle">◀</button>
                         <div class="sidebar-content">
                             <div class="sidebar-section">
                                 <div class="section-title">全局统计</div>
@@ -724,7 +726,14 @@ const JsonGraph3D = (function() {
                                     <span class="stat-value" id="stat-depth">0</span>
                                 </div>
                             </div>
-                            <div class="sidebar-section selected-stats" style="display: none;">
+                            <div class="sidebar-section outline-nav-section">
+                                <div class="section-title">大纲导航 <span class="outline-hint" id="outline-hint"></span></div>
+                                <div class="outline-search-box">
+                                    <input type="text" id="outline-search" placeholder="搜索节点..." />
+                                </div>
+                                <div class="outline-tree" id="outline-tree"></div>
+                            </div>
+                            <div class="sidebar-section selected-stats">
                                 <div class="section-title">选中节点</div>
                                 <div class="stat-item">
                                     <span class="stat-label">路径</span>
@@ -737,6 +746,12 @@ const JsonGraph3D = (function() {
                                 <div class="stat-item">
                                     <span class="stat-label">子节点</span>
                                     <span class="stat-value" id="selected-children">0</span>
+                                </div>
+                                <div class="outline-selected-actions" id="outline-selected-actions">
+                                    <button class="outline-action-btn" id="outline-copy-path" title="复制路径">📋</button>
+                                    <button class="outline-action-btn" id="outline-extract-json" title="提取JSON">📦</button>
+                                    <button class="outline-action-btn" id="outline-toggle-mark" title="标记">⭐</button>
+                                    <button class="outline-action-btn" id="outline-drill-down" title="查看子图">→</button>
                                 </div>
                             </div>
                         </div>
@@ -787,6 +802,7 @@ const JsonGraph3D = (function() {
             rebuildScene();
             updateStats(jsonData);
             applyTheme();
+            initOutlinePanel(jsonData);
         }, 50);
     }
 
@@ -881,10 +897,6 @@ const JsonGraph3D = (function() {
             btn.addEventListener('click', () => handleBreadcrumbAction(btn.dataset.action));
         });
 
-        modal.querySelector('.sidebar-toggle').addEventListener('click', () => {
-            modal.querySelector('.modal-sidebar').classList.toggle('collapsed');
-        });
-
         const graphArea = modal.querySelector('.modal-graph-area');
         graphArea.addEventListener('click', onGraphClick);
         graphArea.addEventListener('dblclick', onGraphDblClick);
@@ -893,6 +905,24 @@ const JsonGraph3D = (function() {
         window.addEventListener('resize', onWindowResize);
         document.addEventListener('fullscreenchange', onFullscreenChange);
         document.addEventListener('keydown', handleKeydown);
+
+        // Outline selected-node action buttons
+        document.getElementById('outline-copy-path')?.addEventListener('click', () => {
+            if (selectedNode) copyNodePath(selectedNode);
+        });
+        document.getElementById('outline-extract-json')?.addEventListener('click', () => {
+            if (selectedNode) extractNodeJson(selectedNode);
+        });
+        document.getElementById('outline-toggle-mark')?.addEventListener('click', () => {
+            if (selectedNode) {
+                const btn = document.getElementById('outline-toggle-mark');
+                toggleNodeMark(selectedNode, btn);
+                btn.classList.toggle('marked', markedNodes.has(selectedNode.path));
+            }
+        });
+        document.getElementById('outline-drill-down')?.addEventListener('click', () => {
+            if (selectedNode && selectedNode.hasChildren) drillDownToNode(selectedNode);
+        });
     }
 
     function handleKeydown(e) {
@@ -986,6 +1016,8 @@ const JsonGraph3D = (function() {
         collapsedNodes.clear();
         rebuildSceneForPath('$');
         updateBreadcrumbDisplay();
+        renderOutlineTree();
+        highlightOutlineNode('$');
     }
 
     // Navigate back one level
@@ -995,6 +1027,9 @@ const JsonGraph3D = (function() {
         collapsedNodes.clear();
         rebuildSceneForPath(navigationStack[navigationStack.length - 1]);
         updateBreadcrumbDisplay();
+        const currentPath = navigationStack[navigationStack.length - 1];
+        renderOutlineTree();
+        highlightOutlineNode(currentPath);
     }
 
     // Navigate to a specific path
@@ -1005,6 +1040,8 @@ const JsonGraph3D = (function() {
         collapsedNodes.clear();
         rebuildSceneForPath(path);
         updateBreadcrumbDisplay();
+        renderOutlineTree();
+        highlightOutlineNode(path);
     }
 
     // Rebuild scene using a specific path as root
@@ -1189,20 +1226,24 @@ const JsonGraph3D = (function() {
         });
     }
 
+    let _zoomDebounceTimer = null;
     function handleZoomAction(action) {
-        const factor = action === 'zoom-in' ? 1.2 : 0.8;
-        const newZoom = Math.max(CONFIG.MIN_ZOOM, Math.min(CONFIG.MAX_ZOOM, (camera.userData.zoom || 1) * factor));
-        camera.userData.zoom = newZoom;
+        clearTimeout(_zoomDebounceTimer);
+        _zoomDebounceTimer = setTimeout(() => {
+            const factor = action === 'zoom-in' ? 1.2 : 0.8;
+            const newZoom = Math.max(CONFIG.MIN_ZOOM, Math.min(CONFIG.MAX_ZOOM, (camera.userData.zoom || 1) * factor));
+            camera.userData.zoom = newZoom;
 
-        // Move camera along the direction from target to camera (away/toward target)
-        const direction = new THREE.Vector3().subVectors(camera.position, controls.target).normalize();
-        const currentDistance = camera.position.distanceTo(controls.target);
-        const newDistance = currentDistance / factor;
-        camera.position.copy(controls.target).addScaledVector(direction, newDistance);
+            // Move camera along the direction from target to camera (away/toward target)
+            const direction = new THREE.Vector3().subVectors(camera.position, controls.target).normalize();
+            const currentDistance = camera.position.distanceTo(controls.target);
+            const newDistance = currentDistance / factor;
+            camera.position.copy(controls.target).addScaledVector(direction, newDistance);
 
-        controls.update();
+            controls.update();
 
-        modal.querySelector('#zoom-display').textContent = Math.round(newZoom * 100) + '%';
+            modal.querySelector('#zoom-display').textContent = Math.round(newZoom * 100) + '%';
+        }, 100);
     }
 
     function resetCamera() {
@@ -1255,9 +1296,11 @@ const JsonGraph3D = (function() {
                 selectedNode = node;
                 updateSelectedNodeStats(node);
                 highlightNode(node);
+                highlightOutlineNode(node.path);
             }
         } else {
             clearSelection();
+            clearOutlineSelection();
         }
     }
 
@@ -1312,8 +1355,6 @@ const JsonGraph3D = (function() {
             <div class="menu-item" data-action="copy-json">📄 提取JSON片段</div>
             <div class="menu-item" data-action="mark-important">⭐ 标记重点关注</div>
             <div class="menu-divider"></div>
-            <div class="menu-item" data-action="collapse-children">➖ 折叠子节点</div>
-            <div class="menu-item" data-action="expand-children">➕ 展开子节点</div>
             <div class="menu-divider"></div>
             <div class="menu-item" data-action="open-subgraph">🔍 查看下级图谱</div>
         `;
@@ -1359,10 +1400,6 @@ const JsonGraph3D = (function() {
                 collapsedNodes.add(node.path);
                 saveAndRebuild();
                 break;
-            case 'expand-children':
-                collapsedNodes.delete(node.path);
-                saveAndRebuild();
-                break;
             case 'open-subgraph':
                 // Navigate to the selected node's path as new root
                 if (node.hasChildren && (node.type === 'object' || node.type === 'array')) {
@@ -1395,7 +1432,8 @@ const JsonGraph3D = (function() {
                 mesh.material.emissiveIntensity = node.isRoot ? 0.3 : 0;
             }
         });
-        modal.querySelector('.selected-stats').style.display = 'none';
+        updateSelectedNodeStats(null);
+        clearOutlineSelection();
     }
 
     // Helper: save collapsed state to instance, then rebuild
@@ -1447,11 +1485,24 @@ const JsonGraph3D = (function() {
     }
 
     function updateSelectedNodeStats(node) {
-        if (!node) return;
-        modal.querySelector('.selected-stats').style.display = 'block';
+        const actions = document.getElementById('outline-selected-actions');
+        if (!node) {
+            document.getElementById('selected-path').textContent = '-';
+            document.getElementById('selected-type').textContent = '-';
+            document.getElementById('selected-children').textContent = '0';
+            if (actions) actions.classList.remove('visible');
+            return;
+        }
         document.getElementById('selected-path').textContent = buildJsonPath(node);
         document.getElementById('selected-type').textContent = node.type;
         document.getElementById('selected-children').textContent = node.hasChildren ? node.childCount : 0;
+        if (actions) {
+            actions.classList.add('visible');
+            const markBtn = document.getElementById('outline-toggle-mark');
+            if (markBtn) markBtn.classList.toggle('marked', markedNodes.has(node.path));
+            const drillBtn = document.getElementById('outline-drill-down');
+            if (drillBtn) drillBtn.style.visibility = node.hasChildren ? 'visible' : 'hidden';
+        }
     }
 
     function updateStats(json) {
@@ -1478,6 +1529,331 @@ const JsonGraph3D = (function() {
         }
     }
 
+    // ========== OUTLINE PANEL ==========
+    let outlineTree = null;
+    let outlineSelectedPath = null;
+    let outlineSearchTimer = null;
+    let outlineExpandedNodes = new Set(); // Track which outline nodes are expanded
+
+    function buildOutlineTree(json, path = '$', depth = 0) {
+        const type = getValueType(json);
+        const hasChildren = type === 'object' || type === 'array';
+        const node = {
+            path,
+            key: path === '$' ? 'root' : path.split('.').pop().split('[')[0],
+            type,
+            value: json,
+            depth,
+            hasChildren,
+            childCount: hasChildren ? countChildren(json) : 0,
+            children: []
+        };
+        if (hasChildren) {
+            if (type === 'object') {
+                Object.entries(json).forEach(([key, val]) => {
+                    const childPath = `${path}.${key}`;
+                    node.children.push(buildOutlineTree(val, childPath, depth + 1));
+                });
+            } else if (Array.isArray(json)) {
+                json.forEach((val, idx) => {
+                    const childPath = `${path}[${idx}]`;
+                    node.children.push(buildOutlineTree(val, childPath, depth + 1));
+                });
+            }
+        }
+        return node;
+    }
+
+    // ====== Outline Action Functions ======
+    function copyNodePath(node) {
+        const path = node.path;
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(path).then(() => {
+                showNotification('路径已复制: ' + path);
+            }).catch(() => {
+                showNotification('复制失败');
+            });
+        } else {
+            const ta = document.createElement('textarea');
+            ta.value = path;
+            document.body.appendChild(ta);
+            ta.select();
+            document.execCommand('copy');
+            ta.remove();
+            showNotification('路径已复制: ' + path);
+        }
+    }
+
+    function extractNodeJson(node) {
+        const json = JSON.stringify(node.value, null, 2);
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(json).then(() => {
+                showNotification('JSON 已复制到剪贴板');
+            }).catch(() => {
+                showNotification('复制失败');
+            });
+        } else {
+            const ta = document.createElement('textarea');
+            ta.value = json;
+            document.body.appendChild(ta);
+            ta.select();
+            document.execCommand('copy');
+            ta.remove();
+            showNotification('JSON 已复制到剪贴板');
+        }
+    }
+
+    function toggleNodeMark(node, btn) {
+        const path = node.path;
+        const isMarked = markedNodes.has(path);
+        if (isMarked) {
+            markedNodes.delete(path);
+        } else {
+            markedNodes.add(path);
+        }
+        // Update the mark button that was clicked
+        if (btn) btn.classList.toggle('marked', !isMarked);
+        // Also update the selected-stats mark button if it shows this node
+        const statsMarkBtn = document.getElementById('outline-toggle-mark');
+        if (statsMarkBtn && selectedNode && statsMarkBtn !== btn) {
+            statsMarkBtn.classList.toggle('marked', markedNodes.has(path));
+        }
+        // Sync to 3D scene if node is currently rendered
+        const meshNode = nodes.find(n => n.path === path);
+        if (meshNode) {
+            if (markedNodes.has(path)) {
+                highlightNode(meshNode);
+            }
+        }
+    }
+
+    function drillDownToNode(node) {
+        if (node.hasChildren) {
+            navigateTo(node.path);
+        }
+    }
+
+    function updateOutlineMarkButtons() {
+        document.querySelectorAll('.outline-mark-btn').forEach(btn => {
+            const item = btn.closest('.outline-item');
+            if (item) {
+                const path = item.dataset.path;
+                if (markedNodes.has(path)) {
+                    btn.classList.add('marked');
+                } else {
+                    btn.classList.remove('marked');
+                }
+            }
+        });
+    }
+
+    // ====== End Outline Action Functions ======
+
+    function onOutlineNodeClick(node) {
+        // Highlight in outline
+        document.querySelectorAll('.outline-item').forEach(el => el.classList.remove('selected'));
+        const item = document.querySelector(`.outline-item[data-path="${CSS.escape(node.path)}"]`);
+        if (item) item.classList.add('selected');
+        outlineSelectedPath = node.path;
+
+        // Focus camera on node in 3D scene
+        const meshNode = nodes.find(n => n.path === node.path);
+        if (meshNode && camera && controls) {
+            animateCameraTo(meshNode.x, meshNode.y, meshNode.z, meshNode.x, meshNode.y, meshNode.z);
+        }
+    }
+
+    function onOutlineNodeDblClick(node) {
+        // Navigate to child graph if has children
+        if (node.hasChildren && !node.isRoot) {
+            navigateTo(node.path);
+        }
+    }
+
+    function filterOutline(query) {
+        if (!query) {
+            document.querySelectorAll('.outline-item').forEach(el => el.classList.remove('filtered-hidden'));
+            return;
+        }
+        const lower = query.toLowerCase();
+        document.querySelectorAll('.outline-item').forEach(el => {
+            const key = el.querySelector('.outline-key')?.textContent || '';
+            const value = el.querySelector('.outline-value')?.textContent || '';
+            const match = key.toLowerCase().includes(lower) || value.toLowerCase().includes(lower);
+            el.classList.toggle('filtered-hidden', !match);
+        });
+    }
+
+    function highlightOutlineNode(path) {
+        document.querySelectorAll('.outline-item').forEach(el => el.classList.remove('selected'));
+        const item = document.querySelector(`.outline-item[data-path="${CSS.escape(path)}"]`);
+        if (item) {
+            item.classList.add('selected');
+            // Scroll into view
+            item.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+        }
+        outlineSelectedPath = path;
+    }
+
+    function clearOutlineSelection() {
+        document.querySelectorAll('.outline-item').forEach(el => el.classList.remove('selected'));
+        outlineSelectedPath = null;
+    }
+
+    function initOutlinePanel(json) {
+        outlineTree = buildOutlineTree(json);
+        const count = countOutlineNodes(outlineTree);
+        const hint = document.getElementById('outline-hint');
+
+        if (count > CONFIG.OUTLINE_EXPAND_THRESHOLD) {
+            if (hint) {
+                hint.innerHTML = `<span style="color:#dcdcaa;font-size:11px;">⚠ ${count.toLocaleString()} 节点</span>`;
+            }
+        } else {
+            if (hint) {
+                hint.innerHTML = `<span style="color:#8b949e;font-size:11px;">${count.toLocaleString()} 节点</span>`;
+            }
+        }
+        // Sidebar is always collapsed by default; outline is always rendered but hidden
+        modal.querySelector('.modal-sidebar').classList.add('collapsed');
+        outlineExpandedNodes.clear(); // All nodes collapsed by default
+        renderOutlineTree();
+
+        // Search input handler
+        const searchInput = document.getElementById('outline-search');
+        if (searchInput) {
+            searchInput.addEventListener('input', e => {
+                clearTimeout(outlineSearchTimer);
+                outlineSearchTimer = setTimeout(() => filterOutline(e.target.value), 300);
+            });
+        }
+
+        // Toolbar buttons
+        const toolbarToggleBtn = document.getElementById('toolbar-toggle-outline');
+        if (toolbarToggleBtn) {
+            toolbarToggleBtn.addEventListener('click', () => {
+                modal.querySelector('.modal-sidebar').classList.toggle('collapsed');
+            });
+        }
+    }
+
+    function countOutlineNodes(node) {
+        let count = 1;
+        if (node.children) {
+            node.children.forEach(child => { count += countOutlineNodes(child); });
+        }
+        return count;
+    }
+
+    // Render hierarchical outline tree with collapsible children
+    // Children are hidden by default; user must manually expand each node
+    function renderOutlineTree() {
+        const container = document.getElementById('outline-tree');
+        if (!container || !outlineTree) return;
+        container.innerHTML = '';
+
+        function renderNode(node) {
+            const isExpanded = outlineExpandedNodes.has(node.path);
+            const item = document.createElement('div');
+            item.className = 'outline-item';
+            item.dataset.path = node.path;
+
+            const indent = document.createElement('span');
+            indent.style.width = (node.depth * 12) + 'px';
+            indent.style.display = 'inline-block';
+
+            // Expand/collapse toggle button
+            const toggleBtn = document.createElement('button');
+            toggleBtn.className = 'outline-toggle-btn';
+            toggleBtn.textContent = node.hasChildren ? (isExpanded ? '⊟' : '⊞') : '';
+            toggleBtn.style.cssText = 'background:none;border:none;cursor:pointer;color:#8b949e;padding:0 2px;font-size:10px;';
+            if (node.hasChildren) {
+                toggleBtn.addEventListener('click', e => {
+                    e.stopPropagation();
+                    if (outlineExpandedNodes.has(node.path)) {
+                        outlineExpandedNodes.delete(node.path);
+                    } else {
+                        outlineExpandedNodes.add(node.path);
+                    }
+                    renderOutlineTree();
+                });
+            }
+
+            const keySpan = document.createElement('span');
+            keySpan.className = 'outline-key';
+            keySpan.textContent = node.key;
+
+            const valueSpan = document.createElement('span');
+            valueSpan.className = 'outline-value';
+            if (!node.hasChildren) {
+                const val = node.value;
+                if (val === null) valueSpan.textContent = 'null';
+                else if (typeof val === 'string') valueSpan.textContent = `"${val.substring(0, 20)}${val.length > 20 ? '...' : ''}"`;
+                else valueSpan.textContent = String(val);
+            } else {
+                valueSpan.textContent = node.type === 'array' ? `[${node.childCount}]` : `{${node.childCount}}`;
+            }
+
+            // Action buttons
+            const actions = document.createElement('span');
+            actions.className = 'outline-actions';
+            actions.style.cssText = 'margin-left:auto;display:flex;gap:2px;flex-shrink:0;';
+
+            const copyBtn = document.createElement('button');
+            copyBtn.className = 'outline-action-btn';
+            copyBtn.title = '复制路径';
+            copyBtn.textContent = '📋';
+            copyBtn.addEventListener('click', e => { e.stopPropagation(); copyNodePath(node); });
+            actions.appendChild(copyBtn);
+
+            const extractBtn = document.createElement('button');
+            extractBtn.className = 'outline-action-btn';
+            extractBtn.title = '提取JSON';
+            extractBtn.textContent = '📦';
+            extractBtn.addEventListener('click', e => { e.stopPropagation(); extractNodeJson(node); });
+            actions.appendChild(extractBtn);
+
+            const markBtn = document.createElement('button');
+            markBtn.className = 'outline-action-btn outline-mark-btn';
+            markBtn.title = '标记节点';
+            markBtn.textContent = '⭐';
+            markBtn.addEventListener('click', e => { e.stopPropagation(); toggleNodeMark(node, markBtn); });
+            actions.appendChild(markBtn);
+
+            if (node.hasChildren) {
+                const drillBtn = document.createElement('button');
+                drillBtn.className = 'outline-action-btn';
+                drillBtn.title = '查看子图';
+                drillBtn.textContent = '→';
+                drillBtn.addEventListener('click', e => { e.stopPropagation(); drillDownToNode(node); });
+                actions.appendChild(drillBtn);
+            }
+
+            item.appendChild(indent);
+            item.appendChild(toggleBtn);
+            item.appendChild(keySpan);
+            item.appendChild(valueSpan);
+            item.appendChild(actions);
+
+            item.addEventListener('click', () => onOutlineNodeClick(node));
+
+            container.appendChild(item);
+
+            // Render children if expanded
+            if (node.hasChildren && isExpanded) {
+                node.children.forEach(child => renderNode(child));
+            }
+        }
+
+        // Only render root-level nodes; all children are collapsed by default
+        if (outlineTree) {
+            renderNode(outlineTree);
+        }
+        updateOutlineMarkButtons();
+    }
+
+    // ========== OUTLINE PANEL END ==========
+
     function applyTheme() {
         const colors = CONFIG.THEME_COLORS[currentTheme];
         if (scene) scene.background.setHex(colors.bg);
@@ -1499,11 +1875,35 @@ const JsonGraph3D = (function() {
             .graph-modal .toolbar-btn { background: transparent; border: 1px solid #${colors.border.toString(16).padStart(6, '0')}; color: ${fgHex}; }
             .graph-modal .toolbar-btn:hover { background: rgba(78,201,176,0.15); border-color: #58a6ff; }
             .graph-modal .toolbar-btn.active { background: #${colors.selected.toString(16).padStart(6, '0')}; color: #${(colors.bg === 0x0d1117 ? '0d1117' : 'ffffff')}; }
+            .graph-modal .toolbar-divider { width: 1px; height: 20px; background: #${colors.border.toString(16).padStart(6, '0')}; margin: 0 4px; }
             .graph-modal .modal-sidebar { background: #${(colors.bg === 0x0d1117 ? 0x161b22 : 0xf6f8fa).toString(16).padStart(6, '0')}; border-left: 1px solid #${colors.border.toString(16).padStart(6, '0')}; }
             .graph-modal .stat-label, .graph-modal .section-title { color: ${fgDimHex}; }
             .graph-modal .stat-value { color: ${fgHex}; }
+            .graph-modal .outline-hint { font-size: 11px; font-weight: normal; margin-left: 8px; }
             .graph-modal .zoom-btn, .graph-modal .zoom-display { background: transparent; border: 1px solid #${colors.border.toString(16).padStart(6, '0')}; color: ${fgHex}; }
             .graph3d-node-label { color: ${fgHex}; font-size: 11px; font-family: monospace; pointer-events: none; text-shadow: 0 1px 3px rgba(0,0,0,0.8); }
+            .graph-modal .outline-nav-section { flex: 1; min-height: 0; display: flex; flex-direction: column; }
+            .graph-modal .outline-search-box { padding: 8px 0; }
+            .graph-modal .outline-search-box input { width: 100%; padding: 4px 8px; background: #0d1117; border: 1px solid #30363d; border-radius: 4px; color: #c9d1d9; font-size: 12px; box-sizing: border-box; }
+            .graph-modal .outline-search-box input:focus { outline: none; border-color: #58a6ff; }
+            .graph-modal .outline-tree { flex: 1; overflow-y: auto; font-size: 12px; }
+            .graph-modal .outline-item { display: flex; align-items: center; padding: 2px 4px; cursor: pointer; border-radius: 3px; white-space: nowrap; }
+            .graph-modal .outline-toggle-btn { background: none; border: none; cursor: pointer; color: #8b949e; padding: 0 2px; font-size: 10px; min-width: 16px; }
+            .graph-modal .outline-item:hover { background: rgba(88,166,255,0.1); }
+            .graph-modal .outline-item.selected { background: rgba(88,166,255,0.2); }
+            .graph-modal .outline-item.filtered-hidden { display: none; }
+            .graph-modal .outline-key { color: #79c0ff; margin-right: 4px; }
+            .graph-modal .outline-value { color: #a5d6ff; opacity: 0.7; overflow: hidden; text-overflow: ellipsis; max-width: 120px; }
+            .graph-modal .outline-tree::-webkit-scrollbar { width: 6px; }
+            .graph-modal .outline-tree::-webkit-scrollbar-track { background: transparent; }
+            .graph-modal .outline-tree::-webkit-scrollbar-thumb { background: #30363d; border-radius: 3px; }
+            .graph-modal .outline-action-btn { background: none; border: none; cursor: pointer; font-size: 11px; padding: 4px 6px; opacity: 0; visibility: hidden; border-radius: 3px; transition: opacity 0.15s, visibility 0.15s; min-width: 24px; min-height: 24px; box-sizing: border-box; }
+            .graph-modal .outline-item:hover .outline-action-btn { opacity: 0.8; visibility: visible; }
+            .graph-modal .outline-action-btn:hover { opacity: 1; background: rgba(88,166,255,0.15); }
+            .graph-modal .outline-mark-btn.marked { color: #dcdcaa; opacity: 1; visibility: visible; }
+            .graph-modal .outline-selected-actions { display: flex; gap: 4px; margin-top: 8px; visibility: hidden; }
+            .graph-modal .outline-selected-actions.visible { visibility: visible; }
+            .graph-modal .outline-action-btn.marked { color: #dcdcaa; opacity: 1; visibility: visible; }
         `;
     }
 
@@ -1575,15 +1975,20 @@ const JsonGraph3D = (function() {
         renderTabs();
     }
 
+    let _resizeDebounceTimer = null;
     function onWindowResize() {
-        if (!camera || !renderer || !labelRenderer) return;
-        const graphArea = modal.querySelector('.modal-graph-area');
-        const width = graphArea.clientWidth || 800;
-        const height = graphArea.clientHeight || 600;
-        camera.aspect = width / height;
-        camera.updateProjectionMatrix();
-        renderer.setSize(width, height);
-        labelRenderer.setSize(width, height);
+        clearTimeout(_resizeDebounceTimer);
+        _resizeDebounceTimer = setTimeout(() => {
+            if (!camera || !renderer || !labelRenderer) return;
+            const graphArea = modal?.querySelector('.modal-graph-area');
+            if (!graphArea) return;
+            const width = graphArea.clientWidth || 800;
+            const height = graphArea.clientHeight || 600;
+            camera.aspect = width / height;
+            camera.updateProjectionMatrix();
+            renderer.setSize(width, height);
+            labelRenderer.setSize(width, height);
+        }, 100);
     }
 
     function onFullscreenChange() {
@@ -1649,6 +2054,8 @@ const JsonGraph3D = (function() {
                 labelCache.clear();
                 navigationStack = ['$'];
                 rootJson = null;
+                outlineTree = null;
+                outlineSelectedPath = null;
                 document.removeEventListener('keydown', handleKeydown);
                 window.removeEventListener('resize', onWindowResize);
             }, 300);
