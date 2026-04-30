@@ -82,6 +82,11 @@ const JsonGraph3D = (function() {
     let graphInstances = new Map();
     let animationMixers = [];
 
+    // Instanced rendering pool - one InstancedMesh per node type
+    let instancedMeshes = {};
+    // Map nodeId -> instanceIndex for raycasting
+    let nodeIdToInstance = {};
+
     // Breadcrumb navigation state
     let navigationStack = ['$'];  // ['$', '$.tasks', '$.tasks[0]']
     let rootJson = null;  // Original root JSON for navigation
@@ -90,6 +95,11 @@ const JsonGraph3D = (function() {
     let raycaster = null;
     let mouse = null;
     let _ignoreCollapsedNodes = false;  // Flag to ignore collapsed state during rebuild
+
+    let layoutWorker = null;  // Web Worker for layout calculation
+
+    // P1-OPTIMIZED: Label cache - one CSS2DObject per node type, clone on use
+    const labelCache = new Map(); // type -> { div, label }
 
     function getValueType(value) {
         if (value === null) return 'null';
@@ -369,12 +379,154 @@ const JsonGraph3D = (function() {
         return mesh;
     }
 
+    // P0-OPTIMIZED: Build InstancedMesh pool by node type for batch rendering
+    function buildInstancedMeshes() {
+        // Dispose old instanced meshes
+        Object.values(instancedMeshes).forEach(mesh => {
+            scene.remove(mesh);
+            mesh.geometry.dispose();
+            mesh.material.dispose();
+        });
+        instancedMeshes = {};
+        nodeIdToInstance = {};
+
+        // Group nodes by type (exclude root which needs glow effect)
+        const nodesByType = { root: [], string: [], number: [], boolean: [], object: [], array: [], null: [] };
+        nodes.forEach(node => {
+            const type = node.isRoot ? 'root' : node.type;
+            if (!nodesByType[type]) nodesByType[type] = [];
+            nodesByType[type].push(node);
+        });
+
+        // Create one InstancedMesh per type
+        const nodeTypes = ['string', 'number', 'boolean', 'object', 'array', 'null'];
+        nodeTypes.forEach(type => {
+            const typeNodes = nodesByType[type];
+            if (typeNodes.length === 0) return;
+
+            // Use average radius for shared geometry (acceptable compromise)
+            const avgRadius = CONFIG.NODE_RADIUS;
+            const geometry = new THREE.SphereGeometry(avgRadius, 16, 16);
+            const color = CONFIG.NODE_COLORS[type] || 0x808080;
+            const material = new THREE.MeshPhongMaterial({
+                color: color,
+                emissive: 0x000000,
+                emissiveIntensity: 0,
+                shininess: 80
+            });
+
+            const instancedMesh = new THREE.InstancedMesh(geometry, material, typeNodes.length);
+            const matrix = new THREE.Matrix4();
+            const colorAttr = new THREE.Color();
+
+            typeNodes.forEach((node, i) => {
+                matrix.setPosition(node.x, node.y, node.z);
+                instancedMesh.setMatrixAt(i, matrix);
+                colorAttr.setHex(color);
+                instancedMesh.setColorAt(i, colorAttr);
+                nodeIdToInstance[node.id] = { mesh: instancedMesh, index: i };
+            });
+
+            instancedMesh.instanceMatrix.needsUpdate = true;
+            if (instancedMesh.instanceColor) instancedMesh.instanceColor.needsUpdate = true;
+            scene.add(instancedMesh);
+            instancedMeshes[type] = instancedMesh;
+
+            // Add CSS2D labels on top (can't be instanced - must be per-node)
+            typeNodes.forEach((node, i) => {
+                const baseRadius = CONFIG.NODE_RADIUS;
+                const childBonus = node.childCount * CONFIG.SIZE_INFLATION * 0.5;
+                const decay = Math.pow(CONFIG.SIZE_DECAY, node.depth);
+                const radius = Math.max(baseRadius * decay + childBonus, 6);
+                const label = createNodeLabel(node, radius);
+                // Position label in world space at node position
+                label.position.set(node.x, node.y + radius + 12, node.z);
+                scene.add(label);
+            });
+        });
+
+        // Root node gets special treatment (glow effect + highlight)
+        const rootNodes = nodesByType['root'];
+        rootNodes.forEach(node => {
+            const baseRadius = CONFIG.NODE_RADIUS;
+            const radius = baseRadius;
+            const color = CONFIG.NODE_COLORS.root;
+            const geometry = new THREE.SphereGeometry(radius, 24, 24);
+            const material = new THREE.MeshPhongMaterial({
+                color: color,
+                emissive: color,
+                emissiveIntensity: 0.3,
+                shininess: 80
+            });
+            const mesh = new THREE.Mesh(geometry, material);
+            mesh.position.set(node.x, node.y, node.z);
+            mesh.userData = { nodeId: node.id, node: node };
+            // Glow sphere
+            const glowGeometry = new THREE.SphereGeometry(radius * 1.8, 24, 24);
+            const glowMaterial = new THREE.MeshBasicMaterial({ color: color, transparent: true, opacity: 0.15 });
+            mesh.add(new THREE.Mesh(glowGeometry, glowMaterial));
+            const label = createNodeLabel(node, radius);
+            mesh.add(label);
+            scene.add(mesh);
+            nodeMeshes.push(mesh);
+        });
+    }
+
+    // P0-OPTIMIZED: Build single LineSegments for all links
+    let allLinksLine = null;
+    function buildAllLinksLine() {
+        if (allLinksLine) {
+            scene.remove(allLinksLine);
+            allLinksLine.geometry.dispose();
+            allLinksLine.material.dispose();
+            allLinksLine = null;
+        }
+        if (links.length === 0) return;
+
+        const positions = new Float32Array(links.length * 6);
+        links.forEach((link, i) => {
+            const source = nodes.find(n => n.id === (link.source.id || link.source));
+            const target = nodes.find(n => n.id === (link.target.id || link.target));
+            if (source && target) {
+                positions[i * 6 + 0] = source.x;
+                positions[i * 6 + 1] = source.y;
+                positions[i * 6 + 2] = source.z;
+                positions[i * 6 + 3] = target.x;
+                positions[i * 6 + 4] = target.y;
+                positions[i * 6 + 5] = target.z;
+            }
+        });
+
+        const geometry = new THREE.BufferGeometry();
+        geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+        const material = new THREE.LineBasicMaterial({
+            color: CONFIG.THEME_COLORS[currentTheme].fg,
+            transparent: true,
+            opacity: 0.6
+        });
+        allLinksLine = new THREE.LineSegments(geometry, material);
+        scene.add(allLinksLine);
+    }
+
     function createNodeLabel(node, radius) {
+        const type = node.isRoot ? 'root' : node.type;
+        if (!labelCache.has(type)) {
+            // Create once per type
+            const labelDiv = document.createElement('div');
+            labelDiv.className = 'graph3d-node-label';
+            labelDiv.style.color = '#' + CONFIG.THEME_COLORS[currentTheme].fg.toString(16).padStart(6, '0');
+            labelDiv.style.background = 'rgba(13, 17, 23, 0.75)';
+            labelDiv.style.backdropFilter = 'blur(4px)';
+            const label = new CSS2DObject(labelDiv);
+            label.userData = { isLabel: true };
+            labelCache.set(type, { div: labelDiv, label });
+        }
+        const cached = labelCache.get(type);
+        // Update text
         let labelText;
         if (node.isRoot) {
             labelText = 'root';
         } else if (typeof node.key === 'number') {
-            // Array element: show value for leaf nodes, otherwise show index
             if (!node.hasChildren && node.value !== undefined && node.value !== null) {
                 const v = String(node.value);
                 labelText = v.length > 8 ? v.slice(0, 6) + '..' : v;
@@ -384,19 +536,11 @@ const JsonGraph3D = (function() {
         } else {
             labelText = String(node.key);
         }
-        const displayText = labelText.length > 8 ? labelText.slice(0, 6) + '..' : labelText;
-
-        const labelDiv = document.createElement('div');
-        labelDiv.className = 'graph3d-node-label';
-        labelDiv.textContent = displayText;
-        labelDiv.style.color = '#' + CONFIG.THEME_COLORS[currentTheme].fg.toString(16).padStart(6, '0');
-        labelDiv.style.background = 'rgba(13, 17, 23, 0.75)';
-        labelDiv.style.backdropFilter = 'blur(4px)';
-
-        const label = new CSS2DObject(labelDiv);
-        label.position.set(0, radius + 12, 0);
-        label.userData = { isLabel: true };
-        return label;
+        cached.div.textContent = labelText.length > 8 ? labelText.slice(0, 6) + '..' : labelText;
+        // Clone because CSS2DObject can't have multiple parents
+        const newLabel = cached.label.clone();
+        newLabel.position.set(0, radius + 12, 0);
+        return newLabel;
     }
 
     function createLinkLine(sourceNode, targetNode) {
@@ -455,8 +599,23 @@ const JsonGraph3D = (function() {
     }
 
     function rebuildScene() {
-        // Skip disposal when called from autoCollapse (meshes already disposed or will be)
+        // P0-OPTIMIZED: Dispose instanced meshes and allLinksLine (not individual nodeMeshes/linkLines)
         if (!_autoCollapsing) {
+            // Dispose instanced meshes
+            Object.values(instancedMeshes).forEach(mesh => {
+                scene.remove(mesh);
+                mesh.geometry.dispose();
+                mesh.material.dispose();
+            });
+            instancedMeshes = {};
+            // Dispose allLinksLine
+            if (allLinksLine) {
+                scene.remove(allLinksLine);
+                allLinksLine.geometry.dispose();
+                allLinksLine.material.dispose();
+                allLinksLine = null;
+            }
+            // Dispose root node meshes (non-instanced)
             nodeMeshes.forEach(mesh => {
                 while (mesh.children.length > 0) {
                     const child = mesh.children[0];
@@ -472,16 +631,9 @@ const JsonGraph3D = (function() {
                     mesh.material.dispose();
                 }
             });
-            linkLines.forEach(line => {
-                while (line.children.length > 0) {
-                    const child = line.children[0];
-                    if (child.geometry) child.geometry.dispose();
-                    if (child.material) child.material.dispose();
-                    line.remove(child);
-                }
-                scene.remove(line);
-                line.geometry.dispose();
-                line.material.dispose();
+            // Remove CSS2D labels from scene (they're added to scene directly in buildInstancedMeshes)
+            scene.children.filter(c => c.isCSS2DObject).forEach(label => {
+                scene.remove(label);
             });
         }
         nodeMeshes = [];
@@ -507,19 +659,28 @@ const JsonGraph3D = (function() {
             return;  // autoCollapse triggers rebuildScene recursively with proper state
         }
 
-        applySphericalLayout();
+        startLayout();
+    }
 
-        links.forEach(link => {
-            const source = nodes.find(n => n.id === (link.source.id || link.source));
-            const target = nodes.find(n => n.id === (link.target.id || link.target));
-            if (source && target) {
-                createLinkLine(source, target);
-            }
-        });
-
-        nodes.forEach(node => {
-            createNodeMesh(node);
-        });
+    function startLayout() {
+        console.log('[JsonGraph3D] [startLayout] layoutWorker:', !!layoutWorker, 'nodes:', nodes.length);
+        if (layoutWorker) {
+            // Worker mode - async, results come via onmessage
+            layoutWorker.postMessage({
+                nodes: nodes,
+                links: links,
+                config: { SPHERE_LAYER_SPACING: CONFIG.SPHERE_LAYER_SPACING }
+            });
+            console.log('[JsonGraph3D] [startLayout] Worker message sent, waiting for response...');
+        } else {
+            // Fallback: synchronous layout (worker failed to load)
+            console.log('[JsonGraph3D] [startLayout] FALLBACK to sync layout, calling applySphericalLayout...');
+            applySphericalLayout();
+            console.log('[JsonGraph3D] [startLayout] applySphericalLayout done, building meshes...');
+            buildInstancedMeshes();
+            buildAllLinksLine();
+            console.log('[JsonGraph3D] [startLayout] FALLBACK complete, instancedMeshes types:', Object.keys(instancedMeshes).join(','));
+        }
     }
 
     function createModal(jsonData) {
@@ -537,6 +698,10 @@ const JsonGraph3D = (function() {
                     <div class="modal-tabs"></div>
                     <div class="modal-toolbar">
                         <button class="toolbar-btn" data-action="reset-camera" title="重置视角">🔄</button>
+                        <button class="toolbar-btn" data-action="view-top" title="俯视">↑</button>
+                        <button class="toolbar-btn" data-action="view-bottom" title="仰视">↓</button>
+                        <button class="toolbar-btn" data-action="view-side" title="侧视">→</button>
+                        <button class="toolbar-btn" data-action="view-isometric" title="等距视图">◇</button>
                         <button class="toolbar-btn" data-action="toggle-theme" title="切换主题">🌓</button>
                         <button class="toolbar-btn" data-action="toggle-family-compact" title="族压缩模式">🔲</button>
                         <button class="toolbar-btn" data-action="fullscreen" title="全屏">⛶</button>
@@ -636,6 +801,38 @@ const JsonGraph3D = (function() {
         createControls();
         console.log('[JsonGraph3D] controls created, controls:', !!controls);
         setupRaycaster();
+        
+        // Initialize layout worker (fallback to sync if Worker fails)
+        try {
+            layoutWorker = new Worker('js/layout.worker.js');
+            layoutWorker.onmessage = function(e) {
+                const { positions } = e.data;
+                // Apply positions to nodes
+                positions.forEach((pos, nodeId) => {
+                    const node = nodes.find(n => n.id === nodeId);
+                    if (node) {
+                        node.x = pos.x;
+                        node.y = pos.y;
+                        node.z = pos.z;
+                    }
+                });
+                // Build meshes after layout is applied
+                buildInstancedMeshes();
+                buildAllLinksLine();
+            };
+            layoutWorker.onerror = function(e) {
+                console.error('[JsonGraph3D] Worker error:', e);
+                layoutWorker = null;
+                // Fallback to sync layout
+                applySphericalLayout();
+                buildInstancedMeshes();
+                buildAllLinksLine();
+            };
+        } catch (e) {
+            console.warn('[JsonGraph3D] Worker init failed, using sync layout:', e);
+            layoutWorker = null;
+        }
+        
         animate();
         console.log('[JsonGraph3D] initThreeJS complete');
     }
@@ -703,8 +900,52 @@ const JsonGraph3D = (function() {
         if (e.key === 'Escape') closeModal();
     }
 
+    function animateCameraTo(targetX, targetY, targetZ, lookX, lookY, lookZ) {
+        const startPos = { x: camera.position.x, y: camera.position.y, z: camera.position.z };
+        const startTarget = { x: controls.target.x, y: controls.target.y, z: controls.target.z };
+        const endPos = { x: targetX, y: targetY, z: targetZ };
+        const endTarget = { x: lookX, y: lookY, z: lookZ };
+        
+        let frame = 0;
+        const maxFrames = 15;
+        
+        function step() {
+            frame++;
+            const t = frame / maxFrames;
+            const ease = 1 - Math.pow(1 - t, 3); // easeOutCubic
+            
+            camera.position.x = startPos.x + (endPos.x - startPos.x) * ease;
+            camera.position.y = startPos.y + (endPos.y - startPos.y) * ease;
+            camera.position.z = startPos.z + (endPos.z - startPos.z) * ease;
+            
+            controls.target.x = startTarget.x + (endTarget.x - startTarget.x) * ease;
+            controls.target.y = startTarget.y + (endTarget.y - startTarget.y) * ease;
+            controls.target.z = startTarget.z + (endTarget.z - startTarget.z) * ease;
+            
+            controls.update();
+            
+            if (frame < maxFrames) {
+                requestAnimationFrame(step);
+            }
+        }
+        
+        requestAnimationFrame(step);
+    }
+
     function handleToolbarAction(action) {
         switch (action) {
+            case 'view-top':
+                animateCameraTo(0, 800, 0, 0, 0, 0);
+                break;
+            case 'view-bottom':
+                animateCameraTo(0, -800, 0, 0, 0, 0);
+                break;
+            case 'view-side':
+                animateCameraTo(800, 200, 0, 0, 0, 0);
+                break;
+            case 'view-isometric':
+                animateCameraTo(500, 400, 500, 0, 0, 0);
+                break;
             case 'reset-camera':
                 resetCamera();
                 break;
@@ -774,7 +1015,7 @@ const JsonGraph3D = (function() {
         const targetJson = getValueAtPath(rootJson, path);
         if (!targetJson) return;
 
-        // Clear current scene meshes and links
+        // Clear current scene meshes, links, instanced meshes, and allLinksLine
         nodeMeshes.forEach(mesh => {
             while (mesh.children.length > 0) {
                 const child = mesh.children[0];
@@ -790,6 +1031,22 @@ const JsonGraph3D = (function() {
                 mesh.material.dispose();
             }
         });
+        // Clear instanced meshes
+        Object.values(instancedMeshes).forEach(mesh => {
+            scene.remove(mesh);
+            mesh.geometry.dispose();
+            mesh.material.dispose();
+        });
+        instancedMeshes = {};
+        // Clear allLinksLine
+        if (allLinksLine) {
+            scene.remove(allLinksLine);
+            allLinksLine.geometry.dispose();
+            allLinksLine.material.dispose();
+            allLinksLine = null;
+        }
+        // Clear CSS2D labels
+        scene.children.filter(c => c.isCSS2DObject).forEach(label => scene.remove(label));
         linkLines.forEach(line => {
             scene.remove(line);
             line.geometry.dispose();
@@ -883,20 +1140,8 @@ const JsonGraph3D = (function() {
 
         addChildren(rootId, path, targetJson, 0, false);
 
-        // Apply layout and create meshes
-        applySphericalLayout();
-
-        links.forEach(link => {
-            const source = nodes.find(n => n.id === (link.source.id || link.source));
-            const target = nodes.find(n => n.id === (link.target.id || link.target));
-            if (source && target) {
-                createLinkLine(source, target);
-            }
-        });
-
-        nodes.forEach(node => {
-            createNodeMesh(node);
-        });
+        // Use startLayout to trigger async (Worker) or sync rendering path
+        startLayout();
 
         updateStats(targetJson);
     }
@@ -969,6 +1214,32 @@ const JsonGraph3D = (function() {
         modal.querySelector('#zoom-display').textContent = '100%';
     }
 
+    // P0-OPTIMIZED: Raycasting helper for InstancedMesh
+    function getRaycastTargets() {
+        const targets = [...nodeMeshes]; // Root node meshes (non-instanced)
+        Object.values(instancedMeshes).forEach(mesh => targets.push(mesh));
+        return targets;
+    }
+
+    function findNodeFromIntersect(intersect) {
+        const mesh = intersect.object;
+        // Root node mesh (non-instanced) - has userData.node
+        if (mesh.userData && mesh.userData.node) {
+            return mesh.userData.node;
+        }
+        // InstancedMesh hit - look up via instanceId
+        if (mesh.isInstancedMesh && intersect.instanceId !== undefined) {
+            const entry = Object.entries(nodeIdToInstance).find(([id, info]) =>
+                info.mesh === mesh && info.index === intersect.instanceId
+            );
+            if (entry) {
+                const nodeId = entry[0];
+                return nodes.find(n => n.id === nodeId);
+            }
+        }
+        return null;
+    }
+
     function onGraphClick(e) {
         const graphArea = modal.querySelector('.modal-graph-area');
         const rect = graphArea.getBoundingClientRect();
@@ -976,13 +1247,10 @@ const JsonGraph3D = (function() {
         mouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
 
         raycaster.setFromCamera(mouse, camera);
-        const intersects = raycaster.intersectObjects(nodeMeshes);
+        const intersects = raycaster.intersectObjects(getRaycastTargets(), false);
 
         if (intersects.length > 0) {
-            const mesh = intersects[0].object;
-            const nodeId = mesh.userData.nodeId;
-            const node = nodes.find(n => n.id === nodeId);
-
+            const node = findNodeFromIntersect(intersects[0]);
             if (node) {
                 selectedNode = node;
                 updateSelectedNodeStats(node);
@@ -1000,11 +1268,10 @@ const JsonGraph3D = (function() {
         mouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
 
         raycaster.setFromCamera(mouse, camera);
-        const intersects = raycaster.intersectObjects(nodeMeshes);
+        const intersects = raycaster.intersectObjects(getRaycastTargets(), false);
 
         if (intersects.length > 0) {
-            const mesh = intersects[0].object;
-            const node = mesh.userData.node;
+            const node = findNodeFromIntersect(intersects[0]);
             if (node && node.hasChildren) {
                 toggleCollapse(node.id);
             }
@@ -1013,24 +1280,27 @@ const JsonGraph3D = (function() {
 
     function onGraphContextMenu(e) {
         e.preventDefault();
-
         const graphArea = modal.querySelector('.modal-graph-area');
         const rect = graphArea.getBoundingClientRect();
         mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
         mouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
 
         raycaster.setFromCamera(mouse, camera);
-        const intersects = raycaster.intersectObjects(nodeMeshes);
+        const targets = getRaycastTargets();
+        console.log('[JsonGraph3D] [CONTEXT-MENU] targets:', targets.length, '| instancedMeshes:', Object.keys(instancedMeshes).join(',') || 'none', '| nodeMeshes:', nodeMeshes.length);
+        const intersects = raycaster.intersectObjects(targets, false);
+        console.log('[JsonGraph3D] [CONTEXT-MENU] intersects:', intersects.length);
 
         if (intersects.length > 0) {
-            const mesh = intersects[0].object;
-            const node = mesh.userData.node;
+            const node = findNodeFromIntersect(intersects[0]);
+            console.log('[JsonGraph3D] [CONTEXT-MENU] node found:', node ? `${node.id} (${node.key})` : 'NULL');
             selectedNode = node;
             showContextMenu(e.clientX, e.clientY, node);
         }
     }
 
     function showContextMenu(x, y, node) {
+        if (!node) return;  // Guard: no node under click
         if (!contextMenu) {
             contextMenu = document.createElement('div');
             contextMenu.className = 'context-menu';
@@ -1327,6 +1597,34 @@ const JsonGraph3D = (function() {
         if (modal) {
             modal.classList.remove('active');
             setTimeout(() => {
+                // Clear contextMenu orphan
+                if (contextMenu) {
+                    contextMenu.remove();
+                    contextMenu = null;
+                }
+                // Clear instanced meshes
+                Object.values(instancedMeshes).forEach(mesh => {
+                    scene.remove(mesh);
+                    mesh.geometry.dispose();
+                    mesh.material.dispose();
+                });
+                instancedMeshes = {};
+                // Clear allLinksLine
+                if (allLinksLine) {
+                    scene.remove(allLinksLine);
+                    allLinksLine.geometry.dispose();
+                    allLinksLine.material.dispose();
+                    allLinksLine = null;
+                }
+                // Clear CSS2D labels
+                if (scene) {
+                    scene.children.filter(c => c.isCSS2DObject).forEach(label => scene.remove(label));
+                }
+                // Terminate layout worker
+                if (layoutWorker) {
+                    layoutWorker.terminate();
+                    layoutWorker = null;
+                }
                 if (renderer) {
                     renderer.dispose();
                     modal.querySelector('.modal-graph-area').removeChild(renderer.domElement);
@@ -1347,6 +1645,10 @@ const JsonGraph3D = (function() {
                 tabs = [];
                 activeTabId = null;
                 graphInstances.clear();
+                nodeIdToInstance = {};
+                labelCache.clear();
+                navigationStack = ['$'];
+                rootJson = null;
                 document.removeEventListener('keydown', handleKeydown);
                 window.removeEventListener('resize', onWindowResize);
             }, 300);

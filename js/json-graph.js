@@ -1239,19 +1239,30 @@ const JsonGraph = (function() {
 
         Object.entries(levels).forEach(([depth, levelNodes]) => {
             if (parseInt(depth) === 0) return;
+
+            const nodeSpacing = isCompactMode ? 50 : 80;
+            // 智能计算每行节点数：优先填满行，根据节点总数计算最优行数
+            const usableWidth = width * 0.9;
+            const idealRows = Math.ceil(Math.sqrt(levelNodes.length));
+            const maxNodesPerRow = Math.max(4, Math.min(8, Math.ceil(levelNodes.length / idealRows)));
+
             const y = isCompactMode
                 ? height * 0.1 + parseInt(depth) * levelHeight
                 : height * 0.1 + parseInt(depth) * levelHeight;
 
-            const nodeSpacing = isCompactMode ? 60 : 100;
-            const totalWidth = levelNodes.length * nodeSpacing;
-            let x = (width - totalWidth) / 2 + nodeSpacing / 2;
+            // 层内换行：超过maxNodesPerRow则换行
+            for (let row = 0; row < Math.ceil(levelNodes.length / maxNodesPerRow); row++) {
+                const rowNodes = levelNodes.slice(row * maxNodesPerRow, (row + 1) * maxNodesPerRow);
+                const totalWidth = rowNodes.length * nodeSpacing;
+                let x = (width - totalWidth) / 2 + nodeSpacing / 2;
+                const rowY = y + row * levelHeight * 1.5;
 
-            levelNodes.forEach((node) => {
-                node.y = y;
-                node.x = x;
-                x += nodeSpacing;
-            });
+                rowNodes.forEach((node) => {
+                    node.y = rowY;
+                    node.x = x;
+                    x += nodeSpacing;
+                });
+            }
         });
 
         if (isFamilyCompactMode) {
@@ -1341,17 +1352,17 @@ const JsonGraph = (function() {
                 path.dataset.targetId = targetId;
                 mainGroup.insertBefore(path, mainGroup.firstChild);
             } else {
-                const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-                line.setAttribute('x1', source.x);
-                line.setAttribute('y1', source.y);
-                line.setAttribute('x2', target.x);
-                line.setAttribute('y2', target.y);
-                line.setAttribute('stroke', isHighlighted ? 'var(--graph-selected, #58a6ff)' : 'var(--graph-border, #30363d)');
-                line.setAttribute('stroke-width', isHighlighted ? 2 : 1);
-                line.setAttribute('stroke-opacity', isHighlighted ? 0.8 : 0.4);
-                line.dataset.sourceId = sourceId;
-                line.dataset.targetId = targetId;
-                mainGroup.insertBefore(line, mainGroup.firstChild);
+                const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                const midY = (source.y + target.y) / 2;
+                const d = `M ${source.x} ${source.y} Q ${source.x} ${midY} ${(source.x + target.x) / 2} ${midY} T ${target.x} ${target.y}`;
+                path.setAttribute('d', d);
+                path.setAttribute('fill', 'none');
+                path.setAttribute('stroke', isHighlighted ? 'var(--graph-selected, #58a6ff)' : 'var(--graph-border, #30363d)');
+                path.setAttribute('stroke-width', isHighlighted ? 2 : 1);
+                path.setAttribute('stroke-opacity', isHighlighted ? 0.8 : 0.4);
+                path.dataset.sourceId = sourceId;
+                path.dataset.targetId = targetId;
+                mainGroup.insertBefore(path, mainGroup.firstChild);
             }
         });
 
@@ -1364,16 +1375,18 @@ const JsonGraph = (function() {
             group.dataset.nodeId = node.id;
 
             const baseSize = isCompactMode ? CONFIG.NODE_BASE_SIZE * 0.7 : CONFIG.NODE_BASE_SIZE;
-            const childBonus = node.childCount * CONFIG.SIZE_INFLATION;
+            const childBonus = node.isRoot ? 0 : node.childCount * CONFIG.SIZE_INFLATION;
             const decay = Math.pow(CONFIG.SIZE_DECAY, node.depth);
-            const size = Math.max(baseSize * decay + childBonus, 12);
+            const size = node.isRoot
+                ? Math.min(50, Math.max(baseSize * decay + childBonus, 12))
+                : Math.max(baseSize * decay + childBonus, 12);
 
             const isHighlighted = highlightedNodes.has(node.id);
             const isSelected = selectedNode && selectedNode.id === node.id;
 
             if (node.isRoot) {
                 const halo = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-                halo.setAttribute('r', size * 1.8);
+                halo.setAttribute('r', size * 1.2);
                 halo.setAttribute('fill', 'url(#halo-gradient)');
                 halo.innerHTML = `<animate attributeName="r" values="${size * 1.5};${size * 2.2};${size * 1.5}" dur="2s" repeatCount="indefinite"/>`;
                 group.appendChild(halo);
@@ -1448,6 +1461,37 @@ const JsonGraph = (function() {
                     toggleCollapse(node.id);
                 });
                 group.appendChild(toggle);
+
+                // 智能徽标：childCount > 20 显示数量提示
+                if (node.childCount > 20) {
+                    const badge = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+                    const badgeText = node.childCount > 99 ? '99+' : String(node.childCount);
+
+                    // 徽标圆形背景
+                    const badgeCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                    badgeCircle.setAttribute('cx', size * 0.6);
+                    badgeCircle.setAttribute('cy', size * 0.6);
+                    badgeCircle.setAttribute('r', '8');
+                    badgeCircle.setAttribute('fill', '#f97316');
+                    badgeCircle.setAttribute('stroke', '#fff');
+                    badgeCircle.setAttribute('stroke-width', '1');
+                    badge.appendChild(badgeCircle);
+
+                    // 徽标文字
+                    const badgeTextEl = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                    badgeTextEl.setAttribute('x', size * 0.6);
+                    badgeTextEl.setAttribute('y', size * 0.6 + 3);
+                    badgeTextEl.setAttribute('text-anchor', 'middle');
+                    badgeTextEl.setAttribute('fill', '#fff');
+                    badgeTextEl.setAttribute('font-size', '7');
+                    badgeTextEl.setAttribute('font-weight', 'bold');
+                    badgeTextEl.textContent = badgeText;
+                    badge.appendChild(badgeTextEl);
+
+                    // tooltip
+                    badge.setAttribute('title', `含 ${node.childCount} 个子节点，点击展开`);
+                    group.appendChild(badge);
+                }
             }
 
             group.addEventListener('mousedown', (e) => {
@@ -1525,23 +1569,6 @@ const JsonGraph = (function() {
             group.setAttribute('transform', `translate(${node.x}, ${node.y})`);
         }
 
-        const lineEls = mainGroup.querySelectorAll('line');
-        lineEls.forEach(line => {
-            const sourceId = line.dataset.sourceId;
-            const targetId = line.dataset.targetId;
-
-            if (sourceId === node.id || targetId === node.id) {
-                const source = nodes.find(n => n.id === sourceId);
-                const target = nodes.find(n => n.id === targetId);
-                if (source && target) {
-                    line.setAttribute('x1', source.x);
-                    line.setAttribute('y1', source.y);
-                    line.setAttribute('x2', target.x);
-                    line.setAttribute('y2', target.y);
-                }
-            }
-        });
-
         const pathEls = mainGroup.querySelectorAll('path');
         pathEls.forEach(path => {
             const sourceId = path.dataset.sourceId;
@@ -1552,7 +1579,7 @@ const JsonGraph = (function() {
                 const target = nodes.find(n => n.id === targetId);
                 if (source && target) {
                     const midY = (source.y + target.y) / 2;
-                    const d = `M ${source.x} ${source.y} Q ${source.x} ${midY} ${target.x} ${target.y}`;
+                    const d = `M ${source.x} ${source.y} Q ${source.x} ${midY} ${(source.x + target.x) / 2} ${midY} T ${target.x} ${target.y}`;
                     path.setAttribute('d', d);
                 }
             }
