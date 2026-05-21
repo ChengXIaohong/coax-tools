@@ -111,14 +111,14 @@ const GraphButtonManager = {
 
     validateJsonData() {
         const jsonString = outputJsonData.value.trim();
-        
+
         if (!jsonString) {
             return { valid: false, error: 'EMPTY', message: 'JSON数据为空，请先输入数据', action: 'jumpToInput' };
         }
 
         try {
             const parsed = JSON.parse(jsonString);
-            
+
             if (typeof parsed !== 'object' || parsed === null) {
                 return { valid: false, error: 'INVALID_STRUCTURE', message: 'JSON结构无效，必须为对象或数组', action: null };
             }
@@ -741,7 +741,7 @@ document.addEventListener('DOMContentLoaded', function() {
             clearAllSelections();
         }
     });
-    
+
     // 加载示例数据
     loadSampleData();
 });
@@ -842,26 +842,28 @@ function toggleGraph3dView() {
         return;
     }
 
+    let parsed;
     try {
-        const parsed = JSON.parse(jsonString);
-        if (typeof parsed !== 'object' || parsed === null) {
-            showMessage('JSON结构无效，必须为对象或数组', 'error');
-            return;
-        }
-
-        if (window.JsonGraph3D && window.JsonGraph3D.isOpen()) {
-            window.JsonGraph3D.close();
-            isGraph3dView = false;
-            return;
-        }
-
-        console.log('[3D Graph] Calling JsonGraph3D.open with', Object.keys(parsed).length, 'keys');
-        window.JsonGraph3D.open(parsed);
-        isGraph3dView = true;
+        parsed = JSON.parse(jsonString);
     } catch (e) {
-        console.error('[3D Graph] Error:', e);
         showMessage('JSON语法错误：' + e.message, 'error');
+        return;
     }
+
+    if (typeof parsed !== 'object' || parsed === null) {
+        showMessage('JSON结构无效，必须为对象或数组', 'error');
+        return;
+    }
+
+    if (window.JsonGraph3D && window.JsonGraph3D.isOpen()) {
+        window.JsonGraph3D.close();
+        isGraph3dView = false;
+        return;
+    }
+
+    console.log('[3D Graph] Calling JsonGraph3D.open with', Object.keys(parsed).length, 'keys');
+    window.JsonGraph3D.open(parsed);
+    isGraph3dView = true;
 }
 
 function showGraphValidationError(validation) {

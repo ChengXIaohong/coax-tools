@@ -276,10 +276,17 @@
         cancelBtn.addEventListener('click', closeImportModal);
         overlay.addEventListener('click', closeImportModal);
 
-        // Confirm import
+        // Confirm import — 写入编辑器，autoFormat 同步更新 outputJsonData
         confirmBtn.addEventListener('click', () => {
-            if (importedData && window.JsonGraph3D) {
-                window.JsonGraph3D.open(importedData);
+            if (importedData) {
+                const formatted = JSON.stringify(importedData, null, 2);
+                // 找到 inputJson 并写入（假设在主页面可访问）
+                const inputEl = document.getElementById('inputJson');
+                if (inputEl) {
+                    inputEl.value = formatted;
+                    // 触发 autoFormat（通过 input 事件）
+                    inputEl.dispatchEvent(new Event('input', { bubbles: true }));
+                }
                 closeImportModal();
             }
         });
