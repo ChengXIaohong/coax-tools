@@ -124,8 +124,9 @@ const JsonGraph3D = (function() {
         nodes = [];
         links = [];
 
-        let nodeId = 0;
-        const rootId = `node-${nodeId++}`;
+        var nodeId = 0;
+        var rootId = 'node-' + (nodeId++);
+        var MAX_GRAPH_NODES = 10000;  // 安全硬限制: 最多创建10000个节点
 
         nodes.push({
             id: rootId,
@@ -141,23 +142,27 @@ const JsonGraph3D = (function() {
         // addChildren: uses PATH instead of nodeId for collapse state
         // parentPath format: $.address, $.hobbies[1], etc.
         function addChildren(parentId, parentPath, obj, depth, ancestorCollapsed) {
-            const type = getValueType(obj);
+            if (nodes.length >= MAX_GRAPH_NODES) return;
+            var type = getValueType(obj);
 
             if (type === 'object' && obj !== null) {
-                Object.entries(obj).forEach(([key, value]) => {
-                    const childId = `node-${nodeId++}`;
-                    const childPath = `${parentPath}.${key}`;
-                    const childType = getValueType(value);
-                    const hasChildren = childType === 'object' || childType === 'array';
-                    // KEY FIX: check collapse state by PATH instead of nodeId
-                    const isCollapsed = collapsedNodes.has(childPath);
+                var entries = Object.entries(obj);
+                for (var ei = 0; ei < entries.length; ei++) {
+                    if (nodes.length >= MAX_GRAPH_NODES) break;
+                    var key = entries[ei][0];
+                    var value = entries[ei][1];
+                    var childId = 'node-' + (nodeId++);
+                    var childPath = parentPath + '.' + key;
+                    var childType = getValueType(value);
+                    var hasChildren = childType === 'object' || childType === 'array';
+                    var isCollapsed = collapsedNodes.has(childPath);
 
                     nodes.push({
                         id: childId,
                         type: childType,
                         value: value,
                         key: key,
-                        path: childPath,  // Store stable path on node
+                        path: childPath,
                         depth: depth + 1,
                         isRoot: false,
                         hasChildren: hasChildren,
@@ -171,22 +176,23 @@ const JsonGraph3D = (function() {
                     if (hasChildren && !isCollapsed && !ancestorCollapsed) {
                         addChildren(childId, childPath, value, depth + 1, isCollapsed);
                     }
-                });
+                }
             } else if (type === 'array') {
-                obj.forEach((item, index) => {
-                    const childId = `node-${nodeId++}`;
-                    const childPath = `${parentPath}[${index}]`;
-                    const childType = getValueType(item);
-                    const hasChildren = childType === 'object' || childType === 'array';
-                    // KEY FIX: check collapse state by PATH instead of nodeId
-                    const isCollapsed = collapsedNodes.has(childPath);
+                for (var ai = 0; ai < obj.length; ai++) {
+                    if (nodes.length >= MAX_GRAPH_NODES) break;
+                    var item = obj[ai];
+                    var childId = 'node-' + (nodeId++);
+                    var childPath = parentPath + '[' + ai + ']';
+                    var childType = getValueType(item);
+                    var hasChildren = childType === 'object' || childType === 'array';
+                    var isCollapsed = collapsedNodes.has(childPath);
 
                     nodes.push({
                         id: childId,
                         type: childType,
                         value: item,
-                        key: index,
-                        path: childPath,  // Store stable path on node
+                        key: ai,
+                        path: childPath,
                         depth: depth + 1,
                         isRoot: false,
                         hasChildren: hasChildren,
@@ -200,7 +206,7 @@ const JsonGraph3D = (function() {
                     if (hasChildren && !isCollapsed && !ancestorCollapsed) {
                         addChildren(childId, childPath, item, depth + 1, isCollapsed);
                     }
-                });
+                }
             }
         }
 
@@ -1218,8 +1224,9 @@ const JsonGraph3D = (function() {
         // Build graph from the target sub-json
         nodes = [];
         links = [];
-        let nodeId = 0;
-        const rootId = `node-${nodeId++}`;
+        var nodeId = 0;
+        var rootId = 'node-' + (nodeId++);
+        var MAX_GRAPH_NODES = 10000;
 
         nodes.push({
             id: rootId,
@@ -1234,15 +1241,20 @@ const JsonGraph3D = (function() {
         });
 
         function addChildren(parentId, parentPath, obj, depth, ancestorCollapsed) {
-            const type = getValueType(obj);
+            if (nodes.length >= MAX_GRAPH_NODES) return;
+            var type = getValueType(obj);
 
             if (type === 'object' && obj !== null) {
-                Object.entries(obj).forEach(([key, value]) => {
-                    const childId = `node-${nodeId++}`;
-                    const childPath = `${parentPath}.${key}`;
-                    const childType = getValueType(value);
-                    const hasChildren = childType === 'object' || childType === 'array';
-                    const isCollapsed = collapsedNodes.has(childPath);
+                var entries = Object.entries(obj);
+                for (var ei = 0; ei < entries.length; ei++) {
+                    if (nodes.length >= MAX_GRAPH_NODES) break;
+                    var key = entries[ei][0];
+                    var value = entries[ei][1];
+                    var childId = 'node-' + (nodeId++);
+                    var childPath = parentPath + '.' + key;
+                    var childType = getValueType(value);
+                    var hasChildren = childType === 'object' || childType === 'array';
+                    var isCollapsed = collapsedNodes.has(childPath);
 
                     nodes.push({
                         id: childId,
@@ -1263,20 +1275,22 @@ const JsonGraph3D = (function() {
                     if (hasChildren && !isCollapsed && !ancestorCollapsed) {
                         addChildren(childId, childPath, value, depth + 1, isCollapsed);
                     }
-                });
+                }
             } else if (type === 'array') {
-                obj.forEach((item, index) => {
-                    const childId = `node-${nodeId++}`;
-                    const childPath = `${parentPath}[${index}]`;
-                    const childType = getValueType(item);
-                    const hasChildren = childType === 'object' || childType === 'array';
-                    const isCollapsed = collapsedNodes.has(childPath);
+                for (var ai = 0; ai < obj.length; ai++) {
+                    if (nodes.length >= MAX_GRAPH_NODES) break;
+                    var item = obj[ai];
+                    var childId = 'node-' + (nodeId++);
+                    var childPath = parentPath + '[' + ai + ']';
+                    var childType = getValueType(item);
+                    var hasChildren = childType === 'object' || childType === 'array';
+                    var isCollapsed = collapsedNodes.has(childPath);
 
                     nodes.push({
                         id: childId,
                         type: childType,
                         value: item,
-                        key: index,
+                        key: ai,
                         path: childPath,
                         depth: depth + 1,
                         isRoot: false,
@@ -1291,7 +1305,7 @@ const JsonGraph3D = (function() {
                     if (hasChildren && !isCollapsed && !ancestorCollapsed) {
                         addChildren(childId, childPath, item, depth + 1, isCollapsed);
                     }
-                });
+                }
             }
         }
 

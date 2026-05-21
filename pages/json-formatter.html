@@ -61,10 +61,15 @@
     </div>
 
     <!-- 3D图谱加载遮罩 -->
-    <div id="graph3d-loading" class="graph-loading-overlay">
-        <div class="graph-loading-spinner"></div>
-        <div class="graph-loading-text">正在打开 3D 图谱...</div>
+<div id="graph3d-loading" class="graph-loading-overlay">
+    <div class="graph-loading-spinner"></div>
+    <div class="graph-loading-text">正在打开 3D 图谱...</div>
+    <div class="graph-loading-details" id="graph3d-loading-details"></div>
+    <div class="graph-loading-progress">
+        <div class="graph-loading-bar" id="graph3d-loading-bar"></div>
     </div>
+    <button class="cancel-btn" id="graph3d-cancel-btn" style="display:none;">取消</button>
+</div>
 
     <script src="../js/theme-switcher.js"></script>
     <script src="../js/json-import.js"></script>
@@ -131,17 +136,125 @@
             }
         };
 
-        // 拦截 toggleGraph3dView 函数，实现懒加载
+        // 拦截 toggleGraph3dView 函数，实现懒加载和性能优化
         // 由于 isGraph3dView 是 json-formatter.js 的局部变量，需要完整替换逻辑
+
+        // 保留旧函数引用用于解绑事件(模块脚本执行在DOMContentLoaded之后)
+        var _oldToggle = window.toggleGraph3dView;
+
+        // 大JSON检测限值
+        const JSON_SIZE_WARN = 200000;   // 200KB 触发警告
+        const JSON_SIZE_LIMIT = 2000000;  // 2MB 采样阈值
+        const NODE_COUNT_WARN = 500;      // 500节点触发警告
+        const NODE_COUNT_LIMIT = 5000;    // 5000节点强制采样
+        const PROCESS_TIMEOUT = 45000;    // 45秒超时
+
+        // 采样: 提取 JSON 结构的概要，限制节点数
+        function sampleJsonData(obj, maxNodes) {
+            if (typeof obj !== 'object' || obj === null) return obj;
+            const sampled = Array.isArray(obj) ? [] : {};
+            let count = 0;
+
+            function traverse(current, target) {
+                if (count >= maxNodes) return;
+
+                if (Array.isArray(current)) {
+                    var len = Math.min(current.length, Math.max(20, maxNodes - count));
+                    for (var i = 0; i < len && count < maxNodes; i++) {
+                        count++;
+                        var item = current[i];
+                        if (typeof item === 'object' && item !== null) {
+                            target[i] = Array.isArray(item) ? [] : {};
+                            traverse(item, target[i]);
+                        } else {
+                            target[i] = item;
+                        }
+                    }
+                    if (len < current.length) {
+                        target['...'] = (current.length - len) + ' more items';
+                        count++;
+                    }
+                } else {
+                    var entries = Object.entries(current);
+                    var len = Math.min(entries.length, Math.max(10, maxNodes - count));
+                    for (var i = 0; i < len && count < maxNodes; i++) {
+                        count++;
+                        var key = entries[i][0];
+                        var val = entries[i][1];
+                        if (typeof val === 'object' && val !== null) {
+                            target[key] = Array.isArray(val) ? [] : {};
+                            traverse(val, target[key]);
+                        } else {
+                            target[key] = val;
+                        }
+                    }
+                    if (len < entries.length) {
+                        target['...'] = (entries.length - len) + ' more keys';
+                        count++;
+                    }
+                }
+            }
+
+            traverse(obj, sampled);
+            return sampled;
+        }
+
+        // 估算节点总数
+        function estimateNodeCount(obj, limit) {
+            if (typeof obj !== 'object' || obj === null) return 1;
+            var count = 1;
+            var items = Array.isArray(obj) ? obj : Object.values(obj);
+            for (var i = 0; i < items.length; i++) {
+                if (count > limit) return count;
+                count += estimateNodeCount(items[i], limit - count);
+            }
+            return count;
+        }
+
+        // 显示大小警告对话框
+        function showSizeWarningDialog(sizeKB, nodeCount) {
+            return new Promise(function(resolve) {
+                var overlay = document.createElement('div');
+                overlay.className = 'graph-loading-overlay';
+                overlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.6);display:flex;align-items:center;justify-content:center;z-index:9999;';
+
+                var modal = document.createElement('div');
+                modal.className = 'json-size-warning';
+                modal.innerHTML =
+                    '<h3>⚠️ 数据较大</h3>' +
+                    '<p>JSON 约 ' + sizeKB + 'KB，预估 ' + nodeCount + ' 个节点。<br>3D 图谱渲染可能较慢或卡顿。</p>' +
+                    '<div class="warning-actions">' +
+                    '<button class="danger" id="warn-cancel">取消</button>' +
+                    '<button id="warn-sample">使用采样模式(精简)</button>' +
+                    '<button class="primary" id="warn-full">直接渲染</button>' +
+                    '</div>';
+
+                overlay.appendChild(modal);
+                document.body.appendChild(overlay);
+
+                function cleanup(result) {
+                    overlay.remove();
+                    resolve(result);
+                }
+
+                modal.querySelector('#warn-cancel').onclick = function() { cleanup('cancel'); };
+                modal.querySelector('#warn-sample').onclick = function() { cleanup('sample'); };
+                modal.querySelector('#warn-full').onclick = function() { cleanup('full'); };
+            });
+        }
+
         window.toggleGraph3dView = async function() {
-            const graph3dToggle = document.getElementById('graph3dToggle');
-            const outputJsonData = document.getElementById('outputJsonData');
+            var graph3dToggle = document.getElementById('graph3dToggle');
+            var outputJsonData = document.getElementById('outputJsonData');
+            var loadingOverlay = document.getElementById('graph3d-loading');
+            var loadingDetails = document.getElementById('graph3d-loading-details');
+            var loadingBar = document.getElementById('graph3d-loading-bar');
+            var cancelBtn = document.getElementById('graph3d-cancel-btn');
 
             console.log('[3D Graph] toggleGraph3dView called, JsonGraph3D:', typeof window.JsonGraph3D);
-            let jsonString = outputJsonData.value.trim();
+            var jsonString = outputJsonData.value.trim();
 
             if (!jsonString) {
-                // 如果没有数据，加载示例数据后重试
                 if (typeof loadSampleData === 'function') loadSampleData();
                 jsonString = outputJsonData.value.trim();
             }
@@ -149,12 +262,30 @@
             if (!jsonString) {
                 if (typeof showMessage === 'function') showMessage('JSON数据为空，请先输入数据', 'warning');
                 graph3dToggle.classList.add('error');
-                setTimeout(() => graph3dToggle.classList.remove('error'), 500);
+                setTimeout(function() { graph3dToggle.classList.remove('error'); }, 500);
+                return;
+            }
+
+            // 大小检查
+            var sizeKB = Math.round(jsonString.length / 1024);
+            if (jsonString.length > JSON_SIZE_LIMIT) {
+                if (typeof showMessage === 'function') showMessage('JSON数据过大(' + sizeKB + 'KB)，3D图谱无法处理', 'error');
                 return;
             }
 
             try {
-                const parsed = JSON.parse(jsonString);
+                // 进度: 解析JSON
+                if (loadingDetails) loadingDetails.textContent = '正在解析 JSON...';
+                if (loadingBar) loadingBar.style.width = '10%';
+
+                var parsed;
+                try {
+                    parsed = JSON.parse(jsonString);
+                } catch (e) {
+                    if (typeof showMessage === 'function') showMessage('JSON语法错误：' + e.message, 'error');
+                    return;
+                }
+
                 if (typeof parsed !== 'object' || parsed === null) {
                     if (typeof showMessage === 'function') showMessage('JSON结构无效，必须为对象或数组', 'error');
                     return;
@@ -168,28 +299,103 @@
                 }
 
                 // 先显示加载状态
-                const loader = document.getElementById('graph-loader');
+                var loader = document.getElementById('graph-loader');
                 if (loader) loader.style.display = 'flex';
+
+                // 估算节点数并决定是否警告/采样
+                var estNodes = estimateNodeCount(parsed, NODE_COUNT_LIMIT + 1);
+
+                if (jsonString.length > JSON_SIZE_WARN || estNodes > NODE_COUNT_WARN) {
+                    var action = await showSizeWarningDialog(sizeKB, estNodes);
+                    if (action === 'cancel') {
+                        if (loader) loader.style.display = 'none';
+                        return;
+                    }
+                    if (action === 'sample') {
+                        if (loadingDetails) loadingDetails.textContent = '正在采样数据(缩减至 ' + NODE_COUNT_WARN + ' 节点)...';
+                        if (loadingBar) loadingBar.style.width = '15%';
+                        parsed = sampleJsonData(parsed, NODE_COUNT_WARN);
+                    }
+                }
+
+                // 进度: 懒加载依赖
+                if (loadingDetails) loadingDetails.textContent = '正在加载 3D 引擎...';
+                if (loadingBar) loadingBar.style.width = '30%';
 
                 await window.JsonGraph3DLoader.load();
 
+                // 进度: 准备3D场景
+                if (loadingDetails) loadingDetails.textContent = '生成节点布局 (' + estNodes + ' 节点)...';
+                if (loadingBar) loadingBar.style.width = '50%';
+
                 // 隐藏懒加载loader，显示打开遮罩
-                const graphLoader = document.getElementById('graph-loader');
+                var graphLoader = document.getElementById('graph-loader');
                 if (graphLoader) graphLoader.style.display = 'none';
-                const loadingOverlay = document.getElementById('graph3d-loading');
                 if (loadingOverlay) loadingOverlay.classList.add('active');
+                if (cancelBtn) cancelBtn.style.display = 'inline-block';
+
+                // 超时保护
+                var processingTimeout = setTimeout(function() {
+                    console.error('[3D Graph] Processing timeout');
+                    if (loadingOverlay) loadingOverlay.classList.remove('active');
+                    if (cancelBtn) cancelBtn.style.display = 'none';
+                    if (loadingBar) loadingBar.classList.add('error');
+                    if (loadingDetails) loadingDetails.textContent = '处理超时，请尝试更小的数据集或使用采样模式';
+                    if (typeof window.JsonGraph3D !== 'undefined' && window.JsonGraph3D.close) {
+                        try { window.JsonGraph3D.close(); } catch(e) {}
+                    }
+                    if (typeof showMessage === 'function') showMessage('3D图谱处理超时，请使用采样模式或缩减数据', 'error');
+                }, PROCESS_TIMEOUT);
+
+                // 取消按钮
+                var cancelled = false;
+                if (cancelBtn) {
+                    cancelBtn.onclick = function() {
+                        cancelled = true;
+                        clearTimeout(processingTimeout);
+                        if (loadingOverlay) loadingOverlay.classList.remove('active');
+                        if (cancelBtn) cancelBtn.style.display = 'none';
+                        if (typeof window.JsonGraph3D !== 'undefined' && window.JsonGraph3D.close) {
+                            try { window.JsonGraph3D.close(); } catch(e) {}
+                        }
+                        if (typeof showMessage === 'function') showMessage('已取消3D图谱渲染', 'warning');
+                    };
+                }
+
+                // 进度: 渲染场景
+                if (loadingDetails) loadingDetails.textContent = '渲染 3D 场景...';
+                if (loadingBar) loadingBar.style.width = '70%';
 
                 console.log('[3D Graph] Calling JsonGraph3D.open with', Object.keys(parsed).length, 'keys');
                 window.JsonGraph3D.open(parsed);
+
+                if (cancelled) return;
+
+                clearTimeout(processingTimeout);
                 window.JsonGraph3DLoader._isOpen = true;
+
+                if (loadingBar) loadingBar.style.width = '100%';
+                if (loadingDetails) loadingDetails.textContent = '加载完成';
+
                 setTimeout(function() {
                     if (loadingOverlay) loadingOverlay.classList.remove('active');
-                }, 100);
+                    if (cancelBtn) cancelBtn.style.display = 'none';
+                    if (loadingBar) loadingBar.classList.remove('error');
+                }, 300);
             } catch (e) {
                 console.error('[3D Graph] Error:', e);
+                if (loadingOverlay) loadingOverlay.classList.remove('active');
+                if (cancelBtn) cancelBtn.style.display = 'none';
                 if (typeof showMessage === 'function') showMessage('JSON语法错误：' + e.message, 'error');
             }
         };
+
+        // 重新绑定事件确保使用优化后的版本
+        var _g3dBtn = document.getElementById('graph3dToggle');
+        if (_g3dBtn) {
+            if (_oldToggle) _g3dBtn.removeEventListener('click', _oldToggle);
+            _g3dBtn.addEventListener('click', window.toggleGraph3dView);
+        }
     </script>
 </body>
 </html>
