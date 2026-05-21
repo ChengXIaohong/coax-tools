@@ -830,7 +830,6 @@ function toggleGraph3dView() {
     let jsonString = outputJsonData.value.trim();
 
     if (!jsonString) {
-        // 如果没有数据，加载示例数据后重试
         loadSampleData();
         jsonString = outputJsonData.value.trim();
     }
@@ -861,9 +860,15 @@ function toggleGraph3dView() {
         return;
     }
 
+    const loadingOverlay = document.getElementById('graph3d-loading');
+    if (loadingOverlay) loadingOverlay.classList.add('active');
+
     console.log('[3D Graph] Calling JsonGraph3D.open with', Object.keys(parsed).length, 'keys');
     window.JsonGraph3D.open(parsed);
     isGraph3dView = true;
+    setTimeout(function() {
+        if (loadingOverlay) loadingOverlay.classList.remove('active');
+    }, 100);
 }
 
 function showGraphValidationError(validation) {

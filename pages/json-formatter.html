@@ -60,6 +60,12 @@
         <span>图谱加载中...</span>
     </div>
 
+    <!-- 3D图谱加载遮罩 -->
+    <div id="graph3d-loading" class="graph-loading-overlay">
+        <div class="graph-loading-spinner"></div>
+        <div class="graph-loading-text">正在打开 3D 图谱...</div>
+    </div>
+
     <script src="../js/theme-switcher.js"></script>
     <script src="../js/json-import.js"></script>
     <script src="../js/json-formatter.js"></script>
@@ -167,9 +173,18 @@
 
                 await window.JsonGraph3DLoader.load();
 
+                // 隐藏懒加载loader，显示打开遮罩
+                const graphLoader = document.getElementById('graph-loader');
+                if (graphLoader) graphLoader.style.display = 'none';
+                const loadingOverlay = document.getElementById('graph3d-loading');
+                if (loadingOverlay) loadingOverlay.classList.add('active');
+
                 console.log('[3D Graph] Calling JsonGraph3D.open with', Object.keys(parsed).length, 'keys');
                 window.JsonGraph3D.open(parsed);
                 window.JsonGraph3DLoader._isOpen = true;
+                setTimeout(function() {
+                    if (loadingOverlay) loadingOverlay.classList.remove('active');
+                }, 100);
             } catch (e) {
                 console.error('[3D Graph] Error:', e);
                 if (typeof showMessage === 'function') showMessage('JSON语法错误：' + e.message, 'error');

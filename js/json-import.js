@@ -185,8 +185,41 @@
                     color: #484f58;
                     cursor: not-allowed;
                 }
+                .import-loading-overlay {
+                    position: absolute;
+                    top: 0; left: 0; right: 0; bottom: 0;
+                    z-index: 10;
+                    background: rgba(0,0,0,0.6);
+                    backdrop-filter: blur(4px);
+                    display: none;
+                    align-items: center;
+                    justify-content: center;
+                    flex-direction: column;
+                    gap: 12px;
+                    border-radius: 12px;
+                }
+                .import-loading-overlay.active { display: flex; }
+                .import-loading-spinner {
+                    width: 36px;
+                    height: 36px;
+                    border: 3px solid #30363d;
+                    border-top-color: #58a6ff;
+                    border-radius: 50%;
+                    animation: import-spin 0.8s linear infinite;
+                }
+                @keyframes import-spin {
+                    to { transform: rotate(360deg); }
+                }
+                .import-loading-text {
+                    color: #c9d1d9;
+                    font-size: 14px;
+                }
             </style>
             <div class="import-overlay"></div>
+            <div class="import-loading-overlay" id="importLoadingOverlay">
+                <div class="import-loading-spinner"></div>
+                <div class="import-loading-text">正在导入数据...</div>
+            </div>
             <div class="import-window">
                 <div class="import-header">
                     <h2>📂 导入 JSON 数据</h2>
@@ -279,15 +312,18 @@
         // Confirm import — 写入编辑器，autoFormat 同步更新 outputJsonData
         confirmBtn.addEventListener('click', () => {
             if (importedData) {
-                const formatted = JSON.stringify(importedData, null, 2);
-                // 找到 inputJson 并写入（假设在主页面可访问）
-                const inputEl = document.getElementById('inputJson');
-                if (inputEl) {
-                    inputEl.value = formatted;
-                    // 触发 autoFormat（通过 input 事件）
-                    inputEl.dispatchEvent(new Event('input', { bubbles: true }));
-                }
-                closeImportModal();
+                const loadingOverlay = importModal.querySelector('#importLoadingOverlay');
+                loadingOverlay.classList.add('active');
+                setTimeout(function() {
+                    var formatted = JSON.stringify(importedData, null, 2);
+                    var inputEl = document.getElementById('inputJson');
+                    if (inputEl) {
+                        inputEl.value = formatted;
+                        inputEl.dispatchEvent(new Event('input', { bubbles: true }));
+                    }
+                    loadingOverlay.classList.remove('active');
+                    closeImportModal();
+                }, 50);
             }
         });
     }
@@ -397,6 +433,7 @@
     function openImportModal() {
         if (!importModal) createImportModal();
         importedData = null;
+        importModal.querySelector('#importLoadingOverlay').classList.remove('active');
         importModal.querySelector('#fileInfo').classList.remove('visible');
         importModal.querySelector('#previewBox').classList.remove('visible');
         importModal.querySelector('#errorMsg').classList.remove('visible');

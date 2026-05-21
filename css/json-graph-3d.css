@@ -80,3 +80,43 @@
     color: #484f58;
     margin: 0 2px;
 }
+
+/* Depth controls for progressive rendering */
+.depth-controls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.depth-controls .page-btn {
+    padding: 4px 10px;
+    background: transparent;
+    border: 1px solid #30363d;
+    color: #c9d1d9;
+    cursor: pointer;
+    font-size: 11px;
+    font-family: inherit;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+.depth-controls .page-btn:hover:not(:disabled) {
+    background: rgba(78, 201, 176, 0.1);
+    border-color: #58a6ff;
+}
+
+.depth-controls .page-btn:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+}
+
+.depth-controls .page-btn:active:not(:disabled) {
+    transform: scale(0.95);
+}
+
+.depth-controls .pagination-info {
+    font-size: 11px;
+    color: #8b949e;
+    white-space: nowrap;
+}

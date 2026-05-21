@@ -35,6 +35,7 @@ const JsonGraph3D = (function() {
         // Tree-aware layout params
         MAX_VISIBLE_NODES: 150,
         AUTO_COLLAPSE_THRESHOLD: 10,
+        MAX_CHILDREN_PER_NODE: 30,
         LAYER_ANGLE_SPAN: Math.PI * 2,  // 每个节点的子树在全部角度范围内展开
         NODE_COLORS: {
             string: 0x4EC9B0,
@@ -75,6 +76,10 @@ const JsonGraph3D = (function() {
     let highlightedNodes = new Set();
     let collapsedNodes = new Set();
     let markedNodes = new Set();
+    let maxRenderDepth = 2;
+    let expandedPaths = new Set();
+    let maxChildrenPerNode = CONFIG.MAX_CHILDREN_PER_NODE;
+    let hiddenChildCounts = new Map();
     let contextMenu = null;
     let currentTheme = 'dark';
     let isFamilyCompactMode = false;
@@ -200,6 +205,42 @@ const JsonGraph3D = (function() {
         }
 
         addChildren(rootId, '$', json, 0, false);
+    }
+
+    function truncateJson(obj, depth, parentPath, expandedPathsSet, hiddenCounts) {
+        if (typeof obj !== 'object' || obj === null) return obj;
+        var actualCount = null;
+        if (Array.isArray(obj)) {
+            actualCount = obj.length;
+        } else {
+            actualCount = Object.keys(obj).length;
+        }
+        var limit = expandedPathsSet && expandedPathsSet.has(parentPath) ? Infinity : maxChildrenPerNode;
+        if (actualCount > limit && hiddenCounts) {
+            hiddenCounts.set(parentPath, actualCount);
+        }
+
+        if (Array.isArray(obj)) {
+            var sliced = obj.slice(0, limit);
+            if (depth <= 0) return sliced;
+            return sliced.map(function(item, i) {
+                return truncateJson(item, depth - 1, parentPath + '[' + i + ']', expandedPathsSet, hiddenCounts);
+            });
+        }
+
+        var entries = Object.entries(obj);
+        var sliced = entries.slice(0, limit);
+        var result = {};
+        if (depth <= 0) {
+            for (var i = 0; i < sliced.length; i++) {
+                result[sliced[i][0]] = sliced[i][1];
+            }
+        } else {
+            for (var i = 0; i < sliced.length; i++) {
+                result[sliced[i][0]] = truncateJson(sliced[i][1], depth - 1, parentPath + '.' + sliced[i][0], expandedPathsSet, hiddenCounts);
+            }
+        }
+        return result;
     }
 
     function applySphericalLayout() {
@@ -407,7 +448,8 @@ const JsonGraph3D = (function() {
 
             // Use average radius for shared geometry (acceptable compromise)
             const avgRadius = CONFIG.NODE_RADIUS;
-            const geometry = new THREE.SphereGeometry(avgRadius, 16, 16);
+            const segments = nodes.length > 300 ? 8 : nodes.length > 150 ? 12 : 16;
+            const geometry = new THREE.SphereGeometry(avgRadius, segments, segments);
             const color = CONFIG.NODE_COLORS[type] || 0x808080;
             const material = new THREE.MeshPhongMaterial({
                 color: color,
@@ -537,66 +579,112 @@ const JsonGraph3D = (function() {
         } else {
             labelText = String(node.key);
         }
-        cached.div.textContent = labelText.length > 8 ? labelText.slice(0, 6) + '..' : labelText;
+        // Append hidden child count if truncated
+        if (node.childCountActual && node.childCountActual > node.childCount) {
+            const short = labelText.length > 8 ? labelText.slice(0, 6) + '..' : labelText;
+            labelText = short + ' (' + node.childCount + '/' + node.childCountActual + ')';
+        } else {
+            labelText = labelText.length > 8 ? labelText.slice(0, 6) + '..' : labelText;
+        }
+        cached.div.textContent = labelText;
         // Clone because CSS2DObject can't have multiple parents
         const newLabel = cached.label.clone();
         newLabel.position.set(0, radius + 12, 0);
         return newLabel;
     }
 
-    function createLinkLine(sourceNode, targetNode) {
-        const points = [
-            new THREE.Vector3(sourceNode.x, sourceNode.y, sourceNode.z),
-            new THREE.Vector3(targetNode.x, targetNode.y, targetNode.z)
-        ];
-
-        const geometry = new THREE.BufferGeometry().setFromPoints(points);
-        const material = new THREE.LineBasicMaterial({
-            color: CONFIG.NODE_COLORS[targetNode.type] || CONFIG.THEME_COLORS[currentTheme].fg,
-            transparent: true,
-            opacity: 0.6
+    function applyDepthLimit() {
+        if (maxRenderDepth === Infinity) return;
+        const validNodeIds = new Set(nodes.filter(n => n.depth <= maxRenderDepth).map(n => n.id));
+        nodes = nodes.filter(n => validNodeIds.has(n.id));
+        links = links.filter(l => {
+            const src = l.source.id || l.source;
+            const tgt = l.target.id || l.target;
+            return validNodeIds.has(src) && validNodeIds.has(tgt);
         });
-
-        const line = new THREE.Line(geometry, material);
-        line.userData = {
-            sourceId: sourceNode.id,
-            targetId: targetNode.id
-        };
-
-        scene.add(line);
-        linkLines.push(line);
-        return line;
     }
 
-    function autoCollapse() {
-        if (nodes.length <= CONFIG.MAX_VISIBLE_NODES) {
-            return;
+    function getMaxDepth(nodes) {
+        return nodes.length > 0 ? Math.max(...nodes.map(n => n.depth)) : 0;
+    }
+
+    function updateDepthDisplay() {
+        const info = document.getElementById('pagination-info');
+        const btn = document.getElementById('depth-expand-btn');
+        if (!info) return;
+        var hiddenTotal = 0;
+        nodes.forEach(function(n) {
+            if (n.childCountActual && n.childCountActual > n.childCount) {
+                hiddenTotal += n.childCountActual - n.childCount;
+            }
+        });
+        if (maxRenderDepth === Infinity) {
+            info.textContent = nodes.length + ' 节点 · 3D 图谱模式';
+            if (btn) btn.style.display = 'none';
+        } else {
+            var extra = hiddenTotal > 0 ? ' · ' + hiddenTotal + ' 隐藏' : '';
+            info.textContent = nodes.length + ' 节点 · 深度 ' + maxRenderDepth + extra + ' · 3D 图谱模式';
+            if (btn) {
+                btn.style.display = '';
+                btn.disabled = false;
+            }
         }
+    }
 
-        // Find candidates: nodes with many children, not already collapsed
-        // Sort by childCount descending - collapse biggest subtrees first
-        // KEY FIX: use node.path instead of node.id
-        const candidates = nodes
-            .filter(n => n.childCount > CONFIG.AUTO_COLLAPSE_THRESHOLD && !collapsedNodes.has(n.path))
-            .sort((a, b) => b.childCount - a.childCount);
-
-        // Collapse until under limit (use 90% of MAX as target)
-        const target = Math.floor(CONFIG.MAX_VISIBLE_NODES * 0.9);
-        for (const node of candidates) {
-            if (nodes.length <= target) break;
-            collapsedNodes.add(node.path);
-        }
-
-        // Save auto-collapsed state to instance before recursive rebuildScene
+    function increaseDepth() {
+        maxRenderDepth++;
+        expandedPaths.clear();
         const instance = graphInstances.get(activeTabId);
-        if (instance) {
-            instance.collapsedNodes = new Set(collapsedNodes);
-        }
-
-        // Trigger proper rebuildScene cycle to handle disposal correctly
-        _autoCollapsing = true;
+        if (instance) instance.maxRenderDepth = maxRenderDepth;
         rebuildScene();
-        _autoCollapsing = false;
+    }
+
+    function buildGraphAsync(json) {
+        hiddenChildCounts = new Map();
+        var truncated = truncateJson(json, maxRenderDepth, '$', expandedPaths, hiddenChildCounts);
+        return new Promise(function(resolve) {
+            var worker;
+            try {
+                worker = new Worker('js/graph-builder.worker.js');
+            } catch (e) {
+                buildGraph(truncated);
+                applyHiddenChildCounts();
+                resolve();
+                return;
+            }
+
+            worker.onmessage = function(e) {
+                var data = e.data;
+                nodes = data.nodes;
+                links = data.links;
+                applyHiddenChildCounts();
+                worker.terminate();
+                resolve();
+            };
+
+            worker.onerror = function() {
+                worker.terminate();
+                buildGraph(truncated);
+                applyHiddenChildCounts();
+                resolve();
+            };
+
+            worker.postMessage({
+                json: truncated,
+                collapsedNodes: Array.from(collapsedNodes),
+                is3D: true
+            });
+        });
+    }
+
+    function applyHiddenChildCounts() {
+        if (hiddenChildCounts.size === 0) return;
+        nodes.forEach(function(n) {
+            var actual = hiddenChildCounts.get(n.path);
+            if (actual !== undefined && actual !== n.childCount) {
+                n.childCountActual = actual;
+            }
+        });
     }
 
     function rebuildScene() {
@@ -652,15 +740,20 @@ const JsonGraph3D = (function() {
         nodes = [];
         links = [];
 
-        buildGraph(graphInstances.get(activeTabId)?.json || {});
+        buildGraphAsync(graphInstances.get(activeTabId)?.json || {}).then(function() {
+            // Restore per-instance depth limit
+            if (instance) {
+                maxRenderDepth = instance.maxRenderDepth !== undefined ? instance.maxRenderDepth : 2;
+            }
 
-        // Auto-collapse if over limit and this is first render (no prior collapsed state)
-        if (!_autoCollapsing && collapsedNodes.size === 0 && nodes.length > CONFIG.MAX_VISIBLE_NODES) {
-            autoCollapse();
-            return;  // autoCollapse triggers rebuildScene recursively with proper state
-        }
+            // Apply truncation-based depth limit
+            applyDepthLimit();
 
-        startLayout();
+            updateStats(graphInstances.get(activeTabId)?.json || {});
+
+            updateDepthDisplay();
+            startLayout();
+        });
     }
 
     function startLayout() {
@@ -768,7 +861,10 @@ const JsonGraph3D = (function() {
                         <button class="breadcrumb-btn" data-action="breadcrumb-back" title="返回上级">←</button>
                         <span class="breadcrumb-trail" id="breadcrumb-trail">$</span>
                     </div>
-                    <div class="pagination-info" id="pagination-info">3D 图谱模式</div>
+                    <div class="depth-controls">
+                        <button class="page-btn" id="depth-expand-btn" data-action="increase-depth">+ 展开下一层</button>
+                        <span class="pagination-info" id="pagination-info">3D 图谱模式</span>
+                    </div>
                 </div>
             </div>
         `;
@@ -785,6 +881,8 @@ const JsonGraph3D = (function() {
             selectedNode: null,
             collapsedNodes: new Set(collapsedNodes),
             markedNodes: new Set(markedNodes),
+            maxRenderDepth: 2,
+            expandedPaths: new Set(),
             isFamilyCompactMode: false
         };
         graphInstances.set(tabId, instance);
@@ -800,7 +898,6 @@ const JsonGraph3D = (function() {
         setTimeout(() => {
             initThreeJS();
             rebuildScene();
-            updateStats(jsonData);
             applyTheme();
             initOutlinePanel(jsonData);
         }, 50);
@@ -858,11 +955,31 @@ const JsonGraph3D = (function() {
         mouse = new THREE.Vector2();
     }
 
-    function animate() {
+    const LABEL_LOD_DISTANCE = 600;
+    let _lastFrameTime = 0;
+    let _labelLodFrame = 0;
+    function animate(time) {
         if (!modal || !renderer) return;
         requestAnimationFrame(animate);
 
+        // Frame budget: skip if last frame took > 100ms (heavy load)
+        if (_lastFrameTime > 0 && time - _lastFrameTime > 100) {
+            _lastFrameTime = time;
+            return;
+        }
+        _lastFrameTime = time;
+
         if (controls) controls.update();
+
+        // Label LOD: update visibility of distant labels every 10 frames
+        _labelLodFrame++;
+        if (_labelLodFrame % 10 === 0 && scene && camera) {
+            scene.children.forEach(child => {
+                if (child.isCSS2DObject) {
+                    child.visible = camera.position.distanceTo(child.position) < LABEL_LOD_DISTANCE;
+                }
+            });
+        }
 
         if (renderer && scene && camera) {
             renderer.render(scene, camera);
@@ -896,6 +1013,11 @@ const JsonGraph3D = (function() {
         modal.querySelectorAll('.breadcrumb-btn').forEach(btn => {
             btn.addEventListener('click', () => handleBreadcrumbAction(btn.dataset.action));
         });
+
+        const depthBtn = document.getElementById('depth-expand-btn');
+        if (depthBtn) {
+            depthBtn.addEventListener('click', increaseDepth);
+        }
 
         const graphArea = modal.querySelector('.modal-graph-area');
         graphArea.addEventListener('click', onGraphClick);
@@ -1014,6 +1136,8 @@ const JsonGraph3D = (function() {
     function navigateToRoot() {
         navigationStack = ['$'];
         collapsedNodes.clear();
+        maxRenderDepth = Infinity;
+        expandedPaths.clear();
         rebuildSceneForPath('$');
         updateBreadcrumbDisplay();
         renderOutlineTree();
@@ -1025,6 +1149,7 @@ const JsonGraph3D = (function() {
         if (navigationStack.length <= 1) return;
         navigationStack.pop();
         collapsedNodes.clear();
+        maxRenderDepth = Infinity;
         rebuildSceneForPath(navigationStack[navigationStack.length - 1]);
         updateBreadcrumbDisplay();
         const currentPath = navigationStack[navigationStack.length - 1];
@@ -1084,11 +1209,6 @@ const JsonGraph3D = (function() {
         }
         // Clear CSS2D labels
         scene.children.filter(c => c.isCSS2DObject).forEach(label => scene.remove(label));
-        linkLines.forEach(line => {
-            scene.remove(line);
-            line.geometry.dispose();
-            line.material.dispose();
-        });
         nodeMeshes = [];
         linkLines = [];
 
@@ -1355,6 +1475,7 @@ const JsonGraph3D = (function() {
             <div class="menu-item" data-action="copy-json">📄 提取JSON片段</div>
             <div class="menu-item" data-action="mark-important">⭐ 标记重点关注</div>
             <div class="menu-divider"></div>
+            ${node.childCountActual && node.childCountActual > node.childCount ? '<div class="menu-item" data-action="expand-node">➕ 展开全部子节点 (' + node.childCount + '/' + node.childCountActual + ')</div>' : ''}
             <div class="menu-divider"></div>
             <div class="menu-item" data-action="open-subgraph">🔍 查看下级图谱</div>
         `;
@@ -1409,10 +1530,17 @@ const JsonGraph3D = (function() {
                     showNotification('该节点无下级数据');
                 }
                 break;
+            case 'expand-node':
+                expandedPaths.add(node.path);
+                const inst = graphInstances.get(activeTabId);
+                if (inst) inst.expandedPaths = new Set(expandedPaths);
+                rebuildScene();
+                break;
         }
     }
 
     function highlightNode(node) {
+        // Handle root nodes (individual meshes)
         nodeMeshes.forEach(mesh => {
             const meshNode = mesh.userData.node;
             if (meshNode && meshNode.id === node.id) {
@@ -1420,6 +1548,15 @@ const JsonGraph3D = (function() {
                 mesh.material.emissiveIntensity = 0.4;
             }
         });
+        // Handle InstancedMesh nodes
+        const instanceInfo = nodeIdToInstance[node.id];
+        if (instanceInfo) {
+            const highlightColor = new THREE.Color(0x58a6ff);
+            instanceInfo.mesh.setColorAt(instanceInfo.index, highlightColor);
+            if (instanceInfo.mesh.instanceColor) {
+                instanceInfo.mesh.instanceColor.needsUpdate = true;
+            }
+        }
     }
 
     function clearSelection() {
@@ -1431,6 +1568,17 @@ const JsonGraph3D = (function() {
                 mesh.material.emissive.setHex(node.isRoot ? color : 0x000000);
                 mesh.material.emissiveIntensity = node.isRoot ? 0.3 : 0;
             }
+        });
+        // Reset InstancedMesh colors
+        Object.entries(nodeIdToInstance).forEach(([nodeId, info]) => {
+            const node = nodes.find(n => n.id === nodeId);
+            if (node) {
+                const color = new THREE.Color(CONFIG.NODE_COLORS[node.type] || 0x808080);
+                info.mesh.setColorAt(info.index, color);
+            }
+        });
+        Object.values(instancedMeshes).forEach(mesh => {
+            if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true;
         });
         updateSelectedNodeStats(null);
         clearOutlineSelection();
@@ -1950,6 +2098,8 @@ const JsonGraph3D = (function() {
             currentInstance.collapsedNodes = new Set(collapsedNodes);
             currentInstance.markedNodes = new Set(markedNodes);
             currentInstance.selectedNode = selectedNode;
+            currentInstance.maxRenderDepth = maxRenderDepth;
+            currentInstance.expandedPaths = new Set(expandedPaths);
         }
         activeTabId = tabId;
         const newInstance = graphInstances.get(tabId);
@@ -1957,6 +2107,8 @@ const JsonGraph3D = (function() {
             collapsedNodes = new Set(newInstance.collapsedNodes || []);
             markedNodes = new Set(newInstance.markedNodes || []);
             selectedNode = newInstance.selectedNode;
+            maxRenderDepth = newInstance.maxRenderDepth !== undefined ? newInstance.maxRenderDepth : 2;
+            expandedPaths = new Set(newInstance.expandedPaths || []);
         }
         rebuildScene();
         renderTabs();

@@ -202,7 +202,11 @@ const JsonGraph = (function() {
                         <span class="zoom-display" id="zoom-display">100%</span>
                         <button class="zoom-btn" data-action="zoom-in">➕</button>
                     </div>
-                    <div class="pagination-info" id="pagination-info"></div>
+                    <div class="pagination-controls" id="pagination-controls">
+                        <button class="page-btn" data-action="prev-page">◀ 上一页</button>
+                        <span class="pagination-info" id="pagination-info"></span>
+                        <button class="page-btn" data-action="next-page">下一页 ▶</button>
+                    </div>
                 </div>
             </div>
         `;
@@ -233,7 +237,6 @@ const JsonGraph = (function() {
 
         setTimeout(() => {
             modal.classList.add('active');
-            removeSkeleton();
         }, 50);
     }
 
@@ -523,6 +526,12 @@ const JsonGraph = (function() {
             });
         });
 
+        modal.querySelectorAll('.page-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                handlePageAction(btn.dataset.action);
+            });
+        });
+
         modal.querySelector('#run-diagnosis').addEventListener('click', () => {
             runDiagnosis(instance);
         });
@@ -647,6 +656,16 @@ const JsonGraph = (function() {
         mainGroup.setAttribute('transform', `translate(${centerX - centerX * scaleChange}, ${centerY - centerY * scaleChange}) scale(${newZoom})`);
         currentZoom = newZoom;
         updateZoomDisplay();
+    }
+
+    function handlePageAction(action) {
+        if (action === 'prev-page' && currentPage > 0) {
+            currentPage--;
+            render();
+        } else if (action === 'next-page' && currentPage < totalPages - 1) {
+            currentPage++;
+            render();
+        }
     }
 
     function toggleFullscreen() {
@@ -1017,8 +1036,13 @@ const JsonGraph = (function() {
                 showNotification('路径已复制');
                 break;
             case 'copy-json':
-                navigator.clipboard.writeText(JSON.stringify(node.value, null, 2));
-                showNotification('JSON片段已复制');
+                var jsonValue = node.value !== undefined ? node.value : getNodeValueByPath(node.path);
+                if (jsonValue !== undefined) {
+                    navigator.clipboard.writeText(JSON.stringify(jsonValue, null, 2));
+                    showNotification('JSON片段已复制');
+                } else {
+                    showNotification('无法获取节点数据', 'error');
+                }
                 break;
             case 'mark-important':
                 toggleMarkNode(node.id);
@@ -1110,94 +1134,114 @@ const JsonGraph = (function() {
         }
     }
 
-    function renderGraph(instance) {
-        initGraphArea();
-        setupTouchGestures();
-        buildGraph(instance.json);
-        layout();
-        render();
-        updateStats(instance.json);
-        applyTheme();
+    function getNodeValueByPath(path) {
+        const instance = graphInstances.get(activeTabId);
+        if (!instance || !path) return undefined;
+        const parts = path.replace(/^\$\.?/, '').split(/\.|\[/).filter(Boolean);
+        let current = instance.json;
+        for (const part of parts) {
+            const key = part.replace(/\]/g, '');
+            if (current === null || current === undefined) return undefined;
+            current = current[key];
+        }
+        return current;
     }
 
-    function buildGraph(json) {
+    function buildGraphAsync(json) {
+        return new Promise(function(resolve) {
+            var worker;
+            try {
+                worker = new Worker('../js/graph-builder.worker.js');
+            } catch (e) {
+                buildGraphSync(json);
+                resolve({ stats: null });
+                return;
+            }
+
+            worker.onmessage = function(e) {
+                var data = e.data;
+                nodes = data.nodes;
+                links = data.links;
+                worker.terminate();
+                resolve({ stats: data.stats });
+            };
+
+            worker.onerror = function() {
+                worker.terminate();
+                buildGraphSync(json);
+                resolve({ stats: null });
+            };
+
+            worker.postMessage({
+                json: json,
+                collapsedNodes: Array.from(collapsedNodes),
+                is3D: false
+            });
+        });
+    }
+
+    function buildGraphSync(json) {
         nodes = [];
         links = [];
-
-        let nodeId = 0;
-        const rootId = `node-${nodeId++}`;
-
+        var nodeId = 0;
+        var rootId = 'node-' + (nodeId++);
         nodes.push({
-            id: rootId,
-            type: getValueType(json),
-            value: json,
-            key: 'root',
-            depth: 0,
-            isRoot: true,
-            childCount: countChildren(json),
-            x: 0,
-            y: 0
+            id: rootId, type: getValueType(json), value: json,
+            key: 'root', depth: 0, isRoot: true,
+            childCount: countChildren(json), x: 0, y: 0
         });
-
         function addChildren(parentId, obj, depth) {
-            const type = getValueType(obj);
-
+            var type = getValueType(obj);
             if (type === 'object' && obj !== null) {
-                Object.entries(obj).forEach(([key, value]) => {
-                    const childId = `node-${nodeId++}`;
-                    const childType = getValueType(value);
-                    const hasChildren = childType === 'object' || childType === 'array';
-
+                Object.entries(obj).forEach(function(_ref) {
+                    var key = _ref[0], value = _ref[1];
+                    var childId = 'node-' + (nodeId++);
+                    var childType = getValueType(value);
+                    var hasChildren = childType === 'object' || childType === 'array';
                     nodes.push({
-                        id: childId,
-                        type: childType,
-                        value: value,
-                        key: key,
-                        depth: depth + 1,
-                        isRoot: false,
+                        id: childId, type: childType, value: value,
+                        key: key, depth: depth + 1, isRoot: false,
                         hasChildren: hasChildren,
                         childCount: hasChildren ? countChildren(value) : 0,
-                        x: 0,
-                        y: 0,
-                        parentId: parentId
+                        x: 0, y: 0, parentId: parentId
                     });
-
                     links.push({ source: parentId, target: childId });
-
                     if (hasChildren && !collapsedNodes.has(childId)) {
                         addChildren(childId, value, depth + 1);
                     }
                 });
             } else if (type === 'array') {
-                obj.forEach((item, index) => {
-                    const childId = `node-${nodeId++}`;
-                    const childType = getValueType(item);
-                    const hasChildren = childType === 'object' || childType === 'array';
-
+                obj.forEach(function(item, index) {
+                    var childId = 'node-' + (nodeId++);
+                    var childType = getValueType(item);
+                    var hasChildren = childType === 'object' || childType === 'array';
                     nodes.push({
-                        id: childId,
-                        type: childType,
-                        value: item,
-                        key: index,
-                        depth: depth + 1,
-                        isRoot: false,
+                        id: childId, type: childType, value: item,
+                        key: index, depth: depth + 1, isRoot: false,
                         hasChildren: hasChildren,
                         childCount: hasChildren ? countChildren(item) : 0,
-                        x: 0,
-                        y: 0,
-                        parentId: parentId
+                        x: 0, y: 0, parentId: parentId
                     });
-
                     links.push({ source: parentId, target: childId });
-
                     if (hasChildren && !collapsedNodes.has(childId)) {
                         addChildren(childId, item, depth + 1);
                     }
                 });
             }
         }
-
         addChildren(rootId, json, 0);
+    }
+
+    function renderGraph(instance) {
+        initGraphArea();
+        setupTouchGestures();
+        buildGraphAsync(instance.json).then(function() {
+            updateStats(instance.json);
+            layout();
+            render();
+            applyTheme();
+            removeSkeleton();
+        });
     }
 
     function countChildren(obj) {
@@ -1330,9 +1374,12 @@ const JsonGraph = (function() {
             highlightedNodes.add(selectedNode.id);
         }
 
+        const visibleNodeIds = new Set(visibleNodes.map(n => n.id));
+
         links.forEach((link, idx) => {
             const sourceId = link.source.id || link.source;
             const targetId = link.target.id || link.target;
+            if (!visibleNodeIds.has(sourceId) || !visibleNodeIds.has(targetId)) return;
             const source = nodes.find(n => n.id === sourceId);
             const target = nodes.find(n => n.id === targetId);
             if (!source || !target) return;
@@ -1517,13 +1564,13 @@ const JsonGraph = (function() {
 
     function getDisplayValue(node) {
         const type = node.type;
-        const value = node.value;
 
-        if (type === 'object') return collapsedNodes.has(node.id) ? '{..}' : Object.keys(value).length + ' keys';
-        if (type === 'array') return collapsedNodes.has(node.id) ? '[..]' : value.length + ' items';
-        if (type === 'string') return `"${value.slice(0, 6)}${value.length > 6 ? '..' : ''}"`;
+        if (type === 'object') return collapsedNodes.has(node.id) ? '{..}' : (node.childCount || 0) + ' keys';
+        if (type === 'array') return collapsedNodes.has(node.id) ? '[..]' : (node.childCount || 0) + ' items';
+        if (type === 'string') return '"' + node.value.slice(0, 6) + (node.value.length > 6 ? '..' : '') + '"';
         if (type === 'null') return 'null';
-        return String(value).slice(0, 8);
+        if (node.value !== undefined) return String(node.value).slice(0, 8);
+        return '';
     }
 
     function startDrag(e, node) {
@@ -1598,9 +1645,12 @@ const JsonGraph = (function() {
     function rebuildAndRender() {
         const instance = graphInstances.get(activeTabId);
         if (instance) {
-            buildGraph(instance.json);
-            layout();
-            render();
+            buildGraphAsync(instance.json).then(function() {
+                updateStats(instance.json);
+                layout();
+                currentPage = 0;
+                render();
+            });
         }
     }
 
@@ -1624,13 +1674,20 @@ const JsonGraph = (function() {
 
     function updatePaginationInfo() {
         const info = modal.querySelector('#pagination-info');
+        const controls = modal.querySelector('#pagination-controls');
         if (info) {
             if (totalPages > 1) {
                 info.textContent = `显示 ${currentPage + 1} / ${totalPages} 页 (${nodes.length} 节点)`;
+                controls.style.display = '';
             } else {
                 info.textContent = `${nodes.length} 节点`;
+                controls.style.display = 'none';
             }
         }
+        const prevBtn = modal.querySelector('[data-action="prev-page"]');
+        const nextBtn = modal.querySelector('[data-action="next-page"]');
+        if (prevBtn) prevBtn.disabled = currentPage <= 0;
+        if (nextBtn) nextBtn.disabled = currentPage >= totalPages - 1;
     }
 
     function clearSelection() {
