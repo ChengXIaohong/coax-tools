@@ -16,13 +16,15 @@ class GPUBenchmark {
         this.sceneInstance = null;
         this.gpuInfo = null;
 
+        this._fxCtx = null;
+
         // v2.0: 多场景结果
         this.sceneResults = [];  // [{scene, avgFPS, minFPS, score}, ...]
         this.currentSceneIdx = 0;
         this.allScenes = [
-            { id: 'particles', label: '💥 粒子爆炸', icon: '💥' },
-            { id: 'matrix',    label: '🟢 矩阵雨',    icon: '🟢' },
-            { id: 'earth',     label: '🌍 粒子地球',   icon: '🌍' }
+            { id: 'tunnel', label: '🌀 超空间隧道', icon: '🌀' },
+            { id: 'galaxy', label: '🌌 星云绽放',   icon: '🌌' },
+            { id: 'earth',  label: '🌍 地球降临',    icon: '🌍' }
         ];
     }
 
@@ -82,6 +84,19 @@ class GPUBenchmark {
         fsCanvas.width = window.innerWidth;
         fsCanvas.height = window.innerHeight;
 
+        // PostFX overlay canvas
+        const fxOverlay = document.createElement('canvas');
+        fxOverlay.id = 'fxOverlay';
+        fxOverlay.width = window.innerWidth;
+        fxOverlay.height = window.innerHeight;
+        Object.assign(fxOverlay.style, {
+            position: 'fixed', top: '0', left: '0',
+            width: '100%', height: '100%',
+            zIndex: '150', pointerEvents: 'none'
+        });
+        document.body.appendChild(fxOverlay);
+        this._fxCtx = fxOverlay.getContext('2d');
+
         // ESC 退出监听
         document.addEventListener('fullscreenchange', () => {
             if (!document.fullscreenElement && this.isRunning) {
@@ -128,6 +143,11 @@ class GPUBenchmark {
             document.exitFullscreen().catch(() => {});
         }
 
+        // Remove PostFX overlay
+        const fxOverlay = document.getElementById('fxOverlay');
+        if (fxOverlay) fxOverlay.remove();
+        this._fxCtx = null;
+
         const fsCanvas = document.getElementById('fsCanvas');
         const hud = document.getElementById('fsHUD');
         const normalUI = document.getElementById('normalUI');
@@ -145,25 +165,16 @@ class GPUBenchmark {
     /* 单场景测试 */
     runScene(sceneId, canvas, hud) {
         return new Promise((resolve) => {
-            // Clear canvas completely before starting new scene
-            // This ensures no leftover content from previous scene (critical for earth WebGL scene)
-            try {
-                const tmpCtx = canvas.getContext('2d');
-                if (tmpCtx) {
-                    tmpCtx.setTransform(1, 0, 0, 1, 0, 0);
-                    tmpCtx.clearRect(0, 0, canvas.width, canvas.height);
-                }
-            } catch(e) {}
-
-            // Only get 2D context for 2D scenes (not earth which needs WebGL)
-            const isEarth = sceneId === 'earth';
-            const ctx = isEarth ? null : canvas.getContext('2d');
+            // All scenes use WebGL now — no 2D context creation (would lock canvas type)
             const W = canvas.width, H = canvas.height;
 
+            // Clean up previous scene
+            if (this.sceneInstance) { this.sceneInstance.stop(); this.sceneInstance = null; }
+
             switch (sceneId) {
-                case 'particles': this.sceneInstance = new ParticleSceneV2(ctx, W, H); break;
-                case 'matrix':    this.sceneInstance = new MatrixRainSceneV2(ctx, W, H); break;
-                case 'earth':     this.sceneInstance = new ParticleEarthScene(canvas, W, H); break;
+                case 'tunnel': this.sceneInstance = new HyperTunnelScene(canvas, W, H); break;
+                case 'galaxy': this.sceneInstance = new NebulaBloomScene(canvas, W, H); break;
+                case 'earth':  this.sceneInstance = new ParticleEarthScene(canvas, W, H); break;
             }
 
             const fpsHistory = [];
@@ -183,8 +194,11 @@ class GPUBenchmark {
 
                 // 预热 1s
                 if (!warmupDone) {
-                    this.sceneInstance.update(frameTime);
-                    this.sceneInstance.draw();
+                    try {
+                        this.sceneInstance.update(frameTime);
+                        this.sceneInstance.draw();
+                    } catch (e) {
+                    }
                     if (elapsed >= 1000) { warmupDone = true; startTime = now; fpsHistory.length = 0; }
                     this.animationId = requestAnimationFrame(loop);
                     return;
@@ -198,8 +212,12 @@ class GPUBenchmark {
                 if (fps < 300) fpsHistory.push(fps);
 
                 // 更新场景
-                this.sceneInstance.update(frameTime);
-                this.sceneInstance.draw();
+                try {
+                    this.sceneInstance.update(frameTime);
+                    this.sceneInstance.draw();
+                } catch (e) {
+                }
+                this._applyPostFX(canvas);
 
                 // 更新 HUD
                 const avgFPS = fpsHistory.length > 0 ? Math.round(fpsHistory.reduce((a, b) => a + b, 0) / fpsHistory.length) : 0;
@@ -251,19 +269,127 @@ class GPUBenchmark {
             </div>`;
     }
 
-    /* 场景切换闪光 */
+    /* 场景切换闪光 (cinematic) */
     flashTransition() {
         return new Promise((resolve) => {
             const flash = document.getElementById('sceneFlash');
             if (!flash) { resolve(); return; }
+            // Fix: override display:none from CSS
+            flash.style.display = 'block';
+            flash.style.background = '#fff';
+            flash.style.transform = 'scale(1)';
             flash.style.opacity = '1';
             flash.style.transition = 'none';
             requestAnimationFrame(() => {
-                flash.style.transition = 'opacity 0.5s ease-out';
-                flash.style.opacity = '0';
+                flash.style.transition = 'opacity 0.25s ease-out, transform 0.4s ease-out';
+                flash.style.opacity = '0.7';
+                flash.style.transform = 'scale(1.3)';
+                setTimeout(() => {
+                    flash.style.transition = 'opacity 0.3s ease-out';
+                    flash.style.opacity = '0';
+                    setTimeout(() => {
+                        flash.style.display = 'none';
+                        resolve();
+                    }, 350);
+                }, 200);
             });
-            setTimeout(resolve, 600);
         });
+    }
+
+    /* ===== Post-Processing Effects v3 (dynamic with bloom) ===== */
+    _applyPostFX(srcCanvas) {
+        const ctx = this._fxCtx;
+        if (!ctx) { return; }
+        const W = ctx.canvas.width, H = ctx.canvas.height;
+
+        ctx.clearRect(0, 0, W, H);
+
+        // Get current scene speed for dynamic effect intensity
+        const speed = (this.sceneInstance && this.sceneInstance._speed) || 1.0;
+        const intensity = Math.min(speed / 2.0, 1.5);
+        const isTunnel = this.sceneInstance && this.sceneInstance.constructor.name === 'HyperTunnelScene';
+
+        // === Main pass: original ===
+        ctx.drawImage(srcCanvas, 0, 0);
+
+        // === Bloom: blur + screen composite (tunnel scene) ===
+        if (isTunnel) {
+            const bloomIntensity = 0.25 + intensity * 0.2;
+            ctx.globalCompositeOperation = 'screen';
+            ctx.filter = 'blur(6px)';
+            ctx.globalAlpha = bloomIntensity * 0.5;
+            ctx.drawImage(srcCanvas, 0, 0);
+            ctx.filter = 'blur(12px)';
+            ctx.globalAlpha = bloomIntensity * 0.35;
+            ctx.drawImage(srcCanvas, 0, 0);
+            ctx.filter = 'none';
+            ctx.globalAlpha = 1;
+            ctx.globalCompositeOperation = 'source-over';
+        }
+
+        // === Chromatic aberration: R/G/B separation ===
+        const caOffset = isTunnel ? 1.5 : 1.0 + intensity * 3.0;
+        ctx.globalCompositeOperation = 'screen';
+        ctx.globalAlpha = isTunnel ? 0.12 : (0.25 + intensity * 0.08);
+        ctx.drawImage(srcCanvas, caOffset, 0);
+        ctx.globalAlpha = isTunnel ? 0.12 : (0.25 + intensity * 0.08);
+        ctx.drawImage(srcCanvas, -caOffset, 0);
+        ctx.globalAlpha = isTunnel ? 0.15 : (0.3 + intensity * 0.1);
+        ctx.drawImage(srcCanvas, 0, 0);
+        ctx.globalAlpha = 1;
+        ctx.globalCompositeOperation = 'source-over';
+
+        // === Radial blur ===
+        if (intensity > 0.5) {
+            const blurAmt = Math.min((intensity - 0.5) * 4.0, 0.08);
+            ctx.globalAlpha = blurAmt;
+            for (let i = 0; i < 3; i++) {
+                const off = (i + 1) * 6 * intensity;
+                ctx.drawImage(srcCanvas, off, 0);
+                ctx.drawImage(srcCanvas, -off, 0);
+                ctx.drawImage(srcCanvas, 0, off);
+                ctx.drawImage(srcCanvas, 0, -off);
+            }
+            ctx.globalAlpha = 1;
+            const cx = W / 2, cy = H / 2;
+            ctx.drawImage(srcCanvas, cx - W * 0.25, cy - H * 0.25, W * 0.5, H * 0.5,
+                                    cx - W * 0.25, cy - H * 0.25, W * 0.5, H * 0.5);
+        }
+
+        // === Film grain ===
+        let grainCanvas = document.getElementById('_grainCanvas');
+        let grainCtx;
+        if (grainCanvas) {
+            grainCtx = grainCanvas.getContext('2d');
+        } else {
+            grainCanvas = document.createElement('canvas');
+            grainCanvas.id = '_grainCanvas';
+            grainCanvas.width = 128; grainCanvas.height = 128;
+            grainCanvas.style.display = 'none';
+            document.body.appendChild(grainCanvas);
+            grainCtx = grainCanvas.getContext('2d');
+        }
+        const grainData = grainCtx.createImageData(128, 128);
+        for (let i = 0; i < grainData.data.length; i += 4) {
+            const v = Math.random() * 255;
+            grainData.data[i] = v;
+            grainData.data[i + 1] = v;
+            grainData.data[i + 2] = v;
+            grainData.data[i + 3] = 20 + Math.random() * 15;
+        }
+        grainCtx.putImageData(grainData, 0, 0);
+        ctx.globalAlpha = 0.12 + intensity * 0.08;
+        ctx.drawImage(grainCanvas, 0, 0, W, H);
+        ctx.globalAlpha = 1;
+
+        // === Vignette ===
+        const vigRadius = H * (0.15 + intensity * 0.08);
+        const vigOuter = H * (0.7 + intensity * 0.1);
+        const vig = ctx.createRadialGradient(W / 2, H / 2, vigRadius, W / 2, H / 2, vigOuter);
+        vig.addColorStop(0, 'transparent');
+        vig.addColorStop(1, 'rgba(0,0,0,' + (0.35 + intensity * 0.15) + ')');
+        ctx.fillStyle = vig;
+        ctx.fillRect(0, 0, W, H);
     }
 
     /* ===== 最终结果展示 ===== */
@@ -293,7 +419,7 @@ class GPUBenchmark {
         resultPanel.style.alignItems = 'center';
         resultPanel.style.justifyContent = 'center';
 
-        const sceneLabels = { particles: '💥 粒子爆炸', matrix: '🟢 矩阵雨', earth: '🌍 粒子地球' };
+        const sceneLabels = { tunnel: '🌀 超空间隧道', galaxy: '🌌 星云绽放', earth: '🌍 地球降临' };
 
         let html = '<div class="fs-result-inner">';
         html += '<div class="fs-grade" id="fsGrade" style="color:' + gradeColor + ';opacity:0;transform:scale(0.5)">' + grade + '</div>';
@@ -388,257 +514,927 @@ class GPUBenchmark {
     delay(ms) { return new Promise(r => setTimeout(r, ms)); }
 }
 
-/* ======================= 场景: 粒子爆炸 V2 ======================= */
-class ParticleSceneV2 {
-    constructor(ctx, w, h) {
-        this.ctx = ctx;
+/* ======================= 场景 1: 超空间隧道 v3 (体积光追 + 粒子系统) ======================= */
+class HyperTunnelScene {
+    constructor(canvas, w, h) {
+        this.canvas = canvas;
         this.W = w;
         this.H = h;
-        this.count = 3000;
-        this.particles = [];
-        this.stars = [];
-        this.shakeX = 0;
-        this.shakeY = 0;
-        this.trails = []; // 拖尾
-        this.init();
+        this.time = 0;
+        this.gl = null;
+        this.tunnelProg = null;
+        this.particleProg = null;
+        this.quadBuf = null;
+        this.particleBuf = null;
+        this.particleCount = 5000;
+        this.trailLength = 6;
+        this.renderParticleCount = 0;
+
+        // Mouse / camera
+        this.mouseX = 0;
+        this.mouseY = 0;
+        this.mouseDown = false;
+        this.camAngleH = 0;
+        this.camAngleV = 0.3;
+        this.camDist = 2.5;
+        this.targetCamAngleH = 0;
+        this.targetCamAngleV = 0.3;
+        this.targetCamDist = 2.5;
+        this.autoRotate = true;
+        this._rotateTimeout = null;
+
+        // FPS tracking
+        this._fpsHistory = [];
+        this._lastFPSTime = 0;
+        this._fpsEl = null;
+        this._fpsPanel = null;
+        this._fpsFrameCount = 0;
+
+        this._speed = 1.0;
+
+        this._initGL();
+        this._initMouseControls();
+        this._initFPSMonitor();
     }
-    init() {
-        const cx = this.W / 2, cy = this.H / 2;
-        this.particles = [];
-        for (let i = 0; i < this.count; i++) {
-            const angle = Math.random() * Math.PI * 2;
-            const speed = 2 + Math.random() * 10;
-            const hue = Math.random() * 360;
-            this.particles.push({
-                x: cx, y: cy,
-                vx: Math.cos(angle) * speed,
-                vy: Math.sin(angle) * speed,
-                r: 1.5 + Math.random() * 3,
-                life: 1.0,
-                decay: 0.003 + Math.random() * 0.005,
-                hue,
-                trail: []
-            });
-        }
-        // 背景星点
-        this.stars = Array.from({ length: 200 }, () => ({
-            x: Math.random() * this.W, y: Math.random() * this.H,
-            r: Math.random() * 1.5,
-            alpha: 0.3 + Math.random() * 0.5
-        }));
+
+    /* ---- Matrix helpers ---- */
+    _mat4Perspective(fov, aspect, near, far) {
+        const f = 1.0 / Math.tan(fov / 2);
+        const nf = 1 / (near - far);
+        return new Float32Array([
+            f / aspect, 0, 0, 0,
+            0, f, 0, 0,
+            0, 0, (far + near) * nf, -1,
+            0, 0, 2 * far * near * nf, 0
+        ]);
     }
-    stop() {}
-    update(dt) {
-        const k = dt / 16;
-        // 震屏
-        this.shakeX = (Math.random() - 0.5) * 6;
-        this.shakeY = (Math.random() - 0.5) * 6;
-
-        for (let i = 0; i < this.particles.length; i++) {
-            const p = this.particles[i];
-            // 拖尾记录
-            p.trail.push({ x: p.x, y: p.y, life: p.life });
-            if (p.trail.length > 5) p.trail.shift();
-
-            p.x += p.vx * k;
-            p.y += p.vy * k;
-            p.vy += 0.08 * k; // 重力
-            p.vx *= 0.995;
-            p.vy *= 0.995;
-            p.life -= p.decay * k;
-
-            if (p.life <= 0) {
-                // 中心重置
-                p.x = this.W / 2; p.y = this.H / 2;
-                const angle = Math.random() * Math.PI * 2;
-                const speed = 2 + Math.random() * 10;
-                p.vx = Math.cos(angle) * speed;
-                p.vy = Math.sin(angle) * speed;
-                p.life = 1.0;
-                p.trail = [];
+    _mat4LookAt(eye, center, up) {
+        const zx = eye[0] - center[0], zy = eye[1] - center[1], zz = eye[2] - center[2];
+        let len = Math.sqrt(zx * zx + zy * zy + zz * zz);
+        const z = [zx / len, zy / len, zz / len];
+        const xx = up[1] * z[2] - up[2] * z[1], xy = up[2] * z[0] - up[0] * z[2], xz = up[0] * z[1] - up[1] * z[0];
+        len = Math.sqrt(xx * xx + xy * xy + xz * xz);
+        const x = [xx / len, xy / len, xz / len];
+        const y = [z[1] * x[2] - z[2] * x[1], z[2] * x[0] - z[0] * x[2], z[0] * x[1] - z[1] * x[0]];
+        return new Float32Array([
+            x[0], y[0], z[0], 0,
+            x[1], y[1], z[1], 0,
+            x[2], y[2], z[2], 0,
+            -(x[0] * eye[0] + x[1] * eye[1] + x[2] * eye[2]),
+            -(y[0] * eye[0] + y[1] * eye[1] + y[2] * eye[2]),
+            -(z[0] * eye[0] + z[1] * eye[1] + z[2] * eye[2]),
+            1
+        ]);
+    }
+    _mat4Multiply(a, b) {
+        const o = new Float32Array(16);
+        for (let i = 0; i < 4; i++) {
+            for (let j = 0; j < 4; j++) {
+                o[j * 4 + i] = a[i] * b[j * 4] + a[i + 4] * b[j * 4 + 1] + a[i + 8] * b[j * 4 + 2] + a[i + 12] * b[j * 4 + 3];
             }
         }
+        return o;
     }
-    draw() {
-        const c = this.ctx;
-        // 震屏
-        c.save();
-        c.translate(this.shakeX, this.shakeY);
 
-        // 深空背景
-        c.fillStyle = '#050510';
-        c.fillRect(-10, -10, this.W + 20, this.H + 20);
+    /* ---- WebGL init ---- */
+    _initGL() {
+        const gl = this.canvas.getContext('webgl', { preserveDrawingBuffer: true })
+            || this.canvas.getContext('experimental-webgl', { preserveDrawingBuffer: true });
+        if (!gl) return;
+        this.gl = gl;
 
-        // 星点
-        for (const s of this.stars) {
-            c.globalAlpha = s.alpha;
-            c.fillStyle = '#fff';
-            c.beginPath();
-            c.arc(s.x, s.y, s.r, 0, Math.PI * 2);
-            c.fill();
-        }
-        c.globalAlpha = 1;
-
-        // 拖尾
-        for (const p of this.particles) {
-            for (let t = 0; t < p.trail.length; t++) {
-                const tr = p.trail[t];
-                const alpha = (t / p.trail.length) * 0.3 * p.life;
-                const r = p.r * (t / p.trail.length) * 0.8;
-                c.globalAlpha = alpha;
-                c.fillStyle = `hsl(${p.hue}, 100%, 70%)`;
-                c.shadowBlur = 8;
-                c.shadowColor = `hsl(${p.hue}, 100%, 60%)`;
-                c.beginPath();
-                c.arc(tr.x, tr.y, r, 0, Math.PI * 2);
-                c.fill();
+        function compileShader(type, src) {
+            const sh = gl.createShader(type);
+            gl.shaderSource(sh, src);
+            gl.compileShader(sh);
+            if (!gl.getShaderParameter(sh, gl.COMPILE_STATUS)) {
+                console.warn('Tunnel shader compile:', gl.getShaderInfoLog(sh));
+                gl.deleteShader(sh);
+                return null;
             }
+            return sh;
         }
-        c.shadowBlur = 0;
 
-        // 粒子主体（发光）
-        for (const p of this.particles) {
-            c.globalAlpha = p.life;
-            c.fillStyle = `hsl(${p.hue}, 100%, 65%)`;
-            c.shadowBlur = 15;
-            c.shadowColor = `hsl(${p.hue}, 100%, 70%)`;
-            c.beginPath();
-            c.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-            c.fill();
+        /* ---- Fullscreen quad (passthrough for ray-marched tunnel) ---- */
+        const quadVerts = new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]);
+        const qbuf = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, qbuf);
+        gl.bufferData(gl.ARRAY_BUFFER, quadVerts, gl.STATIC_DRAW);
+        this.quadBuf = qbuf;
 
-            // 中心白核
-            if (p.life > 0.7) {
-                c.globalAlpha = (p.life - 0.7) / 0.3;
-                c.fillStyle = '#fff';
-                c.beginPath();
-                c.arc(p.x, p.y, p.r * 0.5, 0, Math.PI * 2);
-                c.fill();
+        /* ---- Tunnel vertex shader (passthrough) ---- */
+        const tunnelVS = `
+            attribute vec2 aPos;
+            varying vec2 vUV;
+            void main() {
+                vUV = aPos * 0.5 + 0.5;
+                gl_Position = vec4(aPos, 0.0, 1.0);
             }
-        }
-        c.shadowBlur = 0;
-        c.globalAlpha = 1;
-        c.restore();
-    }
-}
+        `;
 
-/* ======================= 场景: 矩阵雨 V2 ======================= */
-class MatrixRainSceneV2 {
-    constructor(ctx, w, h) {
-        this.ctx = ctx;
-        this.W = w;
-        this.H = h;
-        this.cols = Math.floor(w / 18);
-        this.drops = [];
-        this.chaosParticles = []; // 叠加混沌粒子
-        this.init();
-    }
-    init() {
-        this.drops = [];
-        for (let i = 0; i < this.cols; i++) {
-            this.drops.push({
-                y: Math.random() * this.H,
-                speed: 3 + Math.random() * 6,
-                chars: Array(Math.floor(this.H / 18)).fill(0).map(() => this.mkChar()),
-                bright: Math.random() < 0.05 // 高亮字符
-            });
-        }
-        // 混沌粒子
-        this.chaosParticles = Array.from({ length: 200 }, () => this.mkChaos());
-    }
-    mkChar() {
-        return '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'[Math.floor(Math.random() * 36)];
-    }
-    mkChaos() {
-        return {
-            x: Math.random() * this.W,
-            y: Math.random() * this.H,
-            vx: (Math.random() - 0.5) * 2,
-            vy: 1 + Math.random() * 3,
-            r: 1 + Math.random() * 2,
-            life: 1,
-            decay: 0.01 + Math.random() * 0.02,
-            hue: Math.random() < 0.3 ? 120 : (Math.random() < 0.5 ? 280 : 50)
-        };
-    }
-    stop() {}
-    update(dt) {
-        const k = dt / 16;
-        for (const d of this.drops) {
-            d.y += d.speed * k;
-            if (d.y * 18 > this.H) {
-                d.y = 0;
-                d.chars = Array(Math.floor(this.H / 18)).fill(0).map(() => this.mkChar());
-                d.bright = Math.random() < 0.05;
+        /* ---- Tunnel fragment shader — Ray-marched volume rendering ---- */
+        const tunnelFS = `
+            precision highp float;
+            varying vec2 vUV;
+            uniform float uTime;
+            uniform float uCamAngleH;
+            uniform float uCamAngleV;
+            uniform float uCamDist;
+            uniform vec2 uRes;
+
+            vec3 rotX(vec3 p, float a) {
+                float s = sin(a), c = cos(a);
+                return vec3(p.x, p.y * c - p.z * s, p.y * s + p.z * c);
             }
-        }
-        // 更新混沌粒子
-        for (let i = 0; i < this.chaosParticles.length; i++) {
-            const p = this.chaosParticles[i];
-            p.x += p.vx * k;
-            p.y += p.vy * k;
-            p.life -= p.decay * k;
-            if (p.life <= 0 || p.y > this.H) {
-                this.chaosParticles[i] = this.mkChaos();
-                this.chaosParticles[i].y = -10;
+            vec3 rotY(vec3 p, float a) {
+                float s = sin(a), c = cos(a);
+                return vec3(p.x * c + p.z * s, p.y, -p.x * s + p.z * c);
             }
-        }
-    }
-    draw() {
-        const c = this.ctx;
-        c.fillStyle = 'rgba(0, 0, 10, 0.08)';
-        c.fillRect(0, 0, this.W, this.H);
 
-        c.font = 'bold 16px monospace';
-
-        // 主字符雨
-        for (let i = 0; i < this.drops.length; i++) {
-            const d = this.drops[i];
-            const x = i * 18;
-
-            for (let j = 0; j < d.chars.length; j++) {
-                const charY = d.y * 18 - j * 18;
-                if (charY < 0 || charY > this.H) continue;
-
-                const alpha = 1 - (charY / this.H) * 0.8;
-                const isHead = j === Math.floor(d.y) % d.chars.length;
-
-                if (isHead) {
-                    // 头部高亮白色
-                    c.fillStyle = `rgba(255, 255, 255, ${alpha})`;
-                    c.shadowBlur = 10;
-                    c.shadowColor = '#0f0';
-                } else {
-                    c.fillStyle = `rgba(0, ${180 + Math.random() * 75}, 0, ${alpha * 0.8})`;
-                    c.shadowBlur = 0;
+            // Poison-mushroom-style iterative coordinate warp
+            vec3 warp(vec3 p, float t) {
+                for (int i = 0; i < 5; i++) {
+                    float fi = float(i);
+                    p = vec3(
+                        atan(p.y + cos(t * 0.3 + fi * 0.5), p.x + sin(t * 0.4 + fi * 0.7)) * 1.2,
+                        acos(clamp(p.z / (length(p.xy) + 0.001), -0.99, 0.99)) * 0.6,
+                        length(p) * 0.5
+                    );
+                    p += vec3(
+                        sin(p.y * 1.8 + p.z + t * 0.6 + fi * 0.4) * 0.35,
+                        cos(p.x * 1.4 - p.z * 0.8 + t * 0.5 + fi * 0.3) * 0.35,
+                        sin(p.x + p.y * 1.2 + t * 0.7) * 0.2
+                    );
+                    p = pow(abs(p + 0.5), vec3(0.7 + 0.12 * sin(t * 0.15 + fi)));
                 }
-                c.fillText(d.chars[j], x, charY);
+                return p;
             }
-            c.shadowBlur = 0;
+
+            void main() {
+                vec2 uv = vUV * 2.0 - 1.0;
+                uv.x *= uRes.x / uRes.y;
+
+                // Camera setup
+                float ch = uCamAngleH;
+                float cv = uCamAngleV;
+                float cd = uCamDist;
+                vec3 ro = vec3(0.0, 0.0, -cd);
+                ro = rotX(ro, cv);
+                ro = rotY(ro, ch);
+                vec3 ta = vec3(0.0);
+                vec3 fwd = normalize(ta - ro);
+                vec3 right = normalize(cross(fwd, vec3(0.0, 1.0, 0.0)));
+                vec3 up = cross(right, fwd);
+                vec3 rd = normalize(uv.x * right + uv.y * up + fwd * 2.0);
+
+                // Volumetric ray marching
+                vec3 col = vec3(0.0);
+                float alpha = 0.0;
+                float t = 0.3;
+                float t_step = 0.06;
+
+                // Deep space blue → electric purple bg
+                vec3 bgCol = mix(
+                    vec3(0.005, 0.002, 0.08),
+                    vec3(0.12, 0.02, 0.22),
+                    sin(uTime * 0.05 + vUV.y * 2.0) * 0.5 + 0.5
+                );
+
+                for (int i = 0; i < 8; i++) {
+                    vec3 p = ro + rd * t;
+                    vec3 wp = warp(p, uTime);
+
+                    // Density from warped coordinates
+                    float d1 = sin(wp.x * 5.0 + uTime * 0.7) * cos(wp.y * 4.0 - uTime * 0.5);
+                    float d2 = sin(wp.z * 6.0 + uTime * 0.4) * cos(wp.x * 2.5 + wp.y * 3.5 + uTime * 0.6);
+                    float d3 = sin(length(wp) * 2.5 - uTime * 0.9) * cos(wp.x - wp.y * 1.5 + uTime * 0.3);
+                    float density = abs(d1 * d2 * d3);
+                    density = pow(density, 0.35 + 0.1 * sin(uTime * 0.12));
+
+                    // Color: deep blue ↔ electric purple gradient
+                    float hueShift = sin(wp.x * 2.0 + uTime * 0.25) * 0.5 + 0.5;
+                    vec3 tunnelColor = mix(
+                        vec3(0.02, 0.01, 0.15),
+                        vec3(0.35, 0.06, 0.55),
+                        hueShift
+                    );
+
+                    // Warm gold highlights on dense regions
+                    float gold = smoothstep(0.2, 0.65, density);
+                    tunnelColor += vec3(1.0, 0.78, 0.15) * gold * 0.9 * (1.0 - exp(-density * 4.0));
+
+                    // Volumetric light beams piercing space
+                    float beam = pow(abs(sin(wp.y * 10.0 + uTime * 0.9)), 20.0);
+                    tunnelColor += vec3(0.5, 0.4, 1.0) * beam * 0.5;
+                    float beam2 = pow(abs(sin(wp.z * 6.0 + wp.x * 5.0 + uTime * 0.6)), 8.0);
+                    tunnelColor += vec3(1.0, 0.6, 0.2) * beam2 * 0.3;
+
+                    // Light shafts (god rays)
+                    float shaft = pow(abs(sin(wp.x * 3.0 + wp.z * 2.0 + uTime * 0.8)), 4.0);
+                    tunnelColor += vec3(0.9, 0.7, 0.4) * shaft * 0.4;
+
+                    // Volumetric accumulation
+                    float dens = density * 0.15;
+                    col += (tunnelColor - col) * dens;
+                    alpha += (1.0 - alpha) * dens;
+
+                    t += t_step * (0.4 + density * 2.0);
+                    if (alpha > 0.92 || t > 20.0) break;
+                }
+
+                col = mix(bgCol, col, alpha);
+
+                // Vignette
+                float vig = 1.0 - dot(uv * 0.9, uv * 0.9);
+                col *= clamp(vig, 0.0, 1.0);
+
+                // Tone mapping (Reinhard)
+                col = col / (col + vec3(1.0));
+
+                gl_FragColor = vec4(col, 1.0);
+            }
+        `;
+
+        const tvs = compileShader(gl.VERTEX_SHADER, tunnelVS);
+        const tfs = compileShader(gl.FRAGMENT_SHADER, tunnelFS);
+        if (tvs && tfs) {
+            const p = gl.createProgram();
+            gl.attachShader(p, tvs);
+            gl.attachShader(p, tfs);
+            gl.linkProgram(p);
+            if (gl.getProgramParameter(p, gl.LINK_STATUS)) this.tunnelProg = p;
         }
 
-        // 混沌粒子（彩色雾气）
-        for (const p of this.chaosParticles) {
-            c.globalAlpha = p.life * 0.6;
-            c.fillStyle = `hsl(${p.hue}, 80%, 60%)`;
-            c.shadowBlur = 6;
-            c.shadowColor = `hsl(${p.hue}, 100%, 70%)`;
-            c.beginPath();
-            c.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-            c.fill();
+        /* ---- Particle shaders ---- */
+        const particleVS = `
+            attribute vec3 aPos;
+            attribute vec3 aColor;
+            attribute float aAlpha;
+            attribute float aSize;
+            uniform mat4 uMVP;
+            uniform float uTime;
+            varying float vAlpha;
+            varying vec3 vColor;
+            void main() {
+                gl_Position = uMVP * vec4(aPos, 1.0);
+                float pulse = 1.0 + 0.3 * sin(uTime * 3.0 + aPos.x * 8.0 + aPos.y * 7.0);
+                gl_PointSize = aSize * pulse;
+                vAlpha = aAlpha;
+                vColor = aColor;
+            }
+        `;
+        const particleFS = `
+            precision highp float;
+            varying float vAlpha;
+            varying vec3 vColor;
+            void main() {
+                float d = length(gl_PointCoord - 0.5);
+                if (d > 0.5) discard;
+                float glow = exp(-d * 10.0);
+                float core = exp(-d * 30.0);
+                gl_FragColor = vec4(vColor + core * 0.5, glow * vAlpha * 0.85);
+            }
+        `;
+        const pvs = compileShader(gl.VERTEX_SHADER, particleVS);
+        const pfs = compileShader(gl.FRAGMENT_SHADER, particleFS);
+        if (pvs && pfs) {
+            const p = gl.createProgram();
+            gl.attachShader(p, pvs);
+            gl.attachShader(p, pfs);
+            gl.linkProgram(p);
+            if (gl.getProgramParameter(p, gl.LINK_STATUS)) this.particleProg = p;
         }
-        c.shadowBlur = 0;
-        c.globalAlpha = 1;
 
-        // 暗角
-        const vig = c.createRadialGradient(this.W/2, this.H/2, this.H*0.3, this.W/2, this.H/2, this.H*0.8);
-        vig.addColorStop(0, 'transparent');
-        vig.addColorStop(1, 'rgba(0,0,10,0.5)');
-        c.fillStyle = vig;
-        c.fillRect(0, 0, this.W, this.H);
+        /* ---- Particle data ---- */
+        this._initParticles();
+        const buf = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+        gl.bufferData(gl.ARRAY_BUFFER, this.particleRenderData, gl.DYNAMIC_DRAW);
+        this.particleBuf = buf;
+    }
+
+    /* ---- Particle system ---- */
+    _initParticles() {
+        const count = this.particleCount;
+        const trailLen = this.trailLength;
+        this.particleCurrent = new Float32Array(count * 3);
+        this.particleVelocity = new Float32Array(count * 3);
+        this.particleSizes = new Float32Array(count);
+        this.particlePhases = new Float32Array(count);
+        this.particleTrailData = new Float32Array(count * trailLen * 3);
+        this.particleTrailIdx = new Uint16Array(count);
+
+        for (let i = 0; i < count; i++) {
+            const theta = Math.random() * Math.PI * 2;
+            const r = Math.random() * 0.8;
+            const i3 = i * 3;
+            this.particleCurrent[i3] = r * Math.cos(theta);
+            this.particleCurrent[i3 + 1] = r * Math.sin(theta) * 0.5;
+            this.particleCurrent[i3 + 2] = (Math.random() - 0.5) * 5;
+            this.particleVelocity[i3] = (Math.random() - 0.5) * 0.008;
+            this.particleVelocity[i3 + 1] = (Math.random() - 0.5) * 0.008;
+            this.particleVelocity[i3 + 2] = 0.008 + Math.random() * 0.025;
+            this.particleSizes[i] = 1.0 + Math.random() * 4.0;
+            this.particlePhases[i] = Math.random();
+
+            for (let j = 0; j < trailLen; j++) {
+                const idx = (i * trailLen + j) * 3;
+                this.particleTrailData[idx] = this.particleCurrent[i3];
+                this.particleTrailData[idx + 1] = this.particleCurrent[i3 + 1];
+                this.particleTrailData[idx + 2] = this.particleCurrent[i3 + 2];
+            }
+        }
+
+        // Render buffer: pos3 + color3 + alpha1 + size1 = 10 floats per point
+        this.renderParticleCount = count * trailLen;
+        this.particleRenderData = new Float32Array(this.renderParticleCount * 10);
+        this._buildRenderData();
+    }
+
+    _buildRenderData() {
+        const count = this.particleCount;
+        const trailLen = this.trailLength;
+        let off = 0;
+        for (let i = 0; i < count; i++) {
+            const phase = this.particlePhases[i];
+            const size = this.particleSizes[i];
+            const trailIdx = this.particleTrailIdx[i];
+            // Color: blue-purple (phase~0) → gold (phase~1)
+            const cr = 0.25 + phase * 0.75;
+            const cg = 0.1 + (1.0 - phase) * 0.25 + phase * 0.65;
+            const cb = 0.95 - phase * 0.55;
+            for (let j = 0; j < trailLen; j++) {
+                const histIdx = (trailIdx - j + trailLen) % trailLen;
+                const posIdx = (i * trailLen + histIdx) * 3;
+                const fade = 1.0 - (j / trailLen);
+                const alpha = fade * fade;
+                this.particleRenderData[off] = this.particleTrailData[posIdx];
+                this.particleRenderData[off + 1] = this.particleTrailData[posIdx + 1];
+                this.particleRenderData[off + 2] = this.particleTrailData[posIdx + 2];
+                this.particleRenderData[off + 3] = cr * (0.5 + 0.5 * fade);
+                this.particleRenderData[off + 4] = cg * (0.4 + 0.6 * fade);
+                this.particleRenderData[off + 5] = cb * (0.3 + 0.7 * fade);
+                this.particleRenderData[off + 6] = alpha;
+                this.particleRenderData[off + 7] = size * (0.3 + 0.7 * fade);
+                this.particleRenderData[off + 8] = 0;
+                this.particleRenderData[off + 9] = 0;
+                off += 10;
+            }
+        }
+    }
+
+    _updateParticles(dt) {
+        const count = this.particleCount;
+        const trailLen = this.trailLength;
+        const k = dt * 0.001;
+        const mx = this.mouseX;
+        const my = this.mouseY;
+
+        for (let i = 0; i < count; i++) {
+            const i3 = i * 3;
+            this.particleTrailIdx[i] = (this.particleTrailIdx[i] + 1) % trailLen;
+            const newIdx = this.particleTrailIdx[i];
+
+            let px = this.particleCurrent[i3];
+            let py = this.particleCurrent[i3 + 1];
+            let pz = this.particleCurrent[i3 + 2];
+            let vx = this.particleVelocity[i3];
+            let vy = this.particleVelocity[i3 + 1];
+            let vz = this.particleVelocity[i3 + 2];
+
+            // Mouse gravitational attraction
+            const dx = mx * 1.8 - px;
+            const dy = my * 1.8 - py;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+            if (dist > 0.01) {
+                const force = 0.6 * k / (1.0 + dist * 0.3);
+                vx += dx * force;
+                vy += dy * force;
+            }
+
+            px += vx;
+            py += vy;
+            pz += vz;
+            vx *= 0.975;
+            vy *= 0.975;
+            vz *= 0.995;
+
+            // Z-wrap
+            if (pz > 3.0) {
+                pz = -3.0;
+                px = (Math.random() - 0.5) * 1.5;
+                py = (Math.random() - 0.5) * 0.8;
+            }
+
+            this.particleCurrent[i3] = px;
+            this.particleCurrent[i3 + 1] = py;
+            this.particleCurrent[i3 + 2] = pz;
+            this.particleVelocity[i3] = vx;
+            this.particleVelocity[i3 + 1] = vy;
+            this.particleVelocity[i3 + 2] = vz;
+
+            const trailPos = (i * trailLen + newIdx) * 3;
+            this.particleTrailData[trailPos] = px;
+            this.particleTrailData[trailPos + 1] = py;
+            this.particleTrailData[trailPos + 2] = pz;
+        }
+    }
+
+    /* ---- Mouse / touch controls ---- */
+    _initMouseControls() {
+        const c = this.canvas;
+        const self = this;
+
+        c.addEventListener('mousemove', function (e) {
+            const cw = self.canvas.width, ch = self.canvas.height;
+            self.mouseX = (e.clientX / cw) * 2 - 1;
+            self.mouseY = -(e.clientY / ch) * 2 + 1;
+            if (self.mouseDown) {
+                self.targetCamAngleH += e.movementX * 0.005;
+                self.targetCamAngleV += e.movementY * 0.005;
+                self.targetCamAngleV = Math.max(-1.3, Math.min(1.3, self.targetCamAngleV));
+                self.autoRotate = false;
+                clearTimeout(self._rotateTimeout);
+                self._rotateTimeout = setTimeout(function () { self.autoRotate = true; }, 3000);
+            }
+        });
+        c.addEventListener('mousedown', function (e) {
+            self.mouseDown = true;
+        });
+        c.addEventListener('mouseup', function () { self.mouseDown = false; });
+        c.addEventListener('mouseleave', function () { self.mouseDown = false; });
+        c.addEventListener('wheel', function (e) {
+            self.targetCamDist += e.deltaY * 0.005;
+            self.targetCamDist = Math.max(0.5, Math.min(10, self.targetCamDist));
+            e.preventDefault();
+        }, { passive: false });
+    }
+
+    /* ---- FPS overlay ---- */
+    _initFPSMonitor() {
+        if (document.getElementById('tunnelFPSPanel')) return;
+        const panel = document.createElement('div');
+        panel.id = 'tunnelFPSPanel';
+        panel.style.cssText = 'position:fixed;top:16px;left:16px;z-index:9999;background:rgba(0,0,0,0.7);border-radius:10px;padding:10px 16px;font-family:"SF Mono","Cascadia Code","Consolas","JetBrains Mono",monospace;font-size:15px;color:#fff;backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,0.08);pointer-events:none;display:none;';
+        panel.innerHTML = '<span id="tunnelFPSValue" style="font-weight:700;font-size:18px">--</span> <span style="font-size:11px;opacity:0.55;letter-spacing:1px">FPS</span>';
+        document.body.appendChild(panel);
+        this._fpsPanel = panel;
+        this._fpsEl = document.getElementById('tunnelFPSValue');
+    }
+
+    /* ---- API ---- */
+    stop() {
+        const gl = this.gl;
+        if (!gl) return;
+        if (this.tunnelProg) gl.deleteProgram(this.tunnelProg);
+        if (this.particleProg) gl.deleteProgram(this.particleProg);
+        if (this.quadBuf) gl.deleteBuffer(this.quadBuf);
+        if (this.particleBuf) gl.deleteBuffer(this.particleBuf);
+        for (let i = 0; i < 8; i++) gl.disableVertexAttribArray(i);
+        if (this._fpsPanel) {
+            this._fpsPanel.remove();
+            this._fpsPanel = null;
+            this._fpsEl = null;
+        }
+    }
+
+    update(dt) {
+        this.time += dt;
+
+        // Camera auto-rotate
+        if (this.autoRotate) {
+            this.targetCamAngleH += dt * 0.00015;
+        }
+
+        // Smooth camera
+        const k = Math.min(dt / 16, 3);
+        this.camAngleH += (this.targetCamAngleH - this.camAngleH) * 0.08 * k;
+        this.camAngleV += (this.targetCamAngleV - this.camAngleV) * 0.08 * k;
+        this.camDist += (this.targetCamDist - this.camDist) * 0.08 * k;
+
+        // Benchmark speed ramp (used by _applyPostFX intensity)
+        const totalAnimMs = 5500;
+        const t = Math.min(this.time / totalAnimMs, 1.0);
+        let speed;
+        if (t < 0.15) {
+            speed = 0.5 + (t / 0.15) * 1.0;
+        } else if (t < 0.75) {
+            speed = 1.5 + ((t - 0.15) / 0.6) * 2.0;
+        } else {
+            speed = 3.5 * (1.0 - (t - 0.75) / 0.25);
+        }
+        this._speed = speed;
+
+        // Update particles
+        this._updateParticles(dt);
+        this._buildRenderData();
+
+        // Update buffer
+        const gl = this.gl;
+        if (gl && this.particleBuf) {
+            gl.bindBuffer(gl.ARRAY_BUFFER, this.particleBuf);
+            gl.bufferSubData(gl.ARRAY_BUFFER, 0, this.particleRenderData);
+        }
+
+        // FPS counter
+        this._fpsFrameCount++;
+        if (this.time - this._lastFPSTime >= 1000) {
+            const fps = Math.round(this._fpsFrameCount * 1000 / (this.time - this._lastFPSTime));
+            this._fpsFrameCount = 0;
+            this._lastFPSTime = this.time;
+            if (this._fpsEl) {
+                this._fpsEl.textContent = fps;
+                this._fpsEl.style.color = fps < 30 ? '#ff4444' : '#fff';
+            }
+        }
+    }
+
+    draw() {
+        const gl = this.gl;
+        if (!gl) return;
+
+        if (this._fpsPanel) this._fpsPanel.style.display = 'block';
+
+        const W = this.canvas.width, H = this.canvas.height;
+        gl.viewport(0, 0, W, H);
+        gl.clearColor(0.005, 0.002, 0.06, 1);
+        gl.clear(gl.COLOR_BUFFER_BIT);
+
+        // --- 1. Ray-marched tunnel (fullscreen quad) ---
+        if (this.tunnelProg) {
+            gl.useProgram(this.tunnelProg);
+            gl.uniform1f(gl.getUniformLocation(this.tunnelProg, 'uTime'), this.time * 0.001);
+            gl.uniform1f(gl.getUniformLocation(this.tunnelProg, 'uCamAngleH'), this.camAngleH);
+            gl.uniform1f(gl.getUniformLocation(this.tunnelProg, 'uCamAngleV'), this.camAngleV);
+            gl.uniform1f(gl.getUniformLocation(this.tunnelProg, 'uCamDist'), this.camDist);
+            gl.uniform2f(gl.getUniformLocation(this.tunnelProg, 'uRes'), W, H);
+
+            const aPos = gl.getAttribLocation(this.tunnelProg, 'aPos');
+            gl.bindBuffer(gl.ARRAY_BUFFER, this.quadBuf);
+            gl.enableVertexAttribArray(aPos);
+            gl.vertexAttribPointer(aPos, 2, gl.FLOAT, false, 0, 0);
+            gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+            gl.disableVertexAttribArray(aPos);
+        }
+
+        // --- 2. Particles (additive glow) ---
+        if (this.particleProg && this.particleBuf) {
+            const fov = Math.PI / 3.5;
+            const proj = this._mat4Perspective(fov, W / H, 0.1, 20);
+            const eyeX = Math.sin(this.camAngleH) * Math.cos(this.camAngleV) * 0.3;
+            const eyeY = Math.sin(this.camAngleV) * 0.3;
+            const eyeZ = Math.cos(this.camAngleH) * Math.cos(this.camAngleV) * 0.3;
+            const view = this._mat4LookAt([0, 0, 0], [eyeX, eyeY, eyeZ], [0, 1, 0]);
+            const mvp = this._mat4Multiply(proj, view);
+
+            gl.useProgram(this.particleProg);
+            gl.enable(gl.BLEND);
+            gl.blendFunc(gl.SRC_ALPHA, gl.ONE);
+            gl.depthMask(false);
+
+            gl.uniformMatrix4fv(gl.getUniformLocation(this.particleProg, 'uMVP'), false, mvp);
+            gl.uniform1f(gl.getUniformLocation(this.particleProg, 'uTime'), this.time * 0.001);
+
+            gl.bindBuffer(gl.ARRAY_BUFFER, this.particleBuf);
+            const stride = 10 * 4;
+            const aPos = gl.getAttribLocation(this.particleProg, 'aPos');
+            const aColor = gl.getAttribLocation(this.particleProg, 'aColor');
+            const aAlpha = gl.getAttribLocation(this.particleProg, 'aAlpha');
+            const aSize = gl.getAttribLocation(this.particleProg, 'aSize');
+
+            gl.enableVertexAttribArray(aPos);
+            gl.vertexAttribPointer(aPos, 3, gl.FLOAT, false, stride, 0);
+            gl.enableVertexAttribArray(aColor);
+            gl.vertexAttribPointer(aColor, 3, gl.FLOAT, false, stride, 12);
+            gl.enableVertexAttribArray(aAlpha);
+            gl.vertexAttribPointer(aAlpha, 1, gl.FLOAT, false, stride, 24);
+            gl.enableVertexAttribArray(aSize);
+            gl.vertexAttribPointer(aSize, 1, gl.FLOAT, false, stride, 28);
+
+            gl.drawArrays(gl.POINTS, 0, this.renderParticleCount);
+
+            gl.disableVertexAttribArray(aPos);
+            gl.disableVertexAttribArray(aColor);
+            gl.disableVertexAttribArray(aAlpha);
+            gl.disableVertexAttribArray(aSize);
+            gl.disable(gl.BLEND);
+            gl.depthMask(true);
+        }
     }
 }
 
-/* ======================= 场景: WebGL 3D 地球 ======================= */
+/* ======================= 场景 2: 星云绽放 (Nebula Bloom) ======================= */
+class NebulaBloomScene {
+    constructor(canvas, w, h) {
+        this.canvas = canvas;
+        this.W = w;
+        this.H = h;
+        this.time = 0;
+        this.galaxyRotation = 0;
+        this.camAngle = 0;
+        this.gl = null;
+        this.prog = null;
+        this.particleBuf = null;
+        this.particleCount = 10000;
+        this._initGL();
+    }
+
+    _mat4Perspective(fov, aspect, near, far) {
+        const f = 1.0 / Math.tan(fov / 2);
+        const nf = 1 / (near - far);
+        return new Float32Array([
+            f / aspect, 0, 0, 0,
+            0, f, 0, 0,
+            0, 0, (far + near) * nf, -1,
+            0, 0, 2 * far * near * nf, 0
+        ]);
+    }
+    _mat4LookAt(ex, ey, ez, cx, cy, cz, ux, uy, uz) {
+        const zx = ex - cx, zy = ey - cy, zz = ez - cz;
+        let len = Math.sqrt(zx * zx + zy * zy + zz * zz);
+        const z = [zx / len, zy / len, zz / len];
+        const xx = uy * z[2] - uz * z[1], xy = uz * z[0] - ux * z[2], xz = ux * z[1] - uy * z[0];
+        len = Math.sqrt(xx * xx + xy * xy + xz * xz);
+        const x = [xx / len, xy / len, xz / len];
+        const y = [z[1] * x[2] - z[2] * x[1], z[2] * x[0] - z[0] * x[2], z[0] * x[1] - z[1] * x[0]];
+        return new Float32Array([
+            x[0], y[0], z[0], 0, x[1], y[1], z[1], 0, x[2], y[2], z[2], 0,
+            -(x[0] * ex + x[1] * ey + x[2] * ez),
+            -(y[0] * ex + y[1] * ey + y[2] * ez),
+            -(z[0] * ex + z[1] * ey + z[2] * ez), 1
+        ]);
+    }
+    _mat4Multiply(a, b) {
+        const o = new Float32Array(16);
+        for (let i = 0; i < 4; i++) {
+            for (let j = 0; j < 4; j++) {
+                o[j * 4 + i] = a[i] * b[j * 4] + a[i + 4] * b[j * 4 + 1] + a[i + 8] * b[j * 4 + 2] + a[i + 12] * b[j * 4 + 3];
+            }
+        }
+        return o;
+    }
+    _mat4RotateY(m, a) {
+        const c = Math.cos(a), s = Math.sin(a);
+        const m0 = m[0], m1 = m[1], m2 = m[2], m3 = m[3];
+        const m8 = m[8], m9 = m[9], m10 = m[10], m11 = m[11];
+        m[0] = m0 * c + m8 * s; m[1] = m1 * c + m9 * s; m[2] = m2 * c + m10 * s; m[3] = m3 * c + m11 * s;
+        m[8] = m0 * -s + m8 * c; m[9] = m1 * -s + m9 * c; m[10] = m2 * -s + m10 * c; m[11] = m3 * -s + m11 * c;
+        return m;
+    }
+
+    _initGL() {
+        const gl = this.canvas.getContext('webgl', { preserveDrawingBuffer: true }) || this.canvas.getContext('experimental-webgl');
+        if (!gl) return;
+        this.gl = gl;
+
+        function compileShader(type, src) {
+            const sh = gl.createShader(type);
+            gl.shaderSource(sh, src);
+            gl.compileShader(sh);
+            if (!gl.getShaderParameter(sh, gl.COMPILE_STATUS)) {
+                console.warn('Nebula shader error:', gl.getShaderInfoLog(sh));
+                gl.deleteShader(sh);
+                return null;
+            }
+            return sh;
+        }
+
+        // Vertex shader: per-particle phase for organic motion
+        const vsSource = `
+            attribute vec3 aPos;
+            attribute vec3 aColor;
+            attribute float aSize;
+            attribute float aPhase;
+            uniform mat4 uMVP;
+            uniform float uTime;
+            varying vec3 vColor;
+            varying float vAlpha;
+            void main() {
+                vec3 p = aPos;
+                // Vertical oscillation per particle
+                p.y += sin(uTime * 0.8 + aPhase * 6.28) * 0.04;
+                // Radial pulse
+                float pulse = 0.85 + 0.15 * sin(uTime * 0.6 + aPhase * 4.0);
+                gl_Position = uMVP * vec4(p, 1.0);
+                gl_PointSize = aSize * pulse * 1.5;
+                vColor = aColor;
+                vAlpha = 0.5 + 0.5 * sin(uTime * 1.2 + aPhase * 3.14);
+            }
+        `;
+        const fsSource = `
+            precision mediump float;
+            varying vec3 vColor;
+            varying float vAlpha;
+            void main() {
+                float d = length(gl_PointCoord - 0.5);
+                if (d > 0.5) discard;
+                float glow = exp(-d * 6.0);
+                gl_FragColor = vec4(vColor, glow * vAlpha * 0.7);
+            }
+        `;
+
+        const vs = compileShader(gl.VERTEX_SHADER, vsSource);
+        const fs = compileShader(gl.FRAGMENT_SHADER, fsSource);
+        if (vs && fs) {
+            const prog = gl.createProgram();
+            gl.attachShader(prog, vs);
+            gl.attachShader(prog, fs);
+            gl.linkProgram(prog);
+            if (gl.getProgramParameter(prog, gl.LINK_STATUS)) {
+                this.prog = prog;
+            } else {
+                console.warn('Nebula program link error');
+                return;
+            }
+        } else return;
+
+        // Generate 10000 particles in a 3-arm spiral galaxy
+        const COUNT = 10000;
+        const stride = 10; // pos3 + color3 + size1 + phase1 = 8 floats
+        const data = new Float32Array(COUNT * stride);
+        const armCount = 3;
+
+        function hsl2rgb(h, s, l) {
+            const c2 = (1 - Math.abs(2 * l - 1)) * s;
+            const x2 = c2 * (1 - Math.abs((h * 6) % 2 - 1));
+            const m = l - c2 / 2;
+            let r, g, b;
+            if (h < 1/6) { r = c2; g = x2; b = 0; }
+            else if (h < 2/6) { r = x2; g = c2; b = 0; }
+            else if (h < 3/6) { r = 0; g = c2; b = x2; }
+            else if (h < 4/6) { r = 0; g = x2; b = c2; }
+            else if (h < 5/6) { r = x2; g = 0; b = c2; }
+            else { r = c2; g = 0; b = x2; }
+            return [r + m, g + m, b + m];
+        }
+
+        for (let i = 0; i < COUNT; i++) {
+            const arm = Math.floor(Math.random() * armCount);
+            const armAngle = (arm / armCount) * Math.PI * 2;
+            const radius = Math.pow(Math.random(), 0.4) * 4.5;
+            const spiralAngle = radius * 2.3 + armAngle + (Math.random() - 0.5) * 0.25 * (0.2 + radius / 6);
+            const spread = 0.08 + Math.random() * 0.15 * (0.5 + radius / 3);
+
+            data[i * stride] = radius * Math.cos(spiralAngle);
+            data[i * stride + 1] = (Math.random() - 0.5) * spread * 2;
+            data[i * stride + 2] = radius * Math.sin(spiralAngle);
+
+            // Color map: inner warm → mid purple → outer blue
+            const t = Math.min(radius / 4.5, 1);
+            let hue;
+            if (t < 0.3) hue = 0.05 + t / 0.3 * 0.1;
+            else if (t < 0.6) hue = 0.15 + (t - 0.3) / 0.3 * 0.55;
+            else hue = 0.7 + (t - 0.6) / 0.4 * 0.25;
+            hue += (Math.random() - 0.5) * 0.05;
+
+            const rgb = hsl2rgb(hue, 0.85, 0.55 + Math.random() * 0.2);
+            data[i * stride + 3] = rgb[0];
+            data[i * stride + 4] = rgb[1];
+            data[i * stride + 5] = rgb[2];
+            data[i * stride + 6] = 1.5 + Math.random() * 4.0 + radius * 0.3;
+            data[i * stride + 7] = Math.random();
+        }
+
+        const buf = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+        gl.bufferData(gl.ARRAY_BUFFER, data, gl.STATIC_DRAW);
+        this.particleBuf = buf;
+        this._initCoreStar();
+    }
+
+    stop() {
+        const gl = this.gl;
+        if (!gl) return;
+        if (this.prog) gl.deleteProgram(this.prog);
+        if (this.particleBuf) gl.deleteBuffer(this.particleBuf);
+        if (this.coreBuf) gl.deleteBuffer(this.coreBuf);
+    }
+
+    _initCoreStar() {
+        const gl = this.gl;
+        // Single bright point at galaxy center
+        const data = new Float32Array([0, 0, 0, 1.0, 0.85, 0.5, 20.0, 0]);
+        const buf = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+        gl.bufferData(gl.ARRAY_BUFFER, data, gl.STATIC_DRAW);
+        this.coreBuf = buf;
+    }
+
+    update(dt) {
+        const k = dt / 16;
+        this.time += dt;
+
+        // Galaxy self-rotation
+        this.galaxyRotation += 0.003 * k;
+
+        // Breathing pulse for whole galaxy
+        this._pulse = 1.0 + 0.15 * Math.sin(this.time * 0.0015);
+
+        const totalTime = this.time;
+        const t = Math.min(totalTime / 5500, 1.0);
+
+        // Reset lookAt target
+        this._lookTarget = [0, 0, 0];
+
+        if (t < 0.2) {
+            // Segment 1: Fast zoom from far distance + orbital sweep
+            const seg = t / 0.2;
+            const ease = seg < 0.5 ? 2*seg*seg : 1-Math.pow(-2*seg+2,2)/2;
+            this.camAngle = seg * Math.PI * 0.4;
+            this.camDist = 10.0 - ease * 4.5;
+            this.camHeight = 1.5 - seg * 0.3;
+        } else if (t < 0.65) {
+            // Segment 2: DIVE through the galaxy disk!
+            const seg = (t - 0.2) / 0.45;
+            const ease = seg < 0.5 ? 2*seg*seg : 1-Math.pow(-2*seg+2,2)/2;
+            this.camAngle = Math.PI * 0.4 + seg * Math.PI * 0.7;
+            this.camDist = 5.5 - ease * 3.0;
+            this.camHeight = 1.2 - seg * 2.7; // from +1.2 to -1.5, piercing the disk!
+
+            // During dive, look forward along path (creates the "flying through" sensation)
+            const fwdAngle = this.camAngle + 0.4;
+            const fwdDist = this.camDist * 0.35;
+            this._lookTarget = [
+                fwdDist * Math.sin(fwdAngle),
+                this.camHeight * 0.2,
+                fwdDist * Math.cos(fwdAngle)
+            ];
+        } else {
+            // Segment 3: Pull back, slow flip, reveal full galaxy
+            const seg = (t - 0.65) / 0.35;
+            this.camAngle = Math.PI * 1.1 + seg * Math.PI * 1.2;
+            this.camDist = 2.5 + seg * 4.5;
+            this.camHeight = -0.5 + seg * 2.2;
+        }
+    }
+
+    draw() {
+        const gl = this.gl;
+        if (!gl || !this.prog) return;
+
+        const W = gl.canvas.width, H = gl.canvas.height;
+        gl.viewport(0, 0, W, H);
+        gl.clearColor(0.01, 0.005, 0.02, 1);
+        gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+        gl.enable(gl.BLEND);
+        gl.blendFunc(gl.SRC_ALPHA, gl.ONE);
+
+        const lt = this._lookTarget || [0, 0, 0];
+        const proj = this._mat4Perspective(Math.PI / 4, W / H, 0.1, 30);
+        const eyeX = this.camDist * Math.sin(this.camAngle);
+        const eyeY = this.camHeight;
+        const eyeZ = this.camDist * Math.cos(this.camAngle);
+        const view = this._mat4LookAt(eyeX, eyeY, eyeZ, lt[0], lt[1], lt[2], 0, 1, 0);
+        const model = new Float32Array([1,0,0,0, 0,1,0,0, 0,0,1,0, 0,0,0,1]);
+        this._mat4RotateY(model, this.galaxyRotation);
+        const mv = this._mat4Multiply(view, model);
+        const mvp = this._mat4Multiply(proj, mv);
+
+        // Breathing pulse uniform (modulate particle sizes)
+        const pulseUniform = this._pulse || 1.0;
+
+        gl.useProgram(this.prog);
+        const mvpLoc = gl.getUniformLocation(this.prog, 'uMVP');
+        const timeLoc = gl.getUniformLocation(this.prog, 'uTime');
+        gl.uniformMatrix4fv(mvpLoc, false, mvp);
+        gl.uniform1f(timeLoc, this.time * 0.001);
+
+        const posLoc = gl.getAttribLocation(this.prog, 'aPos');
+        const colLoc = gl.getAttribLocation(this.prog, 'aColor');
+        const sizeLoc = gl.getAttribLocation(this.prog, 'aSize');
+        const phaseLoc = gl.getAttribLocation(this.prog, 'aPhase');
+
+        const stride = 4 * 10;
+
+        // === Draw galaxy particles ===
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.particleBuf);
+        gl.enableVertexAttribArray(posLoc);
+        gl.vertexAttribPointer(posLoc, 3, gl.FLOAT, false, stride, 0);
+        gl.enableVertexAttribArray(colLoc);
+        gl.vertexAttribPointer(colLoc, 3, gl.FLOAT, false, stride, 12);
+        gl.enableVertexAttribArray(sizeLoc);
+        gl.vertexAttribPointer(sizeLoc, 1, gl.FLOAT, false, stride, 24);
+        gl.enableVertexAttribArray(phaseLoc);
+        gl.vertexAttribPointer(phaseLoc, 1, gl.FLOAT, false, stride, 28);
+        gl.drawArrays(gl.POINTS, 0, this.particleCount);
+
+        // === Draw core star (bright center) ===
+        if (this.coreBuf) {
+            gl.bindBuffer(gl.ARRAY_BUFFER, this.coreBuf);
+            gl.enableVertexAttribArray(posLoc);
+            gl.vertexAttribPointer(posLoc, 3, gl.FLOAT, false, stride, 0);
+            gl.enableVertexAttribArray(colLoc);
+            gl.vertexAttribPointer(colLoc, 3, gl.FLOAT, false, stride, 12);
+            gl.enableVertexAttribArray(sizeLoc);
+            gl.vertexAttribPointer(sizeLoc, 1, gl.FLOAT, false, stride, 24);
+            gl.enableVertexAttribArray(phaseLoc);
+            gl.vertexAttribPointer(phaseLoc, 1, gl.FLOAT, false, stride, 28);
+            gl.drawArrays(gl.POINTS, 0, 1);
+        }
+    }
+}
+
+/* ======================= 场景 3: 地球降临 (Earth Pro) ======================= */
 class ParticleEarthScene {
     constructor(canvasOrCtx, w, h) {
         if (canvasOrCtx.getContext) {
@@ -681,7 +1477,7 @@ class ParticleEarthScene {
             }
         } catch(e) {}
 
-        this.gl = this.canvas.getContext('webgl') || this.canvas.getContext('experimental-webgl');
+        this.gl = this.canvas.getContext('webgl', { preserveDrawingBuffer: true }) || this.canvas.getContext('experimental-webgl');
         if (!this.gl) return;
 
         const gl = this.gl;
@@ -700,7 +1496,7 @@ class ParticleEarthScene {
             }
         `;
 
-        // Fragment shader - terrain + lighting + clouds + atmosphere + aurora
+        // Fragment shader - terrain + lighting + clouds + atmosphere + aurora (enhanced)
         const fsSource = `
             precision mediump float;
             varying vec2 vUV;
@@ -724,63 +1520,77 @@ class ParticleEarthScene {
                 for (int i = 0; i < 6; i++) { v += a * noise(p); p *= 2.1; a *= 0.5; }
                 return v;
             }
+            float fbm3(vec2 p) {
+                float v = 0.0; float a = 0.5;
+                for (int i = 0; i < 3; i++) { v += a * noise(p); p *= 2.1; a *= 0.5; }
+                return v;
+            }
 
             void main() {
                 vec3 n = normalize(vPos);
-                // spherical UV to lat/lon
-                float lat = asin(n.y) * 0.3183; // -1 to 1 -> -0.5pi to 0.5pi scaled
+                float lat = asin(n.y) * 0.3183;
                 float lon = atan(n.z, n.x) * 0.3183;
 
-                // Terrain color: fbm noise
-                float elev = fbm(vec2(lon * 4.0 + 100.0, lat * 4.0));
+                // Terrain color: fbm noise (higher freq for more detail)
+                float elev = fbm(vec2(lon * 5.0 + 100.0, lat * 5.0));
                 float isLand = step(0.48, elev);
-                vec3 ocean = mix(vec3(0.05, 0.15, 0.45), vec3(0.1, 0.3, 0.7), fbm(vec2(lon*8.0+50.0, lat*8.0)));
-                vec3 land = mix(vec3(0.1, 0.35, 0.05), vec3(0.45, 0.35, 0.2), fbm(vec2(lon*2.0, lat*2.0+200.0)));
+                vec3 ocean = mix(vec3(0.04, 0.12, 0.40), vec3(0.08, 0.25, 0.65), fbm(vec2(lon*10.0+50.0, lat*10.0)));
+                vec3 land = mix(vec3(0.08, 0.30, 0.04), vec3(0.50, 0.38, 0.18), fbm(vec2(lon*3.0, lat*3.0+200.0)));
                 vec3 terrain = mix(ocean, land, isLand);
 
-                // Ice caps
-                float ice = smoothstep(0.82, 0.95, abs(n.y));
-                terrain = mix(terrain, vec3(0.9, 0.95, 1.0), ice);
+                // Ice caps (smoother transition)
+                float ice = smoothstep(0.78, 0.96, abs(n.y));
+                terrain = mix(terrain, vec3(0.92, 0.96, 1.0), ice);
 
-                // Lighting: sun from direction uLightDir
+                // Lighting
                 vec3 L = normalize(uLightDir);
                 float diff = max(dot(n, L), 0.0);
-                float ambient = 0.08;
-                vec3 lit = terrain * (ambient + diff * 0.9);
+                float ambient = 0.10;
+                vec3 lit = terrain * (ambient + diff * 0.90);
 
-                // Night side: city lights
-                float night = 1.0 - smoothstep(-0.1, 0.1, diff);
-                float cityNoise = fbm(vec2(lon * 12.0 + 300.0, lat * 12.0));
-                float cities = step(0.65, cityNoise) * isLand * night * 0.6;
-                vec3 cityColor = vec3(1.0, 0.8, 0.4);
+                // Night side: city lights with flickering
+                float night = 1.0 - smoothstep(-0.15, 0.15, diff);
+                float citySeed = hash(vec2(lon * 30.0 + 100.0, lat * 30.0 + 200.0));
+                float flicker = 0.7 + 0.3 * sin(uTime * (2.0 + citySeed * 8.0) + citySeed * 100.0);
+                float cityNoise = fbm3(vec2(lon * 15.0 + 300.0, lat * 15.0));
+                float cities = step(0.60, cityNoise) * isLand * night * 0.6 * flicker;
+                vec3 cityColor = mix(vec3(1.0, 0.7, 0.3), vec3(1.0, 0.9, 0.6), citySeed);
                 lit += cities * cityColor;
 
-                // Clouds
-                float cloud = texture2D(uCloudTex, vec2(vUV.x + uTime * 0.003, vUV.y)).r;
-                cloud = smoothstep(0.4, 0.7, cloud);
-                // Clouds are lit from sun side
+                // Clouds with improved lighting
+                float cloud = texture2D(uCloudTex, vec2(vUV.x + uTime * 0.004, vUV.y)).r;
+                cloud = smoothstep(0.35, 0.72, cloud);
                 float cloudLit = max(dot(n, L), 0.0);
-                vec3 cloudColor = mix(vec3(0.4, 0.4, 0.45), vec3(1.0, 1.0, 1.0), cloudLit * 0.5);
+                vec3 cloudColor = mix(vec3(0.35, 0.35, 0.40), vec3(1.0, 1.0, 1.0), cloudLit * 0.6);
                 lit = mix(lit, cloudColor, cloud * 0.85);
 
-                // Atmosphere rim glow
+                // Atmosphere rim glow (Rayleigh-like scattering)
                 float rim = 1.0 - abs(dot(n, vec3(0.0, 1.0, 0.0)));
-                rim = pow(rim, 3.0);
+                rim = pow(rim, 2.5);
                 float sunGlow = max(dot(n, L), 0.0);
-                sunGlow = pow(sunGlow, 8.0);
-                vec3 atmosColor = mix(vec3(0.2, 0.5, 1.0), vec3(1.0, 0.8, 0.3), sunGlow);
-                lit += atmosColor * rim * 0.7;
+                sunGlow = pow(sunGlow, 6.0);
+                // Wavelength-dependent scattering: blue scatters more
+                vec3 rayleigh = vec3(0.3, 0.6, 1.0);
+                vec3 mie = vec3(1.0, 0.8, 0.5);
+                vec3 atmosColor = mix(rayleigh, mie, sunGlow);
+                float atmosStrength = rim * 0.65 + sunGlow * 0.5;
+                lit += atmosColor * atmosStrength;
 
-                // Aurora at poles
-                float auroraN = smoothstep(0.5, 0.98, n.y) * (1.0 - smoothstep(0.98, 1.0, n.y));
-                float auroraS = smoothstep(0.5, 0.98, -n.y) * (1.0 - smoothstep(0.98, 1.0, -n.y));
+                // Aurora at poles (multi-layer, enhanced)
+                float auroraN = smoothstep(0.45, 0.97, n.y) * (1.0 - smoothstep(0.97, 1.0, n.y));
+                float auroraS = smoothstep(0.45, 0.97, -n.y) * (1.0 - smoothstep(0.97, 1.0, -n.y));
                 float auroraVal = auroraN + auroraS;
-                if (auroraVal > 0.1) {
-                    float aWave = sin(lon * 20.0 + uTime * 1.5) * 0.5 + 0.5;
-                    aWave *= sin(lat * 10.0 + uTime * 0.8) * 0.5 + 0.5;
-                    float auroraFade = night * 0.4 + 0.1;
-                    vec3 auroraColor = mix(vec3(0.0, 1.0, 0.5), vec3(0.5, 0.0, 1.0), sin(uTime * 0.3 + lon * 5.0) * 0.5 + 0.5);
-                    lit += auroraColor * auroraVal * aWave * auroraFade;
+                if (auroraVal > 0.05) {
+                    float aWave1 = sin(lon * 25.0 + uTime * 1.8) * 0.5 + 0.5;
+                    float aWave2 = sin(lon * 15.0 + uTime * 1.2 + 2.0) * 0.5 + 0.5;
+                    float aWave = aWave1 * 0.6 + aWave2 * 0.4;
+                    aWave *= sin(lat * 12.0 + uTime * 0.6) * 0.5 + 0.5;
+                    float auroraFade = night * 0.5 + 0.15;
+                    // Multi-color aurora: green → magenta → teal
+                    float colorShift = sin(uTime * 0.2 + lon * 3.0) * 0.5 + 0.5;
+                    vec3 auroraColor = mix(vec3(0.0, 1.0, 0.4), vec3(0.6, 0.0, 1.0), colorShift);
+                    auroraColor = mix(auroraColor, vec3(0.0, 0.8, 1.0), sin(uTime * 0.15 + lon * 2.0) * 0.5 + 0.5);
+                    lit += auroraColor * auroraVal * aWave * auroraFade * 1.2;
                 }
 
                 gl_FragColor = vec4(lit, 1.0);
@@ -817,11 +1627,12 @@ class ParticleEarthScene {
         this._buildAtmosphere(gl, prog);
         this._buildTexture(gl);
         this._buildCloudTexture(gl);
+        this._buildMoon(gl, prog);
     }
 
     _buildMesh(gl, prog) {
         // UV sphere with lat/lon grid, no top/bottom caps
-        const LAT_SEGS = 60, LON_SEGS = 120;
+        const LAT_SEGS = 80, LON_SEGS = 160;
         const verts = [], uvs = [], indices = [];
 
         for (let lat = 0; lat <= LAT_SEGS; lat++) {
@@ -1038,6 +1849,64 @@ class ParticleEarthScene {
         this.cloudTexture = tex;
     }
 
+    _buildMoon(gl, prog) {
+        const SEG = 16;
+        const verts = [];
+        for (let lat = 0; lat <= SEG; lat++) {
+            const theta = lat * Math.PI / SEG;
+            const st = Math.sin(theta), ct = Math.cos(theta);
+            for (let lon = 0; lon <= SEG; lon++) {
+                const phi = lon * 2 * Math.PI / SEG;
+                verts.push(Math.cos(phi) * st, ct, Math.sin(phi) * st);
+            }
+        }
+        const indices = [];
+        for (let lat = 0; lat < SEG; lat++) {
+            for (let lon = 0; lon < SEG; lon++) {
+                const a = lat * (SEG + 1) + lon, b = a + SEG + 1;
+                indices.push(a, b, a + 1, b, b + 1, a + 1);
+            }
+        }
+        const vbo = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, vbo);
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(verts), gl.STATIC_DRAW);
+        const ibo = gl.createBuffer();
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, ibo);
+        gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices), gl.STATIC_DRAW);
+        this.moonMesh = { vbo, ibo, count: indices.length };
+
+        // Simple gray shader for moon
+        const mVS = `
+            attribute vec3 aPos;
+            uniform mat4 uMVP;
+            void main() { gl_Position = uMVP * vec4(aPos, 1.0); }
+        `;
+        const mFS = `
+            precision mediump float;
+            void main() {
+                float d = length(gl_PointCoord - 0.5);
+                gl_FragColor = vec4(0.5, 0.5, 0.52, 0.9);
+            }
+        `;
+        function cs(t, s) {
+            const sh = gl.createShader(t);
+            gl.shaderSource(sh, s);
+            gl.compileShader(sh);
+            if (!gl.getShaderParameter(sh, gl.COMPILE_STATUS)) { gl.deleteShader(sh); return null; }
+            return sh;
+        }
+        const mvs = cs(gl.VERTEX_SHADER, mVS);
+        const mfs = cs(gl.FRAGMENT_SHADER, mFS);
+        if (mvs && mfs) {
+            const mp = gl.createProgram();
+            gl.attachShader(mp, mvs);
+            gl.attachShader(mp, mfs);
+            gl.linkProgram(mp);
+            if (gl.getProgramParameter(mp, gl.LINK_STATUS)) this.moonProg = mp;
+        }
+        this.moonAngle = 0;
+    }
+
     _mat4Perspective(fov, aspect, near, far) {
         const f = 1.0 / Math.tan(fov / 2);
         const nf = 1 / (near - far);
@@ -1104,15 +1973,66 @@ class ParticleEarthScene {
         if (this.texture) gl.deleteTexture(this.texture);
         if (this.cloudTexture) gl.deleteTexture(this.cloudTexture);
         if (this.prog) gl.deleteProgram(this.prog);
+        if (this.moonProg) gl.deleteProgram(this.moonProg);
+        if (this.moonMesh) {
+            gl.deleteBuffer(this.moonMesh.vbo);
+            gl.deleteBuffer(this.moonMesh.ibo);
+        }
     }
 
     update(dt) {
         const k = dt / 16;
         this.time += dt;
         this.auroraPhase += 0.002 * k;
-        // Slow rotation + camera bob
+        // Earth self-rotation
         this.rotation += 0.004 * k;
-        this.cameraZ = Math.sin(this.time * 0.0004) * 0.3;
+        // Moon orbit
+        this.moonAngle += 0.0002 * k;
+
+        // ===== Cinematic camera animation v3 (dramatic) =====
+        // 三段式：极远zoom → 高速俯冲+极地翻转 → 拉远收场
+        const animDuration = 5500;
+        const t = Math.min(this.time / animDuration, 1.0);
+
+        if (t < 0.25) {
+            // Segment 1: 从极远距离快速拉近
+            const seg = t / 0.25;
+            this._camDist = 8.0 - seg * 4.5; // 8.0 → 3.5
+            this._camAngle = seg * Math.PI * 2.0;
+            this._camHeight = 0.3 + Math.sin(seg * Math.PI * 2) * 0.2;
+            this._fov = Math.PI / 6 + seg * Math.PI / 12; // 30° → 45°
+            this._lookTarget = [0, 0, 0];
+        } else if (t < 0.7) {
+            // Segment 2: 高速俯冲 + 极地翻转
+            const seg = (t - 0.25) / 0.45;
+            const ease = seg < 0.5 ? 2 * seg * seg : 1 - Math.pow(-2 * seg + 2, 2) / 2;
+            this._camDist = 3.5 - ease * 2.3;
+            this._camAngle = Math.PI * 2.0 * 0.25 + seg * Math.PI * 1.5;
+            // Polar flip: camera swings from south to north
+            this._camHeight = 0.5 - ease * 1.2;
+            this._fov = Math.PI / 4 + ease * Math.PI / 5;
+            // Look forward along surface
+            const blend = Math.min(seg * 2.0, 1.0);
+            const fwdAngle = this._camAngle + 0.4;
+            const surfaceTarget = [
+                Math.sin(fwdAngle) * 0.95,
+                this._camHeight * 0.2 + 0.1,
+                Math.cos(fwdAngle) * 0.95
+            ];
+            this._lookTarget = [
+                blend * surfaceTarget[0],
+                blend * surfaceTarget[1],
+                blend * surfaceTarget[2]
+            ];
+        } else {
+            // Segment 3: 拉远收场（月球可见方向）
+            const seg = (t - 0.7) / 0.3;
+            this._camDist = 1.2 + seg * 3.5;
+            this._camAngle = Math.PI * 2.0 * 0.25 + Math.PI * 1.5 * 0.45 + seg * Math.PI * 0.4;
+            this._camHeight = -0.7 + seg * 1.5;
+            this._fov = Math.PI / 4 + (1 - seg) * Math.PI / 10;
+            this._lookTarget = [0.3, 0.1, 0];
+        }
     }
 
     draw() {
@@ -1142,11 +2062,16 @@ class ParticleEarthScene {
         gl.enable(gl.BLEND);
         gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 
-        // Camera
-        const camR = 3.0 + this.cameraZ;
-        const eye = [camR * Math.sin(this.rotation * 0.3), 0.5, camR * Math.cos(this.rotation * 0.3)];
-        const proj = this._mat4Perspective(Math.PI / 4, W / H, 0.1, 100);
-        const view = this._mat4LookAt(eye, [0, 0, 0], [0, 1, 0]);
+        // Camera — cinematic animation (三段式过场视角)
+        const camDist = this._camDist !== undefined ? this._camDist : 3.0;
+        const camAngle = this._camAngle !== undefined ? this._camAngle : 0;
+        const camHeight = this._camHeight !== undefined ? this._camHeight : 0.5;
+        const fov = this._fov !== undefined ? this._fov : Math.PI / 4;
+        const lookTarget = this._lookTarget || [0, 0, 0];
+
+        const eye = [camDist * Math.sin(camAngle), camHeight, camDist * Math.cos(camAngle)];
+        const proj = this._mat4Perspective(fov, W / H, 0.1, 100);
+        const view = this._mat4LookAt(eye, lookTarget, [0, 1, 0]);
         const pv = this._mat4Multiply(proj, view);
         const model = new Float32Array([1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]);
         const mvp = pv; // no separate model transform
@@ -1287,6 +2212,33 @@ class ParticleEarthScene {
             gl.drawElements(gl.TRIANGLES, this.atmosMesh.count, gl.UNSIGNED_SHORT, 0);
 
             gl.deleteProgram(aprog);
+        }
+
+        // === Draw Moon ===
+        if (this.moonProg && this.moonMesh) {
+            const moonDist = 6.5;
+            const moonAngle = this.moonAngle || 0;
+            const moonX = moonDist * Math.cos(moonAngle);
+            const moonZ = moonDist * Math.sin(moonAngle);
+            const moonY = 0.5 * Math.sin(moonAngle * 0.5);
+            const moonScale = 0.25;
+            const moonModel = new Float32Array([
+                moonScale, 0, 0, 0,
+                0, moonScale, 0, 0,
+                0, 0, moonScale, 0,
+                moonX, moonY, moonZ, 1
+            ]);
+            const moonMvp = this._mat4Multiply(pv, moonModel);
+            gl.useProgram(this.moonProg);
+            const mmvpLoc = gl.getUniformLocation(this.moonProg, 'uMVP');
+            gl.uniformMatrix4fv(mmvpLoc, false, moonMvp);
+            const mPosLoc = gl.getAttribLocation(this.moonProg, 'aPos');
+            gl.bindBuffer(gl.ARRAY_BUFFER, this.moonMesh.vbo);
+            gl.enableVertexAttribArray(mPosLoc);
+            gl.vertexAttribPointer(mPosLoc, 3, gl.FLOAT, false, 0, 0);
+            gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.moonMesh.ibo);
+            gl.depthMask(true);
+            gl.drawElements(gl.TRIANGLES, this.moonMesh.count, gl.UNSIGNED_SHORT, 0);
         }
 
         gl.disable(gl.BLEND);
