@@ -534,18 +534,33 @@
         return '<?xml version="1.0" encoding="utf-8"?>\n<html xmlns="http://www.w3.org/1999/xhtml">\n<head><title>' + escXml(title) + '</title>\n<link rel="stylesheet" type="text/css" href="styles.css"/></head>\n<body>' + body + '\n</body>\n</html>';
     }
 
-    function makeOpf(title, author, lang, count, uid) {
+    function makeCoverXhtml(imgFile) {
+        return '<?xml version="1.0" encoding="utf-8"?>\n<html xmlns="http://www.w3.org/1999/xhtml">\n<head><title>封面</title></head>\n<body style="text-align:center;padding:0;margin:0">\n<img src="Images/' + imgFile + '" alt="封面" style="max-width:100%;height:100%"/>\n</body>\n</html>';
+    }
+
+    function makeOpf(title, author, lang, count, uid, coverInfo) {
         let items = '', spine = '';
+        let metaCover = '';
+        if (coverInfo) {
+            items += '    <item id="cover-img" href="Images/cover.' + coverInfo.ext + '" media-type="' + coverInfo.mime + '"/>\n';
+            items += '    <item id="cover" href="cover.xhtml" media-type="application/xhtml+xml"/>\n';
+            spine += '    <itemref idref="cover"/>\n';
+            metaCover = '    <meta name="cover" content="cover-img"/>\n  ';
+        }
         for (let i = 1; i <= count; i++) {
             items += '    <item id="ch' + i + '" href="ch' + i + '.xhtml" media-type="application/xhtml+xml"/>\n';
             spine += '    <itemref idref="ch' + i + '"/>\n';
         }
-        return '<?xml version="1.0" encoding="utf-8"?>\n<package xmlns="http://www.idpf.org/2007/opf" xmlns:dc="http://purl.org/dc/elements/1.1/" version="2.0" unique-identifier="BookId">\n  <metadata>\n    <dc:title>' + escXml(title) + '</dc:title>\n    <dc:creator>' + escXml(author) + '</dc:creator>\n    <dc:language>' + lang + '</dc:language>\n    <dc:identifier id="BookId">urn:uuid:' + uid + '</dc:identifier>\n  </metadata>\n  <manifest>\n    <item id="ncx" href="toc.ncx" media-type="application/x-dtbncx+xml"/>\n    <item id="css" href="styles.css" media-type="text/css"/>\n' + items + '  </manifest>\n  <spine toc="ncx">\n' + spine + '  </spine>\n</package>';
+        return '<?xml version="1.0" encoding="utf-8"?>\n<package xmlns="http://www.idpf.org/2007/opf" xmlns:dc="http://purl.org/dc/elements/1.1/" version="2.0" unique-identifier="BookId">\n  <metadata>\n' + metaCover + '    <dc:title>' + escXml(title) + '</dc:title>\n    <dc:creator>' + escXml(author) + '</dc:creator>\n    <dc:language>' + lang + '</dc:language>\n    <dc:identifier id="BookId">urn:uuid:' + uid + '</dc:identifier>\n  </metadata>\n  <manifest>\n    <item id="ncx" href="toc.ncx" media-type="application/x-dtbncx+xml"/>\n    <item id="css" href="styles.css" media-type="text/css"/>\n' + items + '  </manifest>\n  <spine toc="ncx">\n' + spine + '  </spine>\n</package>';
     }
 
-    function makeNcx(title, author, chunks, uid) {
+    function makeNcx(title, author, chunks, uid, hasCover) {
         let nav = '';
         var playOrder = 0;
+        if (hasCover) {
+            playOrder++;
+            nav += '    <navPoint id="np' + playOrder + '" playOrder="' + playOrder + '"><navLabel><text>封面</text></navLabel><content src="cover.xhtml"/></navPoint>\n';
+        }
         var seen = {};
         for (let i = 0; i < chunks.length; i++) {
             var ci = chunks[i].chapterIndex;
@@ -665,7 +680,27 @@
             console.log('[EPUB] writing mimetype...');
             await writeZipEntry('mimetype', 'application/epub+zip', false);
 
-            // 2. 逐章转换 + 写入
+            // 2. 封面图片
+            var hasCover = false;
+            var coverInfo = null;
+            if (state.coverImage) {
+                const m = state.coverImage.match(/^data:image\/(\w+);base64,(.+)$/);
+                if (m) {
+                    console.log('[EPUB] writing cover image...');
+                    hasCover = true;
+                    var coverExt = m[1] === 'jpeg' ? 'jpg' : m[1];
+                    var coverMime = m[1] === 'jpeg' ? 'image/jpeg' : 'image/' + m[1];
+                    var bin = atob(m[2]);
+                    var buf = new Uint8Array(bin.length);
+                    for (var _j = 0; _j < bin.length; _j++) buf[_j] = bin.charCodeAt(_j);
+                    await writeZipEntry('OEBPS/Images/cover.' + coverExt, buf, false);
+                    var coverHtml = makeCoverXhtml('cover.' + coverExt);
+                    await writeZipEntry('OEBPS/cover.xhtml', coverHtml, false);
+                    coverInfo = { ext: coverExt, mime: coverMime };
+                }
+            }
+
+            // 3. 逐章转换 + 写入
             for (var i = 0; i < total; i++) {
                 var ch = chunks[i];
                 var pct = 0.5 + (i / total) * 91;
@@ -695,10 +730,10 @@
             var css = 'body{font-family:serif;line-height:1.8;padding:1em;margin:0}p{text-indent:2em;margin:0}';
             await writeZipEntry('OEBPS/styles.css', css, false);
 
-            var opf = makeOpf(title, author, lang, total, uid);
+            var opf = makeOpf(title, author, lang, total, uid, coverInfo);
             await writeZipEntry('OEBPS/content.opf', opf, false);
 
-            var ncx = makeNcx(title, author, chunks, uid);
+            var ncx = makeNcx(title, author, chunks, uid, hasCover);
             await writeZipEntry('OEBPS/toc.ncx', ncx, false);
 
             var container = '<?xml version="1.0" encoding="utf-8"?>\n<container xmlns="urn:oasis:names:tc:opendocument:xmlns:container" version="1.0">\n  <rootfiles>\n    <rootfile full-path="OEBPS/content.opf" media-type="application/oebps-package+xml"/>\n  </rootfiles>\n</container>';
