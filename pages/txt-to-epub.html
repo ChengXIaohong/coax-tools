@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="将 TXT 文本文件转换为 EPUB 电子书，支持自动章节解析和封面设置。">
+    <meta name="keywords" content="TXT转EPUB, 电子书转换, 文本转EPUB, EPUB生成">
+    <meta name="author" content="coax">
+    <title>TXT转EPUB - coax的小工具</title>
+    <script>
+    (function() {
+        var saved = localStorage.getItem('coax-tools-mode');
+        var theme = saved === 'light' ? 'light' : 'sci-fi';
+        document.documentElement.setAttribute('data-theme', theme);
+    })();
+    </script>
+    <link rel="stylesheet" href="../styles/theme-base.css">
+    <link rel="stylesheet" href="../styles/theme-tool.css">
+    <link rel="stylesheet" href="../css/txt-to-epub.css">
+</head>
+<body data-theme="sci-fi">
+    <div class="bg-orbs"></div>
+    <div class="grid-pattern"></div>
+    <div class="container">
+        <main class="docx-main">
+            <header class="tool-header-bar">
+                <a href="../index.html" class="back-btn">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M19 12H5M12 19l-7-7 7-7"/>
+                    </svg>
+                    返回首页
+                </a>
+                <div class="tool-title">
+                    <div class="tool-icon">📚</div>
+                    <span class="tool-name">Txt转Epub</span>
+                </div>
+                <span class="tool-desc">将 TXT 文本转换为 EPUB 电子书</span>
+            </header>
+
+            <div class="content-zone">
+                <div class="epub-container">
+                    <div class="message" id="message"></div>
+
+                    <!-- 文件上传区 -->
+                    <div class="card">
+                        <h2>📄 文件选择</h2>
+                        <div class="upload-area" id="uploadArea">
+                            <div class="upload-hint">
+                                <span class="upload-icon">📁</span>
+                                <p>拖拽 TXT 文件到此处或点击上传</p>
+                                <p class="upload-limit">最多10个文件，每个最大50MB</p>
+                            </div>
+                            <div class="file-input-wrapper">
+                                <button class="file-input-button">选择文件</button>
+                                <input type="file" id="fileInput" accept=".txt,text/plain" multiple>
+                            </div>
+                        </div>
+                        <div class="file-list" id="fileList"></div>
+                    </div>
+
+                    <!-- 内容预览区 -->
+                    <div class="card" id="previewCard" style="display: none;">
+                        <h2>👁 内容预览</h2>
+                        <div class="preview-controls">
+                            <select id="previewFileSelect"></select>
+                        </div>
+                        <div class="preview-content" id="previewContent"></div>
+                    </div>
+
+                    <!-- 章节解析区 -->
+                    <div class="card" id="chapterCard" style="display: none;">
+                        <h2>📑 章节设置</h2>
+                        <div class="chapter-list" id="chapterList"></div>
+                    </div>
+
+                    <!-- 封面与元数据区 -->
+                    <div class="card">
+                        <h2>🎨 封面与元数据</h2>
+                        <div class="metadata-form">
+                            <div class="form-row">
+                                <label for="bookTitle">书名 <span class="required">*</span>：</label>
+                                <input type="text" id="bookTitle" placeholder="请输入书名">
+                            </div>
+                            <div class="form-row">
+                                <label for="bookAuthor">作者：</label>
+                                <input type="text" id="bookAuthor" value="未知作者" placeholder="请输入作者">
+                            </div>
+                            <div class="form-row">
+                                <label for="bookLanguage">语言：</label>
+                                <select id="bookLanguage">
+                                    <option value="zh-CN" selected>中文(简体)</option>
+                                    <option value="zh-TW">中文(繁体)</option>
+                                    <option value="en">English</option>
+                                    <option value="ja">日本語</option>
+                                </select>
+                            </div>
+                            <div class="form-row cover-row">
+                                <label>封面图片：</label>
+                                <div class="cover-upload" id="coverUpload">
+                                    <div class="cover-placeholder">
+                                        <span class="cover-icon">🖼️</span>
+                                        <span>点击上传封面</span>
+                                    </div>
+                                    <input type="file" id="coverInput" accept="image/jpeg,image/png,image/jpg">
+                                    <img id="coverPreview" class="cover-preview" style="display: none;">
+                                </div>
+                                <button id="removeCoverBtn" class="btn-small btn-danger" style="display: none;">移除</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 操作按钮 -->
+                    <div class="action-row">
+                        <button id="resetBtn" class="btn-secondary">重置</button>
+                        <button id="generateBtn" class="btn-primary">生成 EPUB</button>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- 生成进度遮罩 -->
+        <div class="progress-overlay" id="progressOverlay" style="display:none">
+            <div class="progress-panel">
+                <div class="progress-title" id="progressTitle">正在生成 EPUB</div>
+                <div class="progress-bar-track">
+                    <div class="progress-bar-fill" id="progressFill"></div>
+                </div>
+                <div class="progress-stats">
+                    <span class="progress-percent" id="progressPercent">0%</span>
+                    <span class="progress-detail" id="progressDetail">准备中...</span>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <div class="footer-content">
+                <p>&copy; <span id="currentYear"></span> root@coax. 保留所有权利。</p>
+                <p>渝ICP备2025071398号</p>
+            </div>
+        </footer>
+    </div>
+
+    <script src="../js/theme-switcher.js"></script>
+    <script src="../js/txt-to-epub.js"></script>
+</body>
+</html>

@@ -128,6 +128,14 @@ const tools = [
         icon: "🎮",
         category: "dev"
     },
+    {
+        id: 17,
+        title: "Txt转Epub",
+        description: "将 TXT 文本文件转换为 EPUB 电子书，支持自动章节解析和封面设置。",
+        link: "pages/txt-to-epub.html",
+        icon: "📚",
+        category: "doc"
+    },
 ];
 
 // 分类配置
