@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>Txt转Epub 测试</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; max-width: 1100px; margin: 0 auto; }
+        h1 { border-bottom: 2px solid #333; padding-bottom: 8px; }
+        .test-case { margin: 16px 0; padding: 14px; border: 1px solid #ccc; border-radius: 6px; background: #fafafa; }
+        .test-case h3 { margin-top: 0; }
+        .test-case .desc { color: #666; font-size: 13px; margin: 4px 0 10px; }
+        .test-result { margin-top: 10px; padding: 10px; border-radius: 4px; font-family: Menlo, monospace; font-size: 12px; white-space: pre-wrap; }
+        .pass { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .fail { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .summary { margin: 20px 0; padding: 16px; border-radius: 6px; font-size: 16px; font-weight: bold; }
+        button { padding: 10px 18px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; margin-right: 8px; }
+        button:hover { background: #0056b3; }
+        code { background: #f0f0f0; padding: 1px 5px; border-radius: 3px; font-size: 12px; }
+        .fixture { background: #f9f9f9; padding: 8px 10px; border-left: 3px solid #999; font-family: Menlo, monospace; font-size: 12px; white-space: pre-wrap; margin: 8px 0; }
+        .group-table { border-collapse: collapse; margin: 8px 0; font-size: 12px; }
+        .group-table th, .group-table td { border: 1px solid #ddd; padding: 4px 8px; text-align: left; }
+        .group-table th { background: #eee; }
+    </style>
+</head>
+<body>
+    <h1>Txt转Epub — 章节识别模板 单元测试</h1>
+    <p>测试 4 个章节模板的正则匹配、分组提取、标题格式化与端到端解析。</p>
+
+    <div>
+        <button onclick="runAll()">运行所有测试</button>
+        <button onclick="runChinese()">第X章</button>
+        <button onclick="runNumbered()">数字+标点</button>
+        <button onclick="runChapter()">Chapter X</button>
+        <button onclick="runJuanhuiji()">卷/回/集</button>
+        <button onclick="runEndToEnd()">端到端解析</button>
+    </div>
+
+    <div id="summary" class="summary" style="display:none;"></div>
+
+    <div id="chineseCase" class="test-case">
+        <h3>1. <code>chinese</code> — 第X章 (中文)</h3>
+        <div class="desc">匹配：第1章、第一章、第一百零三章 标题（标题可选）</div>
+        <div id="chineseResult" class="test-result" style="display:none;"></div>
+    </div>
+
+    <div id="numberedCase" class="test-case">
+        <h3>2. <code>numbered</code> — 数字+标点 (1、 / 1.)</h3>
+        <div class="desc">匹配：1、标题、2、标题、10. 标题、1.标题（标题必填）</div>
+        <div id="numberedResult" class="test-result" style="display:none;"></div>
+    </div>
+
+    <div id="chapterCase" class="test-case">
+        <h3>3. <code>chapter</code> — Chapter X (英文)</h3>
+        <div class="desc">匹配：Chapter 1、CHAPTER 12、Chapter 3: Title（不区分大小写）</div>
+        <div id="chapterResult" class="test-result" style="display:none;"></div>
+    </div>
+
+    <div id="juanhuijiCase" class="test-case">
+        <h3>4. <code>juanhuiji</code> — 卷/回/集</h3>
+        <div class="desc">匹配：卷一、卷123、Episode 5、第一回、第一集（第X+回/集/卷 需带后缀）</div>
+        <div id="juanhuijiResult" class="test-result" style="display:none;"></div>
+    </div>
+
+    <div id="e2eCase" class="test-case">
+        <h3>5. 端到端解析</h3>
+        <div class="desc">模拟完整 <code>parseChapters(content, patternId)</code>，验证章节列表与展示标题。</div>
+        <div id="e2eResult" class="test-result" style="display:none;"></div>
+    </div>
+
+    <script>
+    // ===== 测试夹具：与 js/txt-to-epub.js 保持同步 =====
+    const CHAPTER_PATTERNS = [
+        {
+            id: 'chinese',
+            label: '第X章 (中文)',
+            regex: /^第([零一二三四五六七八九十百千万0-9]+)章(?:\s+([^\n]+))?\s*$/gm,
+            numGroup: 1, titleGroup: 2, hasTitle: true,
+            formatTitle: (num, title) => title ? '第' + num + '章 ' + title : '第' + num + '章'
+        },
+        {
+            id: 'numbered',
+            label: '数字+标点',
+            regex: /^(\d+)([、.])[ \t]*([^\n]+?)[ \t]*$/gm,
+            numGroup: 1, titleGroup: 3, hasTitle: false,
+            formatTitle: (num, title, m) => num + m[2] + ' ' + title
+        },
+        {
+            id: 'chapter',
+            label: 'Chapter X',
+            regex: /^Chapter\s+(\d+)(?:[\s:：]+([^\n]+?))?\s*$/gmi,
+            numGroup: 1, titleGroup: 2, hasTitle: true,
+            formatTitle: (num, title) => title ? 'Chapter ' + num + ': ' + title : 'Chapter ' + num
+        },
+        {
+            id: 'juanhuiji',
+            label: '卷/回/集',
+            regex: /^(?:Episode\s+(\d+)|卷([零一二三四五六七八九十百千万0-9]+)|第([零一二三四五六七八九十百千万0-9]+)(卷|回|集))(?:[\s:：]+([^\n]+?))?[ \t]*$/gmi,
+            numGroup: [1, 2, 3], titleGroup: 5, hasTitle: true,
+            formatTitle: (num, title, m) => {
+                if (m[1] !== undefined) return title ? 'Episode ' + num + ': ' + title : 'Episode ' + num;
+                if (m[2] !== undefined) return title ? '卷' + num + ' ' + title : '卷' + num;
+                return title ? '第' + num + m[4] + ' ' + title : '第' + num + m[4];
+            }
+        }
+    ];
+
+    function getPattern(id) {
+        return CHAPTER_PATTERNS.find(p => p.id === id);
+    }
+
+    // 端到端解析（与 js/txt-to-epub.js 同步）
+    function parseChapters(content, patternId) {
+        const pattern = getPattern(patternId);
+        const matches = [];
+        for (const m of content.matchAll(pattern.regex)) {
+            const num = Array.isArray(pattern.numGroup)
+                ? pattern.numGroup.map(g => m[g]).find(v => v !== undefined)
+                : m[pattern.numGroup];
+            const title = pattern.titleGroup !== null ? (m[pattern.titleGroup] || null) : null;
+            matches.push({ start: m.index, end: m.index + m[0].length, num, title, raw: m });
+        }
+        if (matches.length === 0) {
+            return [{ title: '目录', content, sourceText: content.substring(0, 50) }];
+        }
+        const chapters = [];
+        for (let i = 0; i < matches.length; i++) {
+            const cm = matches[i];
+            const body = content.substring(cm.end, i + 1 < matches.length ? matches[i + 1].start : content.length).trim();
+            let chapterTitle = cm.title ? cm.title.trim() : null;
+            if (!chapterTitle && pattern.hasTitle) {
+                const after = content.substring(cm.end);
+                const nl = after.match(/^[ \t]*([^\n\r]+)/m);
+                chapterTitle = nl ? nl[1].trim().substring(0, 50) : null;
+            }
+            chapters.push({
+                title: pattern.formatTitle(cm.num, chapterTitle, cm.raw),
+                content: body,
+                sourceText: body.substring(0, 30)
+            });
+        }
+        return chapters;
+    }
+
+    // ===== 测试框架 =====
+    let totalPass = 0, totalFail = 0;
+
+    function assert(label, cond, detail) {
+        if (cond) { totalPass++; return { pass: true, label, detail: '' }; }
+        totalFail++;
+        return { pass: false, label, detail: detail || '' };
+    }
+
+    function assertMatch(pattern, input, expectedGroups) {
+        pattern.regex.lastIndex = 0;
+        const m = pattern.regex.exec(input);
+        const labels = ['num', 'title', 'punct', 'suffix', 'extra'];
+        if (m === null) return assert('应匹配: ' + JSON.stringify(input), false, '未匹配');
+        for (let i = 0; i < expectedGroups.length; i++) {
+            const actual = m[i + 1];
+            const want = expectedGroups[i];
+            if (actual !== want) {
+                return assert('分组: ' + JSON.stringify(input) + ' → ' + labels[i],
+                    false, '期望 ' + JSON.stringify(want) + ', 实际 ' + JSON.stringify(actual));
+            }
+        }
+        return assert('匹配并提取分组: ' + JSON.stringify(input), true);
+    }
+
+    function assertNoMatch(pattern, input) {
+        pattern.regex.lastIndex = 0;
+        const m = pattern.regex.exec(input);
+        return assert('不应匹配: ' + JSON.stringify(input), m === null, '意外匹配');
+    }
+
+    function assertFormat(pattern, num, title, raw, expected) {
+        const got = pattern.formatTitle(num, title, raw);
+        return assert('formatTitle(' + num + ', ' + JSON.stringify(title) + ') → ' + JSON.stringify(expected),
+            got === expected, '实际: ' + JSON.stringify(got));
+    }
+
+    function runSuite(caseId, tests) {
+        const div = document.getElementById(caseId);
+        const res = document.getElementById(caseId + 'Result');
+        const lines = [];
+        let pass = 0, fail = 0;
+        for (const fn of tests) {
+            const r = fn();
+            if (r.pass) { pass++; lines.push('  ✓ ' + r.label); }
+            else { fail++; lines.push('  ✗ ' + r.label + (r.detail ? '\n      ' + r.detail : '')); }
+        }
+        const ok = fail === 0;
+        lines.unshift((ok ? '通过' : '失败') + ': ' + pass + '/' + (pass + fail));
+        res.className = 'test-result ' + (ok ? 'pass' : 'fail');
+        res.textContent = lines.join('\n');
+        res.style.display = 'block';
+        div.scrollIntoView({ block: 'nearest' });
+    }
+
+    function updateSummary() {
+        const sum = document.getElementById('summary');
+        sum.style.display = 'block';
+        const ok = totalFail === 0;
+        sum.className = 'summary ' + (ok ? 'pass' : 'fail');
+        sum.textContent = (ok ? '✓ 全部通过' : '✗ 存在失败') + ' — 总计 ' + totalPass + ' 通过 / ' + totalFail + ' 失败';
+    }
+
+    function reset() { totalPass = 0; totalFail = 0; }
+
+    // ===== 4 个模板的测试用例 =====
+    function runChinese() {
+        reset();
+        const p = getPattern('chinese');
+        const tests = [
+            () => assertMatch(p, '第一章 相遇',      ['一', '相遇']),
+            () => assertMatch(p, '第1章',            ['1', undefined]),
+            () => assertMatch(p, '第123章 标题',     ['123', '标题']),
+            () => assertMatch(p, '第一百零三章 终点',['一百零三', '终点']),
+            () => assertNoMatch(p, '第三章这是正文'),
+            () => assertNoMatch(p, '第一'),
+            () => assertNoMatch(p, '第一回'),
+            () => assertFormat(p, '一', '相遇', [], '第一章 相遇'),
+            () => assertFormat(p, '5', null, [], '第5章'),
+        ];
+        runSuite('chineseCase', tests);
+        updateSummary();
+    }
+
+    function runNumbered() {
+        reset();
+        const p = getPattern('numbered');
+        const tests = [
+            () => assertMatch(p, '1、标题',     ['1', '、', '标题']),
+            () => assertMatch(p, '10. 一些内容',['10', '.', '一些内容']),
+            () => assertMatch(p, '2.标题',      ['2', '.', '标题']),
+            () => assertNoMatch(p, '1、'),
+            () => assertNoMatch(p, '1'),
+            () => {
+                // formatTitle 保留原标点
+                p.regex.lastIndex = 0;
+                const m1 = p.regex.exec('1、标题');
+                p.regex.lastIndex = 0;
+                const m2 = p.regex.exec('10. 内容');
+                return assert('formatTitle 保留顿号 vs 句号', p.formatTitle(m1[1], m1[3], m1) === '1、 标题' && p.formatTitle(m2[1], m2[3], m2) === '10. 内容');
+            }
+        ];
+        runSuite('numberedCase', tests);
+        updateSummary();
+    }
+
+    function runChapter() {
+        reset();
+        const p = getPattern('chapter');
+        const tests = [
+            () => assertMatch(p, 'Chapter 1',         ['1', undefined]),
+            () => assertMatch(p, 'CHAPTER 12',        ['12', undefined]),
+            () => assertMatch(p, 'Chapter 3: Title',  ['3', 'Title']),
+            () => assertMatch(p, 'chapter 4 dawn',    ['4', 'dawn']),
+            () => assertNoMatch(p, 'Chapter One'),
+            () => assertNoMatch(p, '第一章'),
+            () => assertFormat(p, '1', 'The Beginning', [], 'Chapter 1: The Beginning'),
+            () => assertFormat(p, '2', null, [], 'Chapter 2'),
+        ];
+        runSuite('chapterCase', tests);
+        updateSummary();
+    }
+
+    function runJuanhuiji() {
+        reset();
+        const p = getPattern('juanhuiji');
+        const tests = [
+            () => assertMatch(p, '卷一',     [undefined, '一', undefined, undefined, undefined]),
+            () => assertMatch(p, '卷123',    [undefined, '123', undefined, undefined, undefined]),
+            () => assertMatch(p, '第一回',   [undefined, undefined, '一', '回', undefined]),
+            () => assertMatch(p, '第一集',   [undefined, undefined, '一', '集', undefined]),
+            () => assertMatch(p, '第一卷',   [undefined, undefined, '一', '卷', undefined]),
+            () => assertMatch(p, 'Episode 5',['5', undefined, undefined, undefined, undefined]),
+            () => assertMatch(p, 'Episode 5: Pilot', ['5', undefined, undefined, undefined, 'Pilot']),
+            () => assertNoMatch(p, '第一'),
+            () => assertNoMatch(p, '卷入风暴'),
+            () => {
+                p.regex.lastIndex = 0;
+                const m = p.regex.exec('第一回 大闹天宫');
+                return assert('formatTitle 保留回字', p.formatTitle(m[3], '大闹天宫', m) === '第一回 大闹天宫');
+            }
+        ];
+        runSuite('juanhuijiCase', tests);
+        updateSummary();
+    }
+
+    function runEndToEnd() {
+        reset();
+        const lines = [];
+        const samples = {
+            chinese: '序章\n内容...\n\n第一章 相遇\n内容 A\n\n第二章 重逢\n内容 B',
+            numbered: '序言\n\n1、引子\n林风走在街上\n\n2、发展\n第二天\n\n10. 高潮\n第三天',
+            chapter: 'Prologue\n\nChapter 1: The Beginning\nIt was dark\n\nCHAPTER 2\nNext day',
+            juanhuiji: '序言\n\n卷一\n汉朝\n\n第一百零三回\n西天取经\n\nEpisode 7\n最终季'
+        };
+
+        const expected = {
+            chinese:   ['第一章 相遇', '第二章 重逢'],
+            numbered:  ['1、 引子', '2、 发展', '10. 高潮'],
+            chapter:   ['Chapter 1: The Beginning', 'Chapter 2: Next day'],
+            juanhuiji: ['卷一 汉朝', '第一百零三回 西天取经', 'Episode 7: 最终季']
+        };
+
+        for (const id of Object.keys(samples)) {
+            const chapters = parseChapters(samples[id], id);
+            const titles = chapters.map(c => c.title);
+            const exp = expected[id];
+            lines.push('[' + id + ']');
+            lines.push('  解析到 ' + chapters.length + ' 章');
+            titles.forEach(t => lines.push('    • ' + t));
+            if (JSON.stringify(titles) === JSON.stringify(exp)) {
+                totalPass++;
+                lines.push('  ✓ 标题列表匹配预期');
+            } else {
+                totalFail++;
+                lines.push('  ✗ 标题不匹配');
+                lines.push('    预期: ' + JSON.stringify(exp));
+                lines.push('    实际: ' + JSON.stringify(titles));
+            }
+        }
+
+        const res = document.getElementById('e2eResult');
+        const ok = totalFail === 0;
+        res.className = 'test-result ' + (ok ? 'pass' : 'fail');
+        res.textContent = lines.join('\n');
+        res.style.display = 'block';
+        document.getElementById('e2eCase').scrollIntoView({ block: 'nearest' });
+        updateSummary();
+    }
+
+    function runAll() {
+        runChinese();
+        const a = totalPass, f = totalFail;
+        runNumbered();
+        runChapter();
+        runJuanhuiji();
+        const before = totalPass;
+        runEndToEnd();
+        updateSummary();
+    }
+    </script>
+</body>
+</html>

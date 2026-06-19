@@ -11,8 +11,72 @@
         files: [],           // { name, content, size }
         chapters: [],       // { title, content, sourceText }
         coverImage: null,    // base64 string
-        currentPreviewFile: 0
+        currentPreviewFile: 0,
+        selectedPattern: 'chinese'
     };
+
+    // 章节识别模板（一次转换任务只取一个模板）
+    const CHAPTER_PATTERNS = [
+        {
+            id: 'chinese',
+            label: '第X章 (中文)',
+            regex: /^第([零一二三四五六七八九十百千万0-9]+)章(?:\s+([^\n]+))?\s*$/gm,
+            numGroup: 1, titleGroup: 2, hasTitle: true,
+            formatTitle: (num, title) => title ? '第' + num + '章 ' + title : '第' + num + '章'
+        },
+        {
+            id: 'numbered',
+            label: '数字+标点 (1、 / 1.)',
+            regex: /^(\d+)([、.])[ \t]*([^\n]+?)[ \t]*$/gm,
+            numGroup: 1, titleGroup: 3, hasTitle: false,
+            formatTitle: (num, title, m) => num + m[2] + ' ' + title
+        },
+        {
+            id: 'chapter',
+            label: 'Chapter X (英文)',
+            regex: /^Chapter\s+(\d+)(?:[\s:：]+([^\n]+?))?\s*$/gmi,
+            numGroup: 1, titleGroup: 2, hasTitle: true,
+            formatTitle: (num, title) => title ? 'Chapter ' + num + ': ' + title : 'Chapter ' + num
+        },
+        {
+            id: 'juanhuiji',
+            label: '卷/回/集',
+            regex: /^(?:Episode\s+(\d+)|卷([零一二三四五六七八九十百千万0-9]+)|第([零一二三四五六七八九十百千万0-9]+)(卷|回|集))(?:[\s:：]+([^\n]+?))?[ \t]*$/gmi,
+            numGroup: [1, 2, 3], titleGroup: 5, hasTitle: true,
+            formatTitle: (num, title, m) => {
+                if (m[1] !== undefined) return title ? 'Episode ' + num + ': ' + title : 'Episode ' + num;
+                if (m[2] !== undefined) return title ? '卷' + num + ' ' + title : '卷' + num;
+                return title ? '第' + num + m[4] + ' ' + title : '第' + num + m[4];
+            }
+        }
+    ];
+
+    const PATTERN_HINTS = {
+        chinese:   '匹配：第1章、第十二章、第一百零三章 标题（标题可选）',
+        numbered:  '匹配：1、标题、2、标题、10. 标题、1.标题（标题必填）',
+        chapter:   '匹配：Chapter 1、CHAPTER 12、Chapter 3: Title（不区分大小写）',
+        juanhuiji: '匹配：卷一、卷123、Episode 5、第一回、第一集（第X+回/集/卷 需带后缀）'
+    };
+
+    const PATTERN_STORAGE_KEY = 'coax-tools-chapter-pattern';
+
+    function loadSavedPattern() {
+        try {
+            const saved = localStorage.getItem(PATTERN_STORAGE_KEY);
+            if (saved && CHAPTER_PATTERNS.some(p => p.id === saved)) return saved;
+        } catch (e) {}
+        return 'chinese';
+    }
+
+    function savePattern(id) {
+        try { localStorage.setItem(PATTERN_STORAGE_KEY, id); } catch (e) {}
+    }
+
+    function getCurrentPattern() {
+        return CHAPTER_PATTERNS.find(p => p.id === state.selectedPattern) || CHAPTER_PATTERNS[0];
+    }
+
+    state.selectedPattern = loadSavedPattern();
 
     // DOM 元素
     const elements = {};
@@ -27,6 +91,7 @@
         });
         cacheElements();
         bindEvents();
+        initPatternUI();
     }
 
     function cacheElements() {
@@ -39,6 +104,8 @@
         elements.previewContent = document.getElementById('previewContent');
         elements.chapterCard = document.getElementById('chapterCard');
         elements.chapterList = document.getElementById('chapterList');
+        elements.chapterPatternSelect = document.getElementById('chapterPatternSelect');
+        elements.patternHint = document.getElementById('patternHint');
         elements.bookTitle = document.getElementById('bookTitle');
         elements.bookAuthor = document.getElementById('bookAuthor');
         elements.bookLanguage = document.getElementById('bookLanguage');
@@ -63,6 +130,9 @@
         // 预览切换
         elements.previewFileSelect.addEventListener('change', handlePreviewChange);
 
+        // 章节模板切换
+        elements.chapterPatternSelect.addEventListener('change', handlePatternChange);
+
         // 封面上传
         elements.coverInput.addEventListener('change', handleCoverSelect);
         elements.removeCoverBtn.addEventListener('click', removeCover);
@@ -70,6 +140,24 @@
         // 操作按钮
         elements.resetBtn.addEventListener('click', resetAll);
         elements.generateBtn.addEventListener('click', generateEpub);
+    }
+
+    function initPatternUI() {
+        elements.chapterPatternSelect.value = state.selectedPattern;
+        updatePatternHint();
+    }
+
+    function updatePatternHint() {
+        elements.patternHint.textContent = PATTERN_HINTS[state.selectedPattern] || '';
+    }
+
+    function handlePatternChange() {
+        const newId = elements.chapterPatternSelect.value;
+        if (!CHAPTER_PATTERNS.some(p => p.id === newId)) return;
+        state.selectedPattern = newId;
+        savePattern(newId);
+        updatePatternHint();
+        if (state.files.length > 0) parseChapters();
     }
 
     // ========== 文件处理 ==========
@@ -279,18 +367,20 @@
 
         try {
             const fullContent = state.files.map(f => f.content).join('\n\n');
-
-            // 统一正则：匹配「第X章 标题」或「第X章」
-            const CHAPTER_REGEX = /^第([零一二三四五六七八九十百千万0-9]+)章(?:\s+([^\n]+))?\s*$/gm;
+            const pattern = getCurrentPattern();
 
             const matches = [];
-            let m;
-            while ((m = CHAPTER_REGEX.exec(fullContent)) !== null) {
+            for (const m of fullContent.matchAll(pattern.regex)) {
+                const num = Array.isArray(pattern.numGroup)
+                    ? pattern.numGroup.map(g => m[g]).find(v => v !== undefined)
+                    : m[pattern.numGroup];
+                const title = pattern.titleGroup !== null ? (m[pattern.titleGroup] || null) : null;
                 matches.push({
                     start: m.index,
                     end: m.index + m[0].length,
-                    num: m[1],
-                    title: m[2] || null
+                    num: num,
+                    title: title,
+                    raw: m
                 });
             }
 
@@ -308,15 +398,14 @@
                     const content = fullContent.substring(contentStart, contentEnd).trim();
 
                     let chapterTitle = cm.title ? cm.title.trim() : null;
-                    if (!chapterTitle) {
+                    if (!chapterTitle && pattern.hasTitle) {
                         const after = fullContent.substring(cm.end);
                         const nl = after.match(/^[ \t]*([^\n\r]+)/m);
                         chapterTitle = nl ? nl[1].trim().substring(0, 50) : null;
                     }
-                    const displayTitle = chapterTitle ? '第' + cm.num + '章 ' + chapterTitle : '第' + cm.num + '章';
 
                     state.chapters.push({
-                        title: displayTitle,
+                        title: pattern.formatTitle(cm.num, chapterTitle, cm.raw),
                         content: content,
                         sourceText: content.substring(0, 30)
                     });

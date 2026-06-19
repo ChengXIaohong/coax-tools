@@ -70,6 +70,18 @@
                     <!-- 章节解析区 -->
                     <div class="card" id="chapterCard" style="display: none;">
                         <h2>📑 章节设置</h2>
+                        <div class="chapter-options">
+                            <div class="option-row">
+                                <label for="chapterPatternSelect">章节识别规则：</label>
+                                <select id="chapterPatternSelect">
+                                    <option value="chinese">第X章 (中文)</option>
+                                    <option value="numbered">数字+标点 (1、 / 1.)</option>
+                                    <option value="chapter">Chapter X (英文)</option>
+                                    <option value="juanhuiji">卷/回/集</option>
+                                </select>
+                            </div>
+                            <div class="regex-hint" id="patternHint"></div>
+                        </div>
                         <div class="chapter-list" id="chapterList"></div>
                     </div>
 
