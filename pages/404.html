@@ -3,30 +3,32 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>页面未找到 - coax的小工具</title>
-    <link rel="stylesheet" href="../css/style.css">
-    <link rel="stylesheet" href="../css/404.css">
-    <!-- 添加favicon图标 -->
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔧</text></svg>">
+    <title>404 页面未找到 - coax的小工具</title>
+    <script>
+    (function() {
+        var saved = localStorage.getItem('coax-tools-mode');
+        var theme = (saved === 'dark' || saved === 'sci-fi') ? 'dark' : 'light';
+        document.documentElement.setAttribute('data-theme', theme);
+    })();
+    </script>
+    <link rel="stylesheet" href="../styles/theme-base.css?v=20260930">
+    <link rel="stylesheet" href="../css/404.css?v=20260930">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpolygon points='50,5 90,27.5 90,72.5 50,95 10,72.5 10,27.5' fill='none' stroke='%235C6E63' stroke-width='6'/%3E%3C/svg%3E">
 </head>
 <body>
     <div class="container">
         <div class="not-found-container">
             <div class="error-code">404</div>
-            <div class="error-message">哎呀，页面迷路了！</div>
+            <div class="error-message">页面不存在</div>
             <div class="error-description">
-                <p>您要找的页面似乎被外星人绑架了，或者可能从未存在过。</p>
-                <p>不要担心，这并不意味着世界末日。</p>
-            </div>
-            <div class="astronaut-animation">
-                <div class="astronaut">👨‍🚀</div>
+                <p>这个地址没有对应的文件。</p>
             </div>
             <div class="error-actions">
-                <a href="../index.html" class="btn home-btn">返回首页</a>
-                <a href="javascript:history.back()" class="btn back-btn">返回上页</a>
+                <a href="../index.html" class="btn btn--primary">返回首页</a>
+                <a href="javascript:history.back()" class="btn btn--secondary">返回上页</a>
             </div>
             <div class="fun-fact">
-                <p>有趣的事实：404这个数字来源于万维网联盟（W3C）的会议室号码</p>
+                <p>// 404 来自 W3C 的会议室编号</p>
             </div>
         </div>
     </div>

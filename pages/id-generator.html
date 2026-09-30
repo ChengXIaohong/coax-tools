@@ -10,22 +10,21 @@
     <!-- 主题初始化：防止 FOUC（Flash of Unstyled Content）闪烁 -->
     <script>
     (function() {
+        // 默认暖纸浅色；历史值 'sci-fi' 属于旧的深色主题，迁移为 'dark' 以保留用户偏好
         var saved = localStorage.getItem('coax-tools-mode');
-        var theme = saved === 'light' ? 'light' : 'sci-fi';
+        var theme = (saved === 'dark' || saved === 'sci-fi') ? 'dark' : 'light';
         document.documentElement.setAttribute('data-theme', theme);
     })();
     </script>
-    <link rel="stylesheet" href="../styles/theme-base.css">
-    <link rel="stylesheet" href="../styles/theme-tool.css">
+    <link rel="stylesheet" href="../styles/theme-base.css?v=20260930">
+    <link rel="stylesheet" href="../styles/theme-tool.css?v=20260930">
     <link rel="stylesheet" href="../css/id-generator.css">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <!-- 添加favicon图标 -->
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔧</text></svg>">
     <script src="../js/id-data.js"></script>
 </head>
-<body data-theme="sci-fi">
-    <div class="bg-orbs"></div>
-    <div class="grid-pattern"></div>
+<body>
     <div class="container">
         <main class="docx-main">
             <!-- 统一顶栏 -->
@@ -37,7 +36,7 @@
                     返回首页
                 </a>
                 <div class="tool-title">
-                    <div class="tool-icon">🪪</div>
+                    <div class="tool-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="5" width="20" height="14" rx="2"/><circle cx="8" cy="11" r="2"/><path d="M4.5 16c.6-1.4 1.9-2 3.5-2s2.9.6 3.5 2"/><path d="M15 10h4"/><path d="M15 14h3"/></svg></div>
                     <span class="tool-name">身份证生成器</span>
                 </div>
                 <span class="tool-desc">生成模拟身份证信息</span>
@@ -179,7 +178,7 @@
     <div class="disclaimer-modal" id="disclaimerModal">
         <div class="disclaimer-modal-content">
             <div class="disclaimer-modal-header">
-                <h3>⚠️ 免责声明与风险提示</h3>
+                <h3>免责声明与风险提示</h3>
             </div>
             <div class="disclaimer-modal-body">
                 <ul>

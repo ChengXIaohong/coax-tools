@@ -247,7 +247,7 @@
             item.draggable = true;
             item.dataset.index = index;
             item.innerHTML = `
-                <span class="file-icon">📄</span>
+                <span class="file-icon"></span>
                 <div class="file-info">
                     <div class="file-name">${escapeHtml(file.name)}</div>
                     <div class="file-size">${formatFileSize(file.size)}</div>

@@ -1,107 +1,135 @@
-/* TXT 转 EPUB 工具样式 */
+/*
+ * TXT 转 EPUB 工具样式
+ * 纸感瑞士极简 + 莫兰迪护眼
+ *
+ * 规则：零渐变、零阴影、零毛玻璃、圆角 2-4px
+ */
 
 .epub-container {
     max-width: 900px;
     margin: 0 auto;
 }
 
+/* ========================================
+   消息提示
+   ======================================== */
+
 .message {
-    padding: 12px 16px;
-    border-radius: 8px;
-    margin-bottom: 20px;
+    padding: 10px 12px;
+    border-radius: var(--radius);
+    margin-bottom: 16px;
     display: none;
-    font-size: 14px;
+    font-size: 13px;
+    border: 1px solid var(--border);
+    background: var(--bg-card);
+    color: var(--text-1);
 }
 
 .message.info {
-    background: rgba(74, 144, 226, 0.15);
-    border: 1px solid rgba(74, 144, 226, 0.4);
-    color: var(--link-color);
+    background: var(--bg-card);
+    border-color: var(--border-strong);
+    color: var(--text-2);
 }
 
 .message.error {
-    background: rgba(229, 96, 96, 0.15);
-    border: 1px solid rgba(229, 96, 96, 0.4);
-    color: var(--error-color);
+    background: var(--danger-soft);
+    border-color: var(--danger);
+    color: var(--danger);
 }
 
 .message.success {
-    background: rgba(80, 175, 105, 0.15);
-    border: 1px solid rgba(80, 175, 105, 0.4);
-    color: var(--success-color);
+    background: var(--accent-soft);
+    border-color: var(--accent);
+    color: var(--accent-hover);
 }
 
+/* ========================================
+   卡片
+   ======================================== */
+
 .card {
-    background: var(--card-bg);
-    border: 1px solid var(--border-color);
-    border-radius: 12px;
-    padding: 24px;
-    margin-bottom: 20px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px;
+    margin-bottom: 16px;
 }
 
 .card h2 {
-    margin: 0 0 20px 0;
-    font-size: 18px;
+    margin: 0 0 16px 0;
+    font-size: 15px;
     font-weight: 600;
-    color: var(--text-color);
+    color: var(--text-1);
 }
 
-/* 文件上传区 */
+/* ========================================
+   文件上传区
+   ======================================== */
+
 .upload-area {
-    border: 2px dashed var(--border-color);
-    border-radius: 12px;
-    padding: 40px 20px;
+    border: 1px dashed var(--border-strong);
+    border-radius: var(--radius);
+    padding: 32px 16px;
     text-align: center;
-    transition: all 0.2s ease;
+    transition: background-color var(--t-fast), border-color var(--t-fast);
     cursor: pointer;
-    background: var(--input-bg);
+    background: var(--bg-page);
 }
 
+/* .dragover 由 JS 挂载，保留拖放高亮 */
 .upload-area:hover,
 .upload-area.dragover {
-    border-color: var(--link-color);
-    background: rgba(74, 144, 226, 0.05);
+    border-color: var(--accent);
+    background: var(--accent-soft);
 }
 
 .upload-hint {
-    color: var(--text-secondary);
+    color: var(--text-2);
 }
 
 .upload-icon {
-    font-size: 48px;
+    font-size: 40px;
     display: block;
-    margin-bottom: 12px;
+    margin-bottom: 10px;
+    line-height: 1;
 }
 
 .upload-hint p {
-    margin: 8px 0;
-    font-size: 15px;
+    margin: 6px 0;
+    font-size: 13px;
 }
 
 .upload-limit {
-    font-size: 13px !important;
-    opacity: 0.7;
+    font-family: var(--font-mono);
+    font-size: 11px !important;
+    letter-spacing: 0.02em;
+    color: var(--text-3);
 }
 
 .file-input-wrapper {
     position: relative;
     display: inline-block;
-    margin-top: 16px;
+    margin-top: 12px;
 }
 
 .file-input-button {
-    background: var(--btn-bg);
-    color: var(--btn-text);
-    border: 1px solid var(--border-color);
-    padding: 10px 24px;
-    border-radius: 8px;
+    height: 32px;
+    background: var(--bg-card);
+    color: var(--text-1);
+    border: 1px solid var(--border);
+    padding: 0 14px;
+    border-radius: var(--radius);
     cursor: pointer;
-    font-size: 14px;
-    transition: all 0.2s;
+    font-family: var(--font-ui);
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 1;
+    transition: background-color var(--t-fast), border-color var(--t-fast);
 }
 
 .file-input-button:hover {
-    background: var(--btn-hover-bg);
+    background: var(--bg-hover);
+    border-color: var(--border-strong);
 }
 
 .file-input-wrapper input[type="file"] {
@@ -114,35 +142,41 @@
     cursor: pointer;
 }
 
-/* 文件列表 */
+/* ========================================
+   文件列表
+   ======================================== */
+
 .file-list {
-    margin-top: 16px;
+    margin-top: 12px;
 }
 
 .file-item {
     display: flex;
     align-items: center;
-    padding: 12px 16px;
-    background: var(--input-bg);
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
+    padding: 10px 12px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
     margin-bottom: 8px;
     cursor: grab;
-    transition: all 0.2s;
+    transition: background-color var(--t-fast), border-color var(--t-fast);
 }
 
 .file-item:hover {
-    border-color: var(--link-color);
+    border-color: var(--border-strong);
+    background: var(--bg-hover);
 }
 
+/* .dragging 由 JS 在拖拽排序时挂载，保留 */
 .file-item.dragging {
     opacity: 0.5;
     border-style: dashed;
 }
 
 .file-item .file-icon {
-    font-size: 24px;
+    font-size: 20px;
     margin-right: 12px;
+    line-height: 1;
 }
 
 .file-item .file-info {
@@ -151,16 +185,19 @@
 }
 
 .file-item .file-name {
-    font-weight: 500;
-    color: var(--text-color);
+    font-weight: 600;
+    color: var(--text-1);
+    font-size: 13px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
 
 .file-item .file-size {
-    font-size: 13px;
-    color: var(--text-secondary);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.02em;
+    color: var(--text-3);
 }
 
 .file-item .file-actions {
@@ -171,51 +208,66 @@
 .file-item .file-remove {
     background: none;
     border: none;
-    color: var(--text-secondary);
+    color: var(--text-2);
     cursor: pointer;
     font-size: 18px;
+    line-height: 1;
     padding: 4px 8px;
-    border-radius: 4px;
-    transition: all 0.2s;
+    border-radius: 2px;
+    transition: background-color var(--t-fast), color var(--t-fast);
 }
 
 .file-item .file-remove:hover {
-    color: var(--error-color);
-    background: rgba(229, 96, 96, 0.1);
+    color: var(--danger);
+    background: var(--danger-soft);
 }
 
-/* 内容预览 */
+/* ========================================
+   内容预览
+   ======================================== */
+
 .preview-controls {
-    margin-bottom: 16px;
+    margin-bottom: 12px;
 }
 
 .preview-controls select {
     width: 100%;
-    padding: 10px 14px;
-    background: var(--input-bg);
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
-    color: var(--text-color);
-    font-size: 14px;
+    height: 32px;
+    padding: 0 10px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    color: var(--text-1);
+    font-family: var(--font-ui);
+    font-size: 13px;
+}
+
+.preview-controls select:focus {
+    outline: none;
+    border-color: var(--accent);
 }
 
 .preview-content {
     max-height: 300px;
     overflow-y: auto;
-    padding: 16px;
-    background: var(--input-bg);
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
+    padding: 12px;
+    background: var(--bg-page);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
     white-space: pre-wrap;
     word-break: break-all;
-    font-size: 14px;
+    font-family: var(--font-mono);
+    font-size: 12.5px;
     line-height: 1.6;
-    color: var(--text-color);
+    color: var(--text-1);
 }
 
-/* 章节设置 */
+/* ========================================
+   章节设置
+   ======================================== */
+
 .chapter-options {
-    margin-bottom: 16px;
+    margin-bottom: 12px;
 }
 
 .option-row {
@@ -226,64 +278,87 @@
 }
 
 .option-row label {
-    color: var(--text-color);
+    color: var(--text-2);
+    font-size: 13px;
     white-space: nowrap;
 }
 
 .option-row input[type="text"] {
     flex: 1;
     min-width: 200px;
-    padding: 10px 14px;
-    background: var(--input-bg);
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
-    color: var(--text-color);
-    font-size: 14px;
+    height: 32px;
+    padding: 0 10px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    color: var(--text-1);
+    font-family: var(--font-ui);
+    font-size: 13px;
+}
+
+.option-row input[type="text"]:focus,
+.option-row select:focus {
+    outline: none;
+    border-color: var(--accent);
 }
 
 .option-row select {
     flex: 1;
     min-width: 200px;
-    padding: 10px 14px;
-    background: var(--input-bg);
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
-    color: var(--text-color);
-    font-size: 14px;
+    height: 32px;
+    padding: 0 10px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    color: var(--text-1);
+    font-family: var(--font-ui);
+    font-size: 13px;
 }
 
 .regex-hint {
-    font-size: 13px;
-    color: var(--text-secondary);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.02em;
+    color: var(--text-3);
     margin-top: 8px;
+    white-space: pre-wrap;
 }
 
 .btn-small {
-    padding: 8px 16px;
-    background: var(--btn-bg);
-    color: var(--btn-text);
-    border: 1px solid var(--border-color);
-    border-radius: 6px;
+    height: 32px;
+    padding: 0 12px;
+    background: var(--bg-card);
+    color: var(--text-1);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
     cursor: pointer;
+    font-family: var(--font-ui);
     font-size: 13px;
-    transition: all 0.2s;
+    font-weight: 600;
+    line-height: 1;
+    transition: background-color var(--t-fast), border-color var(--t-fast), color var(--t-fast);
     white-space: nowrap;
 }
 
 .btn-small:hover {
-    background: var(--btn-hover-bg);
+    background: var(--bg-hover);
+    border-color: var(--border-strong);
 }
 
 .btn-danger {
-    color: var(--error-color);
-    border-color: var(--error-color);
+    color: var(--danger);
+    border-color: var(--danger);
 }
 
 .btn-danger:hover {
-    background: rgba(229, 96, 96, 0.1);
+    background: var(--danger-soft);
+    border-color: var(--danger);
 }
 
-/* 章节列表 */
+/* ========================================
+   章节列表
+   ======================================== */
+
 .chapter-list {
     max-height: 300px;
     overflow-y: auto;
@@ -292,60 +367,75 @@
 .chapter-item {
     display: flex;
     align-items: center;
-    padding: 10px 14px;
-    background: var(--input-bg);
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
+    padding: 8px 12px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
     margin-bottom: 8px;
     gap: 12px;
 }
 
 .chapter-item .chapter-index {
-    color: var(--text-secondary);
-    font-size: 13px;
+    color: var(--text-3);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.02em;
     min-width: 40px;
 }
 
 .chapter-item input[type="text"] {
     flex: 1;
-    padding: 8px 12px;
-    background: var(--card-bg);
-    border: 1px solid var(--border-color);
-    border-radius: 6px;
-    color: var(--text-color);
-    font-size: 14px;
+    height: 30px;
+    padding: 0 10px;
+    background: var(--bg-page);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    color: var(--text-1);
+    font-family: var(--font-ui);
+    font-size: 13px;
+}
+
+.chapter-item input[type="text"]:focus {
+    outline: none;
+    border-color: var(--accent);
 }
 
 .chapter-item .chapter-remove {
     background: none;
     border: none;
-    color: var(--text-secondary);
+    color: var(--text-2);
     cursor: pointer;
     font-size: 16px;
+    line-height: 1;
     padding: 4px 8px;
-    border-radius: 4px;
-    transition: all 0.2s;
+    border-radius: 2px;
+    transition: background-color var(--t-fast), color var(--t-fast);
 }
 
 .chapter-item .chapter-remove:hover {
-    color: var(--error-color);
-    background: rgba(229, 96, 96, 0.1);
+    color: var(--danger);
+    background: var(--danger-soft);
 }
 
 .chapter-item .source-text {
     flex: 1;
-    color: var(--text-secondary);
-    font-size: 13px;
+    color: var(--text-3);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.02em;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
 
-/* 元数据表单 */
+/* ========================================
+   元数据表单
+   ======================================== */
+
 .metadata-form {
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: 12px;
 }
 
 .form-row {
@@ -356,27 +446,39 @@
 }
 
 .form-row label {
-    color: var(--text-color);
+    color: var(--text-2);
+    font-size: 13px;
     min-width: 70px;
 }
 
 .form-row label .required {
-    color: var(--error-color);
+    color: var(--danger);
 }
 
 .form-row input[type="text"],
 .form-row select {
     flex: 1;
     min-width: 200px;
-    padding: 10px 14px;
-    background: var(--input-bg);
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
-    color: var(--text-color);
-    font-size: 14px;
+    height: 32px;
+    padding: 0 10px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    color: var(--text-1);
+    font-family: var(--font-ui);
+    font-size: 13px;
 }
 
-/* 封面上传 */
+.form-row input[type="text"]:focus,
+.form-row select:focus {
+    outline: none;
+    border-color: var(--accent);
+}
+
+/* ========================================
+   封面上传
+   ======================================== */
+
 .cover-row {
     align-items: flex-start;
 }
@@ -385,34 +487,37 @@
     position: relative;
     width: 120px;
     height: 160px;
-    border: 2px dashed var(--border-color);
-    border-radius: 8px;
+    border: 1px dashed var(--border-strong);
+    border-radius: var(--radius);
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     cursor: pointer;
     overflow: hidden;
-    background: var(--input-bg);
-    transition: all 0.2s;
+    background: var(--bg-page);
+    transition: background-color var(--t-fast), border-color var(--t-fast);
 }
 
 .cover-upload:hover {
-    border-color: var(--link-color);
+    border-color: var(--accent);
+    background: var(--bg-hover);
 }
 
 .cover-placeholder {
     display: flex;
     flex-direction: column;
     align-items: center;
-    color: var(--text-secondary);
-    font-size: 12px;
+    color: var(--text-3);
+    font-size: 11px;
     text-align: center;
+    padding: 0 8px;
 }
 
 .cover-icon {
-    font-size: 32px;
+    font-size: 28px;
     margin-bottom: 8px;
+    line-height: 1;
 }
 
 .cover-upload input[type="file"] {
@@ -429,52 +534,63 @@
     object-fit: cover;
 }
 
-/* 操作按钮 */
+/* ========================================
+   操作按钮
+   ======================================== */
+
 .action-row {
     display: flex;
     justify-content: center;
-    gap: 16px;
-    margin-top: 24px;
+    gap: 12px;
+    margin-top: 20px;
 }
 
 .btn-primary,
 .btn-secondary {
-    padding: 14px 36px;
-    border-radius: 10px;
-    font-size: 16px;
+    height: 32px;
+    padding: 0 20px;
+    border-radius: var(--radius);
+    font-family: var(--font-ui);
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 1;
     cursor: pointer;
-    transition: all 0.2s;
-    border: none;
+    transition: background-color var(--t-fast), border-color var(--t-fast), color var(--t-fast);
     min-width: 140px;
 }
 
 .btn-primary {
-    background: var(--primary-btn-bg, #4a90e2);
-    color: #fff;
+    background: var(--accent);
+    color: #FFFFFF;
+    border: 1px solid var(--accent);
 }
 
 .btn-primary:hover {
-    opacity: 0.9;
-    transform: translateY(-1px);
+    background: var(--accent-hover);
+    border-color: var(--accent-hover);
+    color: #FFFFFF;
 }
 
 .btn-primary:disabled {
-    opacity: 0.5;
+    opacity: 0.45;
     cursor: not-allowed;
-    transform: none;
 }
 
 .btn-secondary {
-    background: var(--btn-bg);
-    color: var(--btn-text);
-    border: 1px solid var(--border-color);
+    background: var(--bg-card);
+    color: var(--text-1);
+    border: 1px solid var(--border);
 }
 
 .btn-secondary:hover {
-    background: var(--btn-hover-bg);
+    background: var(--bg-hover);
+    border-color: var(--border-strong);
 }
 
-/* 加载状态 */
+/* ========================================
+   加载状态
+   ======================================== */
+
 .loading {
     position: relative;
     pointer-events: none;
@@ -485,54 +601,59 @@
     position: absolute;
     top: 50%;
     left: 50%;
-    width: 20px;
-    height: 20px;
-    margin: -10px 0 0 -10px;
-    border: 2px solid var(--border-color);
-    border-top-color: var(--link-color);
+    width: 18px;
+    height: 18px;
+    margin: -9px 0 0 -9px;
+    border: 2px solid var(--border-strong);
+    border-top-color: var(--accent);
     border-radius: 50%;
-    animation: spin 0.8s linear infinite;
+    animation: epubSpin 0.8s linear infinite;
 }
 
-@keyframes spin {
-    to { transform: rotate(360deg); }
+@keyframes epubSpin {
+    to {
+        transform: rotate(360deg);
+    }
 }
 
-/* 进度遮罩层 */
+/* ========================================
+   进度遮罩层
+   ======================================== */
+
 .progress-overlay {
     position: fixed;
     inset: 0;
     z-index: 9999;
-    background: rgba(0, 0, 0, 0.7);
-    backdrop-filter: blur(4px);
+    background: var(--bg-page);
+    background: color-mix(in srgb, var(--bg-page) 88%, transparent);
     display: flex;
     align-items: center;
     justify-content: center;
 }
 
 .progress-panel {
-    background: var(--card-bg);
-    border: 1px solid var(--border-color);
-    border-radius: 16px;
-    padding: 40px;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 32px;
     min-width: 360px;
     max-width: 460px;
     text-align: center;
-    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
 }
 
 .progress-title {
-    font-size: 18px;
+    font-size: 15px;
     font-weight: 600;
-    color: var(--text-color);
-    margin-bottom: 24px;
+    color: var(--text-1);
+    margin-bottom: 20px;
 }
 
 .progress-bar-track {
     width: 100%;
     height: 8px;
-    background: var(--input-bg);
-    border-radius: 4px;
+    background: var(--bg-hover);
+    border: 1px solid var(--border);
+    border-radius: 2px;
     overflow: hidden;
     margin-bottom: 12px;
 }
@@ -540,9 +661,9 @@
 .progress-bar-fill {
     height: 100%;
     width: 0%;
-    background: linear-gradient(90deg, var(--link-color), #7c5cfc);
-    border-radius: 4px;
-    transition: width 0.3s ease;
+    background: var(--accent);
+    border-radius: 2px;
+    transition: width 140ms ease-out;
 }
 
 .progress-stats {
@@ -553,15 +674,18 @@
 }
 
 .progress-percent {
-    font-size: 15px;
-    font-weight: 700;
-    color: var(--link-color);
+    font-family: var(--font-mono);
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--accent);
     font-variant-numeric: tabular-nums;
 }
 
 .progress-detail {
-    font-size: 13px;
-    color: var(--text-secondary);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.02em;
+    color: var(--text-3);
     text-align: right;
 }
 
@@ -569,14 +693,17 @@
     .progress-panel {
         min-width: unset;
         width: 90%;
-        padding: 24px;
+        padding: 20px;
     }
 }
 
-/* 响应式 */
+/* ========================================
+   响应式
+   ======================================== */
+
 @media (max-width: 600px) {
     .card {
-        padding: 16px;
+        padding: 14px;
     }
 
     .form-row {

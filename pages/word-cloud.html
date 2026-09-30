@@ -10,20 +10,19 @@
     <!-- 主题初始化：防止 FOUC（Flash of Unstyled Content）闪烁 -->
     <script>
     (function() {
+        // 默认暖纸浅色；历史值 'sci-fi' 属于旧的深色主题，迁移为 'dark' 以保留用户偏好
         var saved = localStorage.getItem('coax-tools-mode');
-        var theme = saved === 'light' ? 'light' : 'sci-fi';
+        var theme = (saved === 'dark' || saved === 'sci-fi') ? 'dark' : 'light';
         document.documentElement.setAttribute('data-theme', theme);
     })();
     </script>
-    <link rel="stylesheet" href="../styles/theme-base.css">
-    <link rel="stylesheet" href="../styles/theme-tool.css">
+    <link rel="stylesheet" href="../styles/theme-base.css?v=20260930">
+    <link rel="stylesheet" href="../styles/theme-tool.css?v=20260930">
     <link rel="stylesheet" href="../css/word-cloud.css">
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>☁️</text></svg>">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 </head>
-<body data-theme="sci-fi">
-    <div class="bg-orbs"></div>
-    <div class="grid-pattern"></div>
+<body>
     <div class="container">
         <main class="word-cloud-main">
             <!-- 统一顶栏 -->
@@ -35,7 +34,7 @@
                     返回首页
                 </a>
                 <div class="tool-title">
-                    <div class="tool-icon">☁️</div>
+                    <div class="tool-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 18h10a4 4 0 0 0 .6-7.96A6 6 0 0 0 6.2 11.2 3.5 3.5 0 0 0 7 18Z"/><path d="M10 22 12 14l2 8M9.2 18.4h5.6"/></svg></div>
                     <span class="tool-name">词云生成器</span>
                 </div>
                 <span class="tool-desc">生成漂亮的词云图片</span>
@@ -101,7 +100,7 @@
                             <div class="bg-color-options">
                                 <button class="bg-color-btn active" data-bg="dark" style="background:#0c0c0c;color:#00e676;">深色</button>
                                 <button class="bg-color-btn" data-bg="light" style="background:#f8f8f8;color:#006400;">浅色</button>
-                                <button class="bg-color-btn" data-bg="transparent" style="background:linear-gradient(45deg,#333,#666);color:#fff;">透明</button>
+                                <button class="bg-color-btn" data-bg="transparent" style="background:#6E7681;color:#FFFFFF;">透明</button>
                             </div>
                         </div>
 

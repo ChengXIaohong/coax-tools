@@ -1,6 +1,8 @@
 /*
  * 文字云生成器样式
- * 适配 Liquid Glass 科幻主题
+ * 纸感瑞士极简 + 莫兰迪护眼
+ *
+ * 规则：零渐变、零阴影、零毛玻璃、圆角 2-4px
  */
 
 /* ========================================
@@ -14,7 +16,7 @@
 .content-zone {
     display: flex;
     flex-direction: column;
-    gap: 1.5rem;
+    gap: 12px;
 }
 
 /* ========================================
@@ -23,23 +25,21 @@
 
 .message {
     text-align: center;
-    padding: 0.8rem 1.25rem;
-    margin-bottom: 1rem;
+    padding: 8px 12px 8px 32px;
+    margin-bottom: 12px;
     display: none;
-    font-size: 0.85rem;
-    border-radius: 12px;
-    border: 1px solid var(--tool-glass-border);
+    font-size: 13px;
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
     position: relative;
-    padding-left: 2.5rem;
-    background: var(--tool-glass-bg);
-    backdrop-filter: blur(var(--tool-glass-blur));
-    -webkit-backdrop-filter: blur(var(--tool-glass-blur));
+    background: var(--bg-card);
+    color: var(--text-1);
 }
 
 .message::before {
     content: '';
     position: absolute;
-    left: 1rem;
+    left: 12px;
     top: 50%;
     transform: translateY(-50%);
     width: 8px;
@@ -47,92 +47,87 @@
     border-radius: 50%;
 }
 
+/* .message-visible 由 JS 挂载，保留显隐契约 */
 .message-visible {
     display: flex;
     align-items: center;
 }
 
 .message-error {
-    background: rgba(255, 82, 82, 0.1);
-    color: #ff5252;
-    border: 1px solid rgba(255, 82, 82, 0.3);
+    background: var(--danger-soft);
+    color: var(--danger);
+    border: 1px solid var(--danger);
 }
 
 .message-error::before {
-    background: #ff5252;
+    background: var(--danger);
 }
 
 .message-success {
-    background: rgba(167, 139, 250, 0.1);
-    color: var(--tool-accent);
-    border: 1px solid rgba(167, 139, 250, 0.3);
+    background: var(--accent-soft);
+    color: var(--accent-hover);
+    border: 1px solid var(--accent);
 }
 
 .message-success::before {
-    background: var(--tool-accent);
+    background: var(--accent);
 }
 
 .message-warning {
-    background: rgba(255, 193, 7, 0.1);
-    color: #ffc107;
-    border: 1px solid rgba(255, 193, 7, 0.3);
+    background: var(--danger-soft);
+    color: var(--danger);
+    border: 1px solid var(--danger);
 }
 
 .message-warning::before {
-    background: #ffc107;
+    background: var(--danger);
 }
 
 .message-info {
-    background: rgba(33, 150, 243, 0.1);
-    color: #2196f3;
-    border: 1px solid rgba(33, 150, 243, 0.3);
+    background: var(--bg-card);
+    color: var(--text-2);
+    border: 1px solid var(--border-strong);
 }
 
 .message-info::before {
-    background: #2196f3;
+    background: var(--text-3);
 }
 
 /* ========================================
-   面板通用 - Glass Morphism
+   面板通用
    ======================================== */
 
 .panel {
-    background: var(--tool-glass-bg);
-    border: 1px solid var(--tool-glass-border);
-    backdrop-filter: blur(var(--tool-glass-blur));
-    -webkit-backdrop-filter: blur(var(--tool-glass-blur));
-    border-radius: 16px;
-    padding: 1.5rem;
-    transition: all var(--tool-duration-normal, 250ms) var(--tool-ease-out, cubic-bezier(0.16, 1, 0.3, 1));
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px;
+    transition: border-color var(--t-fast);
 }
 
 .panel:hover {
-    border-color: var(--tool-border-hover);
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    border-color: var(--border-strong);
 }
 
 .panel-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 1.5rem;
-    padding-bottom: 1rem;
-    border-bottom: 1px solid var(--tool-border);
+    margin-bottom: 12px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border);
     flex-wrap: wrap;
-    gap: 0.8rem;
+    gap: 8px;
 }
 
 .panel-title {
-    color: var(--tool-fg-dim);
-    font-size: 0.9rem;
+    color: var(--text-2);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.02em;
 }
 
-.panel-title::before {
-    content: '//';
-    color: var(--tool-accent);
-    margin-right: 0.5rem;
-    opacity: 0.7;
-}
+/* 注：标题文本本身已带 "//" 前缀（见 pages/word-cloud.html），不再额外添加伪元素 */
 
 /* ========================================
    操作按钮
@@ -140,90 +135,107 @@
 
 .action-buttons {
     display: flex;
-    gap: 0.75rem;
+    gap: 8px;
     flex-wrap: wrap;
-    margin-top: 1.5rem;
+    margin-top: 12px;
 }
 
 .btn {
-    padding: 0.75rem 1.5rem;
-    font-size: 0.9rem;
+    height: 32px;
+    padding: 0 14px;
+    font-size: 13px;
     font-weight: 600;
-    font-family: inherit;
+    font-family: var(--font-ui);
+    line-height: 1;
     cursor: pointer;
-    transition: all var(--tool-duration-normal, 250ms) var(--tool-ease-out, cubic-bezier(0.16, 1, 0.3, 1));
-    border: none;
-    border-radius: 10px;
+    transition: background-color var(--t-fast), border-color var(--t-fast), color var(--t-fast);
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    color: var(--text-1);
+    border-radius: var(--radius);
     text-decoration: none;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 0.5rem;
+    gap: 6px;
 }
 
 .btn .material-icons {
-    font-size: 1.1rem;
+    font-size: 16px;
 }
 
 .btn:hover {
-    transform: translateY(-2px);
-}
-
-.btn:active {
-    transform: translateY(0);
+    background: var(--bg-hover);
+    border-color: var(--border-strong);
 }
 
 .btn-primary {
-    background: linear-gradient(135deg, var(--tool-accent) 0%, #8b5cf6 100%);
-    color: #fff;
-    box-shadow: 0 4px 20px var(--tool-accent-glow);
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #FFFFFF;
 }
 
 .btn-primary:hover {
-    box-shadow: 0 6px 30px var(--tool-accent-glow);
-    color: #fff;
+    background: var(--accent-hover);
+    border-color: var(--accent-hover);
+    color: #FFFFFF;
+}
+
+/* ghost 按钮：透明底，仅靠文字色与 hover 背景区分 */
+.btn-ghost {
+    background: transparent;
+    border-color: var(--border);
+    color: var(--text-2);
+}
+
+.btn-ghost:hover {
+    background: var(--bg-hover);
+    border-color: var(--border-strong);
+    color: var(--text-1);
 }
 
 .btn-download {
-    background: linear-gradient(135deg, var(--tool-accent) 0%, #8b5cf6 100%);
-    color: #fff;
-    box-shadow: 0 4px 20px var(--tool-accent-glow);
-    font-weight: bold;
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #FFFFFF;
     opacity: 0;
-    transform: translateY(10px);
+    visibility: hidden;
     pointer-events: none;
-    transition: opacity 0.3s ease, transform 0.3s ease;
+    transition: background-color var(--t-fast), border-color var(--t-fast), color var(--t-fast), opacity var(--t-fast), visibility var(--t-fast);
 }
 
+/* .has-result 由 JS 挂载在 #contentZone 上，驱动下载按钮显隐 */
 .has-result .btn-download {
     opacity: 1;
-    transform: translateY(0);
+    visibility: visible;
     pointer-events: auto;
 }
 
 .has-result .btn-download:hover {
-    box-shadow: 0 6px 30px var(--tool-accent-glow);
-    color: #fff;
+    background: var(--accent-hover);
+    border-color: var(--accent-hover);
+    color: #FFFFFF;
 }
 
 .btn-secondary {
-    background: transparent;
-    color: var(--tool-fg);
-    border: 1px solid var(--tool-border);
+    background: var(--bg-card);
+    color: var(--text-1);
+    border: 1px solid var(--border);
 }
 
 .btn-secondary:hover {
-    border-color: var(--tool-accent);
-    box-shadow: 0 0 20px var(--tool-accent-glow);
+    background: var(--bg-hover);
+    border-color: var(--border-strong);
 }
 
 .btn-sm {
-    padding: 0.5rem 1rem;
-    font-size: 0.85rem;
+    height: 28px;
+    padding: 0 10px;
+    font-size: 12px;
 }
 
 .btn-sm .material-icons {
-    font-size: 1rem;
+    font-size: 14px;
 }
 
 /* ========================================
@@ -232,31 +244,32 @@
 
 .input-mode-tabs {
     display: flex;
-    gap: 0.3rem;
+    gap: 4px;
 }
 
 .tab-btn {
     background: transparent;
-    border: 1px solid var(--tool-border);
-    color: var(--tool-fg-dim);
-    padding: 0.4rem 1rem;
-    font-family: inherit;
-    font-size: 0.85rem;
+    border: 1px solid var(--border);
+    color: var(--text-2);
+    height: 28px;
+    padding: 0 10px;
+    font-family: var(--font-ui);
+    font-size: 12px;
     cursor: pointer;
-    transition: all 0.15s;
-    border-radius: 20px;
+    transition: background-color var(--t-fast), border-color var(--t-fast), color var(--t-fast);
+    border-radius: 2px;
 }
 
 .tab-btn:hover {
-    border-color: var(--tool-accent);
-    color: var(--tool-fg);
+    border-color: var(--accent);
+    color: var(--text-1);
+    background: var(--bg-hover);
 }
 
 .tab-btn.active {
-    background: linear-gradient(135deg, var(--tool-accent) 0%, #8b5cf6 100%);
-    color: #fff;
-    border-color: var(--tool-accent);
-    box-shadow: 0 2px 12px var(--tool-accent-glow);
+    background: var(--accent);
+    color: #FFFFFF;
+    border-color: var(--accent);
 }
 
 /* ========================================
@@ -266,67 +279,68 @@
 .input-content {
     display: flex;
     flex-direction: column;
-    gap: 1rem;
+    gap: 12px;
 }
 
 .input-content textarea {
     width: 100%;
     min-height: 180px;
-    background: var(--tool-surface);
-    border: 1px solid var(--tool-border);
-    color: var(--tool-fg);
-    font-family: 'SF Mono', 'Fira Code', 'Consolas', 'Monaco', monospace;
-    font-size: 0.9rem;
-    padding: 1rem;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    color: var(--text-1);
+    font-family: var(--font-mono);
+    font-size: 12.5px;
+    line-height: 1.6;
+    padding: 10px;
     resize: vertical;
-    border-radius: 12px;
-    transition: all var(--tool-duration-fast, 150ms);
+    border-radius: var(--radius);
+    transition: border-color var(--t-fast);
 }
 
 .input-content textarea:hover {
-    border-color: var(--tool-border-hover);
+    border-color: var(--border-strong);
 }
 
 .input-content textarea:focus {
     outline: none;
-    border-color: var(--tool-accent);
-    box-shadow: 0 0 0 3px var(--tool-accent-glow);
+    border-color: var(--accent);
 }
 
 .input-content textarea::placeholder {
-    color: var(--tool-fg-dim);
-    opacity: 0.6;
+    color: var(--text-3);
 }
 
 .input-actions {
     display: flex;
-    gap: 0.8rem;
+    gap: 8px;
     align-items: center;
 }
 
 .file-upload-btn {
     display: inline-flex;
     align-items: center;
-    gap: 0.4rem;
-    padding: 0.6rem 1.2rem;
-    background: linear-gradient(135deg, var(--tool-accent) 0%, #8b5cf6 100%);
-    border: none;
-    color: #fff;
-    font-family: inherit;
-    font-size: 0.85rem;
+    gap: 6px;
+    height: 32px;
+    padding: 0 12px;
+    background: var(--accent);
+    border: 1px solid var(--accent);
+    color: #FFFFFF;
+    font-family: var(--font-ui);
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 1;
     cursor: pointer;
-    transition: all var(--tool-duration-normal, 250ms);
-    border-radius: 20px;
-    box-shadow: 0 4px 15px var(--tool-accent-glow);
+    transition: background-color var(--t-fast), border-color var(--t-fast);
+    border-radius: var(--radius);
 }
 
 .file-upload-btn .material-icons {
-    font-size: 1rem;
+    font-size: 16px;
 }
 
 .file-upload-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px var(--tool-accent-glow);
+    background: var(--accent-hover);
+    border-color: var(--accent-hover);
 }
 
 /* ========================================
@@ -365,39 +379,42 @@
     width: 100%;
     background: transparent;
     border: none;
-    color: var(--tool-fg);
+    color: var(--text-1);
     padding: 0;
-    font-family: inherit;
+    font-family: var(--font-ui);
     font-size: inherit;
     cursor: pointer;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    gap: 0.8rem;
+    gap: 8px;
 }
 
 .config-toggle:hover .panel-title {
-    color: var(--tool-accent);
+    color: var(--accent);
 }
 
 .config-toggle .panel-title {
-    font-size: 0.9rem;
-    transition: color 0.2s;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.02em;
+    transition: color var(--t-fast);
 }
 
 .toggle-icon {
-    font-size: 0.8rem;
-    color: var(--tool-accent);
-    transition: transform 0.3s;
+    font-size: 12px;
+    color: var(--accent);
+    transition: transform var(--t-base);
     flex-shrink: 0;
 }
 
+/* 折叠状态指示：状态标记而非 hover 位移，保留 */
 .config-panel:not(.collapsed) .toggle-icon {
     transform: rotate(90deg);
 }
 
 .config-body {
-    margin-top: 1.2rem;
+    margin-top: 12px;
 }
 
 .config-panel.collapsed .config-body {
@@ -411,81 +428,79 @@
 .config-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-    gap: 1.5rem;
-    margin-bottom: 1.5rem;
+    gap: 16px;
+    margin-bottom: 16px;
 }
 
 .config-group {
     display: flex;
     flex-direction: column;
-    gap: 0.6rem;
+    gap: 6px;
 }
 
 .config-group > label {
-    color: var(--tool-fg);
-    font-size: 0.85rem;
-    font-weight: 500;
+    color: var(--text-2);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.02em;
+    font-weight: 400;
 }
 
-/* Select 下拉框 */
+/* Select 下拉框：只调 padding，箭头沿用 theme-base 的中性描边图标 */
 .config-group select {
-    background: var(--tool-surface);
-    border: 1px solid var(--tool-border);
-    color: var(--tool-fg);
-    font-family: inherit;
-    font-size: 0.9rem;
-    padding: 0.6rem 2.5rem 0.6rem 1rem;
-    border-radius: 10px;
+    background-color: var(--bg-card);
+    border: 1px solid var(--border);
+    color: var(--text-1);
+    font-family: var(--font-ui);
+    font-size: 13px;
+    padding: 0 28px 0 10px;
+    border-radius: var(--radius);
     cursor: pointer;
-    transition: all var(--tool-duration-fast, 150ms);
-    appearance: none;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23a78bfa' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
-    background-repeat: no-repeat;
-    background-position: right 1rem center;
+    transition: border-color var(--t-fast);
 }
 
 .config-group select:hover {
-    border-color: var(--tool-accent);
+    border-color: var(--accent);
 }
 
 .config-group select:focus {
     outline: none;
-    border-color: var(--tool-accent);
-    box-shadow: 0 0 0 3px var(--tool-accent-glow);
+    border-color: var(--accent);
 }
 
 /* 形状选择 */
 .shape-options {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.5rem;
+    gap: 6px;
 }
 
 .shape-btn {
-    background: var(--tool-surface);
-    border: 1px solid var(--tool-border);
-    color: var(--tool-fg-dim);
-    padding: 0.5rem 1rem;
-    font-family: inherit;
-    font-size: 0.85rem;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    color: var(--text-2);
+    height: 32px;
+    padding: 0 10px;
+    font-family: var(--font-ui);
+    font-size: 13px;
     cursor: pointer;
-    transition: all 0.15s;
+    transition: background-color var(--t-fast), border-color var(--t-fast), color var(--t-fast);
     display: inline-flex;
     align-items: center;
-    gap: 0.3rem;
-    border-radius: 8px;
+    gap: 4px;
+    border-radius: var(--radius);
 }
 
 .shape-btn:hover {
-    border-color: var(--tool-accent);
-    color: var(--tool-fg);
-    box-shadow: 0 0 15px var(--tool-accent-glow);
+    border-color: var(--accent);
+    color: var(--text-1);
+    background: var(--bg-hover);
 }
 
 .shape-btn.active {
-    border-color: var(--tool-accent);
-    color: var(--tool-accent);
-    background: rgba(167, 139, 250, 0.1);
+    border-color: var(--accent);
+    color: var(--accent);
+    background: var(--accent-soft);
 }
 
 .custom-shape-btn {
@@ -493,13 +508,15 @@
 }
 
 .custom-shape-btn .material-icons {
-    font-size: 1rem;
+    font-size: 16px;
 }
 
 .custom-shape-name {
-    font-size: 0.8rem;
-    color: var(--tool-accent);
-    margin-top: 0.3rem;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.02em;
+    color: var(--text-3);
+    margin-top: 4px;
     display: none;
 }
 
@@ -507,32 +524,35 @@
     display: block;
 }
 
-/* 背景色选择 */
+/* 背景色选择：色板按钮靠 data-bg 内联底色显示，这里只管边框与状态 */
 .bg-color-options {
     display: flex;
-    gap: 0.5rem;
+    gap: 6px;
 }
 
 .bg-color-btn {
-    padding: 0.5rem 1rem;
-    background: var(--tool-surface);
-    border: 1px solid var(--tool-border);
-    color: var(--tool-fg-dim);
-    font-family: inherit;
-    font-size: 0.85rem;
+    height: 32px;
+    padding: 0 10px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    color: var(--text-2);
+    font-family: var(--font-ui);
+    font-size: 13px;
+    font-weight: 600;
     cursor: pointer;
-    transition: all 0.15s;
-    border-radius: 8px;
+    transition: border-color var(--t-fast), outline-color var(--t-fast);
+    border-radius: var(--radius);
 }
 
 .bg-color-btn:hover {
-    border-color: var(--tool-accent);
-    box-shadow: 0 0 15px var(--tool-accent-glow);
+    border-color: var(--border-strong);
 }
 
+/* 选中态用 1px 边框 + 内描边表达，不使用投影 */
 .bg-color-btn.active {
-    border-color: var(--tool-accent);
-    box-shadow: 0 0 15px var(--tool-accent-glow);
+    border-color: var(--accent);
+    outline: 1px solid var(--accent);
+    outline-offset: -2px;
 }
 
 /* 尺寸输入 */
@@ -540,57 +560,59 @@
 .size-range-inputs {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
+    gap: 6px;
 }
 
 .size-inputs input,
 .size-range-inputs input {
     width: 100px;
-    background: var(--tool-surface);
-    border: 1px solid var(--tool-border);
-    color: var(--tool-fg);
-    font-family: inherit;
-    font-size: 0.9rem;
-    padding: 0.5rem 0.8rem;
-    border-radius: 10px;
-    transition: all var(--tool-duration-fast, 150ms);
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    color: var(--text-1);
+    font-family: var(--font-mono);
+    font-size: 12.5px;
+    height: 32px;
+    padding: 0 8px;
+    border-radius: var(--radius);
+    transition: border-color var(--t-fast);
 }
 
 .size-inputs input:hover,
 .size-range-inputs input:hover {
-    border-color: var(--tool-accent);
+    border-color: var(--accent);
 }
 
 .size-inputs input:focus,
 .size-range-inputs input:focus {
     outline: none;
-    border-color: var(--tool-accent);
-    box-shadow: 0 0 0 3px var(--tool-accent-glow);
+    border-color: var(--accent);
 }
 
 .size-inputs span,
 .size-range-inputs span {
-    color: var(--tool-fg-dim);
+    color: var(--text-3);
+    font-family: var(--font-mono);
+    font-size: 11px;
 }
 
 /* 复选框组 */
 .checkbox-group {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
+    gap: 8px;
 }
 
 .checkbox-group input[type="checkbox"] {
-    width: 18px;
-    height: 18px;
-    accent-color: var(--tool-accent);
+    width: 14px;
+    height: 14px;
+    accent-color: var(--accent);
     cursor: pointer;
-    border-radius: 4px;
+    border-radius: 2px;
 }
 
 .checkbox-group label {
-    color: var(--tool-fg);
-    font-size: 0.9rem;
+    color: var(--text-1);
+    font-size: 13px;
     cursor: pointer;
 }
 
@@ -600,7 +622,7 @@
 
 .preview-actions {
     display: flex;
-    gap: 0.5rem;
+    gap: 6px;
 }
 
 .canvas-container {
@@ -609,15 +631,15 @@
     justify-content: center;
     align-items: center;
     min-height: 400px;
-    background: var(--tool-surface);
-    border: 1px solid var(--tool-border);
-    border-radius: 12px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
 }
 
 #wordCloudCanvas {
     max-width: 100%;
     height: auto;
-    border-radius: 6px;
+    border-radius: 2px;
 }
 
 .preview-placeholder {
@@ -626,20 +648,23 @@
     left: 50%;
     transform: translate(-50%, -50%);
     text-align: center;
-    color: var(--tool-fg-dim);
+    color: var(--text-3);
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 0.5rem;
+    gap: 6px;
 }
 
 .preview-placeholder .icon {
-    font-size: 4rem;
+    font-size: 40px;
     opacity: 0.3;
+    line-height: 1;
 }
 
 .preview-placeholder span:last-child {
-    font-size: 0.9rem;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.02em;
 }
 
 /* ========================================
@@ -651,14 +676,20 @@
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    width: 40px;
-    height: 40px;
-    border: 3px solid var(--tool-border);
-    border-top-color: var(--tool-accent);
+    width: 36px;
+    height: 36px;
+    border: 3px solid var(--border-strong);
+    border-top-color: var(--accent);
     border-radius: 50%;
-    animation: spin 0.8s linear infinite;
+    animation: wordCloudSpin 0.8s linear infinite;
     display: none;
     z-index: 10;
+}
+
+@keyframes wordCloudSpin {
+    to {
+        transform: translate(-50%, -50%) rotate(360deg);
+    }
 }
 
 .canvas-spinner.active {

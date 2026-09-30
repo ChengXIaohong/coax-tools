@@ -30,46 +30,43 @@
                 .import-overlay {
                     position: absolute;
                     top: 0; left: 0; right: 0; bottom: 0;
-                    background: rgba(0,0,0,0.6);
-                    backdrop-filter: blur(4px);
+                    background: rgba(20, 18, 15, 0.32);
                 }
                 .import-window {
                     position: relative;
                     width: 720px;
                     max-width: 90vw;
                     max-height: 85vh;
-                    background: #1a1f26;
-                    border: 1px solid #30363d;
-                    border-radius: 12px;
+                    background: var(--bg-elevated);
+                    border: 1px solid var(--border);
                     display: flex;
                     flex-direction: column;
                     overflow: hidden;
-                    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
                 }
                 .import-header {
                     display: flex;
                     align-items: center;
                     justify-content: space-between;
                     padding: 16px 20px;
-                    border-bottom: 1px solid #30363d;
-                    background: #161b22;
+                    border-bottom: 1px solid var(--border);
+                    background: var(--bg-elevated);
                 }
                 .import-header h2 {
                     margin: 0;
                     font-size: 16px;
                     font-weight: 600;
-                    color: #c9d1d9;
+                    color: var(--text-1);
                 }
                 .import-header button.close-btn {
                     background: none;
                     border: none;
-                    color: #8b949e;
-                    font-size: 20px;
+                    color: var(--text-2);
+                    font-size: 16px;
                     cursor: pointer;
                     padding: 4px;
                     line-height: 1;
                 }
-                .import-header button.close-btn:hover { color: #c9d1d9; }
+                .import-header button.close-btn:hover { color: var(--text-1); }
                 .import-body {
                     flex: 1;
                     overflow-y: auto;
@@ -79,25 +76,25 @@
                     gap: 16px;
                 }
                 .drop-zone {
-                    border: 2px dashed #30363d;
-                    border-radius: 8px;
+                    border: 1px dashed var(--border-strong);
+                    border-radius: var(--radius);
                     padding: 40px 20px;
                     text-align: center;
                     cursor: pointer;
-                    transition: border-color 0.2s, background 0.2s;
+                    transition: border-color var(--t-fast), background-color var(--t-fast);
                 }
                 .drop-zone:hover, .drop-zone.dragover {
-                    border-color: #58a6ff;
-                    background: rgba(88,166,255,0.05);
+                    border-color: var(--accent);
+                    background: var(--bg-hover);
                 }
-                .drop-zone-icon { font-size: 32px; margin-bottom: 8px; }
-                .drop-zone-text { color: #8b949e; font-size: 14px; margin-bottom: 4px; }
-                .drop-zone-hint { color: #6e7681; font-size: 12px; }
+                .drop-zone-icon { font-size: 0; margin-bottom: 0; }
+                .drop-zone-text { color: var(--text-2); font-size: 13px; margin-bottom: 4px; }
+                .drop-zone-hint { font-family: var(--font-mono); font-size: 11px; color: var(--text-3); }
                 .file-input { display: none; }
                 .file-info {
-                    background: #161b22;
-                    border: 1px solid #30363d;
-                    border-radius: 6px;
+                    background: var(--bg-card);
+                    border: 1px solid var(--border);
+                    border-radius: var(--radius);
                     padding: 12px 16px;
                     display: none;
                 }
@@ -112,122 +109,115 @@
                     flex-direction: column;
                     gap: 2px;
                 }
-                .file-info-label { color: #6e7681; font-size: 11px; text-transform: uppercase; }
-                .file-info-value { color: #c9d1d9; font-size: 13px; font-family: monospace; }
+                .file-info-label { font-family: var(--font-mono); font-size: 11px; color: var(--text-3); }
+                .file-info-value { color: var(--text-1); font-size: 13px; font-family: var(--font-mono); }
                 .preview-box {
-                    background: #0d1117;
-                    border: 1px solid #30363d;
-                    border-radius: 6px;
+                    background: var(--bg-card);
+                    border: 1px solid var(--border);
+                    border-radius: var(--radius);
                     overflow: hidden;
                     display: none;
                 }
                 .preview-box.visible { display: block; }
                 .preview-header {
                     padding: 8px 12px;
-                    background: #161b22;
-                    border-bottom: 1px solid #30363d;
-                    color: #8b949e;
-                    font-size: 12px;
+                    background: var(--bg-page);
+                    border-bottom: 1px solid var(--border);
+                    color: var(--text-3);
+                    font-family: var(--font-mono);
+                    font-size: 11px;
                 }
                 .preview-content {
                     padding: 12px;
                     max-height: 200px;
                     overflow-y: auto;
-                    font-family: monospace;
+                    font-family: var(--font-mono);
                     font-size: 12px;
-                    color: #c9d1d9;
+                    color: var(--text-1);
                     white-space: pre-wrap;
                     word-break: break-all;
                 }
                 .error-msg {
-                    background: rgba(248,81,73,0.1);
-                    border: 1px solid #f85149;
-                    border-radius: 6px;
+                    background: var(--danger-soft);
+                    border: 1px solid var(--danger);
+                    border-radius: var(--radius);
                     padding: 12px;
-                    color: #f85149;
+                    color: var(--danger);
                     font-size: 13px;
                     display: none;
                 }
                 .error-msg.visible { display: block; }
                 .import-footer {
                     padding: 16px 20px;
-                    border-top: 1px solid #30363d;
+                    border-top: 1px solid var(--border);
                     display: flex;
                     justify-content: flex-end;
                     gap: 12px;
                 }
                 .import-footer button {
-                    padding: 8px 20px;
-                    border-radius: 6px;
-                    font-size: 14px;
+                    height: 32px;
+                    padding: 0 14px;
+                    border-radius: var(--radius);
+                    font-family: var(--font-ui);
+                    font-size: 13px;
                     cursor: pointer;
-                    transition: all 0.15s;
+                    transition: background-color var(--t-fast), border-color var(--t-fast), color var(--t-fast);
                 }
                 .import-footer button.cancel-btn {
                     background: transparent;
-                    border: 1px solid #30363d;
-                    color: #c9d1d9;
+                    border: 1px solid var(--border);
+                    color: var(--text-1);
                 }
                 .import-footer button.cancel-btn:hover {
-                    border-color: #8b949e;
+                    background: var(--bg-hover);
+                    border-color: var(--border-strong);
                 }
                 .import-footer button.confirm-btn {
-                    background: #238636;
-                    border: 1px solid #238636;
-                    color: #fff;
+                    background: var(--accent);
+                    border: 1px solid var(--accent);
+                    color: var(--on-accent);
                 }
                 .import-footer button.confirm-btn:hover {
-                    background: #2ea043;
+                    background: var(--accent-hover);
                 }
                 .import-footer button.confirm-btn:disabled {
-                    background: #21262d;
-                    border-color: #30363d;
-                    color: #484f58;
+                    background: var(--bg-hover);
+                    border-color: var(--border);
+                    color: var(--text-3);
                     cursor: not-allowed;
                 }
                 .import-loading-overlay {
                     position: absolute;
                     top: 0; left: 0; right: 0; bottom: 0;
                     z-index: 10;
-                    background: rgba(0,0,0,0.6);
-                    backdrop-filter: blur(4px);
+                    background: rgba(20, 18, 15, 0.32);
                     display: none;
                     align-items: center;
                     justify-content: center;
                     flex-direction: column;
                     gap: 12px;
-                    border-radius: 12px;
+                    border-radius: var(--radius);
                 }
                 .import-loading-overlay.active { display: flex; }
-                .import-loading-spinner {
-                    width: 36px;
-                    height: 36px;
-                    border: 3px solid #30363d;
-                    border-top-color: #58a6ff;
-                    border-radius: 50%;
-                    animation: import-spin 0.8s linear infinite;
-                }
-                @keyframes import-spin {
-                    to { transform: rotate(360deg); }
-                }
                 .import-loading-text {
-                    color: #c9d1d9;
-                    font-size: 14px;
+                    font-family: var(--font-mono);
+                    font-size: 11px;
+                    letter-spacing: 0.02em;
+                    color: var(--text-2);
                 }
             </style>
             <div class="import-overlay"></div>
             <div class="import-loading-overlay" id="importLoadingOverlay">
-                <div class="import-loading-spinner"></div>
-                <div class="import-loading-text">正在导入数据...</div>
+                <div class="import-loading-text">[处理中...]</div>
             </div>
             <div class="import-window">
                 <div class="import-header">
-                    <h2>📂 导入 JSON 数据</h2>
+                    <h2>导入 JSON 数据</h2>
                     <button class="close-btn" id="importCloseBtn">✕</button>
                 </div>
                 <div class="import-body">
                     <div class="drop-zone" id="dropZone">
-                        <div class="drop-zone-icon">📁</div>
+                        <div class="drop-zone-icon"></div>
                         <div class="drop-zone-text">拖拽文件到此处 或 点击选择文件</div>
                         <div class="drop-zone-hint">支持 .json .txt .csv 格式，最大 10MB</div>
                         <input type="file" class="file-input" id="fileInput" accept=".json,.txt,.csv,application/json,text/plain,text/csv">

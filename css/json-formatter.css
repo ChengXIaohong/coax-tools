@@ -1,28 +1,102 @@
 /*
  * JSON 格式化器样式
- * 极简风格
+ * 纸感瑞士极简 + Morandi 护眼配色
+ * 规则：无渐变 / 无阴影 / 无玻璃 / 圆角 2-4px / 仅 1px 描边分层
  */
+
+/* ========================================
+   1. 语法高亮调色（数据编码，浅/深色各自可读）
+   ======================================== */
+:root {
+    --code-key: #46654F;      /* 鼠尾草绿 */
+    --code-str: #9C5B3E;      /* 陶土棕 */
+    --code-num: #7E6A22;      /* 暗赭黄 */
+    --code-bool: #3F6A66;     /* 灰青 */
+    --code-null: #6F6A60;     /* 暖灰 */
+    --code-bracket: #5C6E63;  /* 同强调色 */
+    --code-match-bg: #E6EAE4;
+}
+
+[data-theme="dark"],
+[data-mode="dark"] {
+    --code-key: #9DBBA6;
+    --code-str: #DDA184;
+    --code-num: #C9B472;
+    --code-bool: #86BDB4;
+    --code-null: #9A958B;
+    --code-bracket: #8FA396;
+    --code-match-bg: #2C352F;
+}
+
+/* ========================================
+   2. 布局骨架 — 全屏工作区
+   ------------------------------------------------------------
+   本页不做工具页外壳：整个视口就是编辑区，没有 .tool-header-bar，
+   没有外边距，两块面板贴边并排，只用 1px 竖线分隔。
+   ======================================== */
+body {
+    overflow: hidden;
+}
 
 .formatter-container {
     padding: 0;
     margin: 0;
-    background: transparent;
-    box-shadow: none;
-    border-radius: 0;
+    background: var(--bg-page);
     display: flex;
     flex-direction: column;
     position: fixed;
-    top: 1vw;
-    left: 2vw;
-    right: 2vw;
-    bottom: 1vw;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
 }
 
 .panels-container {
     flex: 1;
     display: flex;
-    gap: 0.5vw;
+    gap: 0;
     min-height: 0;
+}
+
+/* 工作区内的极简状态条：面包屑 / 面板名 / 主题切换 / 操作按钮 */
+.ws-bar {
+    height: 28px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0 8px;
+    position: relative;
+    background: var(--bg-page);
+    border-bottom: 1px solid var(--border);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.02em;
+    color: var(--text-3);
+}
+
+.ws-bar__spacer {
+    flex: 1;
+}
+
+.ws-bar__crumb,
+.ws-bar__label {
+    color: var(--text-2);
+    white-space: nowrap;
+}
+
+.ws-bar__link {
+    color: var(--text-2);
+    text-decoration: none;
+    padding: 2px 6px;
+    border-radius: var(--radius);
+    transition: background-color var(--t-fast), color var(--t-fast);
+}
+
+.ws-bar__link:hover {
+    background: var(--bg-hover);
+    color: var(--text-1);
+    text-decoration: none;
 }
 
 .panel {
@@ -30,10 +104,22 @@
     display: flex;
     flex-direction: column;
     min-width: 0;
-    border: 1px solid var(--cli-border);
-    padding: 0.5vw;
+    background: var(--bg-card);
+    border: none;
+    border-radius: 0;
+    padding: 0;
     position: relative;
-    transition: flex 0.2s ease;
+    transition: flex var(--t-base);
+}
+
+#inputPanel {
+    border-right: 1px solid var(--border);
+}
+
+/* 内容区自带内边距，避免贴到状态条 */
+#inputJson,
+#outputJson {
+    padding: 8px 10px;
 }
 
 #inputPanel:focus-within,
@@ -54,21 +140,28 @@
     flex: 0.8;
 }
 
+#outputPanel:focus-within {
+    border-color: var(--border-strong);
+}
+
+/* ========================================
+   3. 输出视图 + 语法高亮
+   ======================================== */
 #outputJson {
     width: 100%;
     flex: 1;
     min-height: 0;
-    padding: 0.5vw;
+    padding: 8px;
     border: none;
     background: transparent;
-    color: var(--cli-fg);
-    font-family: 'SF Mono', 'Fira Code', 'Consolas', 'Monaco', monospace;
-    font-size: 0.9rem;
+    color: var(--text-1);
+    font-family: var(--font-mono);
+    font-size: 13px;
     resize: none;
     overflow: auto;
     white-space: pre-wrap;
     word-wrap: break-word;
-    line-height: normal;
+    line-height: 1.5;
 }
 
 #outputJson:focus {
@@ -76,35 +169,38 @@
 }
 
 .json-key {
-    color: #4EC9B0;
+    color: var(--code-key);
 }
 
 .json-string {
-    color: #CE9178;
+    color: var(--code-str);
 }
 
 .json-number {
-    color: #6A9955;
+    color: var(--code-num);
 }
 
 .json-boolean {
-    color: #569CD6;
+    color: var(--code-bool);
 }
 
 .json-null {
-    color: #569CD6;
+    color: var(--code-null);
 }
 
 .json-bracket {
-    color: #4EC9B0;
-    font-weight: bold;
+    color: var(--code-bracket);
+    font-weight: 600;
 }
 
 .json-bracket.match {
-    background-color: rgba(78, 201, 176, 0.2);
-    text-shadow: 0 0 8px rgba(78, 201, 176, 0.5);
+    background-color: var(--code-match-bg);
+    border-bottom: 1px solid var(--code-bracket);
 }
 
+/* ========================================
+   4. 行悬浮操作
+   ======================================== */
 .line-actions {
     display: none;
     position: absolute;
@@ -124,13 +220,13 @@
     position: relative;
     cursor: pointer;
     line-height: 20px;
-    font-size: 14px;
+    font-size: 13px;
     height: 20px;
     overflow: hidden;
 }
 
 .json-line:hover {
-    background-color: rgba(78, 201, 176, 0.1);
+    background-color: var(--bg-hover);
 }
 
 .json-line:hover .line-actions {
@@ -139,36 +235,43 @@
 }
 
 .line-action-btn {
-    padding: 0 4px;
+    padding: 0 5px;
     margin: 0;
-    background: var(--cli-bg);
-    border: 1px solid var(--cli-border);
-    color: var(--cli-fg-dim);
+    background: var(--bg-elevated);
+    border: 1px solid var(--border-strong);
+    border-radius: 2px;
+    color: var(--text-2);
     cursor: pointer;
-    font-size: 10px;
-    font-family: inherit;
+    font-size: 11px;
+    font-family: var(--font-mono);
     white-space: nowrap;
-    line-height: 18px;
+    line-height: 16px;
     display: inline-block;
     height: 18px;
     box-sizing: border-box;
+    transition: background-color var(--t-fast), border-color var(--t-fast), color var(--t-fast);
 }
 
 .line-action-btn:hover {
-    border-color: var(--cli-fg);
-    color: var(--cli-fg);
+    border-color: var(--accent);
+    color: var(--accent);
+    background: var(--accent-soft);
 }
 
+/* ========================================
+   5. 输入框
+   ======================================== */
 textarea {
     width: 100%;
     flex: 1;
     min-height: 0;
-    padding: 0.5vw;
+    padding: 8px;
     border: none;
     background: transparent;
-    color: var(--cli-fg);
-    font-family: 'SF Mono', 'Fira Code', 'Consolas', 'Monaco', monospace;
-    font-size: 0.9rem;
+    color: var(--text-1);
+    font-family: var(--font-mono);
+    font-size: 13px;
+    line-height: 1.5;
     resize: none;
 }
 
@@ -177,40 +280,76 @@ textarea:focus {
 }
 
 textarea::placeholder {
-    color: var(--cli-fg-dim);
-    opacity: 0.5;
+    color: var(--text-3);
+    opacity: 1;
 }
 
 textarea[readonly] {
-    background: rgba(0, 255, 0, 0.02);
+    background: var(--bg-page);
 }
 
+/* ========================================
+   6. 右上角操作按钮组
+   ======================================== */
+/* 位于 .ws-bar 内（position: relative），下拉菜单以此为定位基准 */
 .output-actions {
-    position: absolute;
-    top: 0.3vw;
-    right: 0.3vw;
-    z-index: 10;
+    position: static;
+    display: flex;
+    align-items: center;
+    gap: 4px;
 }
 
 .action-btn {
-    width: 1.5vw;
-    height: 1.5vw;
-    min-width: 24px;
-    min-height: 24px;
-    background: transparent;
-    border: 1px solid var(--cli-border);
-    color: var(--cli-fg-dim);
+    width: 22px;
+    height: 22px;
+    min-width: 22px;
+    min-height: 22px;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    color: var(--text-2);
     cursor: pointer;
-    font-size: 0.8rem;
+    font-size: 13px;
+    font-family: var(--font-ui);
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: all 0.15s;
+    transition: background-color var(--t-fast), border-color var(--t-fast), color var(--t-fast);
+}
+
+/* 按钮内统一使用 24px 线性 SVG，不用 emoji */
+.action-btn svg,
+.action-btn .graph-icon svg {
+    width: 14px;
+    height: 14px;
+    display: block;
+    stroke: currentColor;
+    fill: none;
+    stroke-width: 1.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.action-btn .graph-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .action-btn:hover {
-    border-color: var(--cli-fg);
-    color: var(--cli-fg);
+    background: var(--bg-hover);
+    border-color: var(--border-strong);
+    color: var(--text-1);
+}
+
+.action-btn.error {
+    border-color: var(--danger);
+    color: var(--danger);
+}
+
+.action-btn.loading {
+    opacity: 0.6;
+    cursor: wait;
 }
 
 .action-menu {
@@ -218,10 +357,14 @@ textarea[readonly] {
     position: absolute;
     top: 100%;
     right: 0;
-    margin-top: 0.3vw;
-    background: var(--cli-bg);
-    border: 1px solid var(--cli-fg);
-    min-width: 120px;
+    z-index: 20;
+    margin-top: 0;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius);
+    min-width: 132px;
+    padding: 2px 0;
+    z-index: 20;
 }
 
 .action-menu.show {
@@ -231,15 +374,16 @@ textarea[readonly] {
 .action-item {
     display: block;
     width: 100%;
-    padding: 0.5vw 1vw;
+    padding: 6px 12px;
     background: transparent;
     border: none;
-    border-bottom: 1px dashed var(--cli-border);
-    color: var(--cli-fg);
+    border-bottom: 1px dashed var(--border);
+    color: var(--text-1);
     text-align: left;
     cursor: pointer;
-    font-size: 0.8rem;
-    font-family: inherit;
+    font-size: 13px;
+    font-family: var(--font-ui);
+    transition: background-color var(--t-fast), color var(--t-fast);
 }
 
 .action-item:last-child {
@@ -247,76 +391,94 @@ textarea[readonly] {
 }
 
 .action-item:hover {
-    background: rgba(0, 255, 0, 0.1);
+    background: var(--bg-hover);
+    color: var(--text-1);
 }
 
 .jsonpath-btn:hover {
-    border-color: var(--cli-fg);
-    color: var(--cli-fg);
+    border-color: var(--accent);
+    color: var(--accent);
 }
 
 .jsonpath-item {
     display: flex;
-    gap: 0.3vw;
-    padding: 0.5vw 1vw;
-    border-bottom: 1px dashed var(--cli-border);
+    gap: 4px;
+    padding: 6px 12px;
+    border-bottom: 1px dashed var(--border);
 }
 
 .jsonpath-item input {
     flex: 1;
     min-width: 120px;
-    padding: 0.3vw 0.5vw;
-    background: transparent;
-    border: 1px solid var(--cli-border);
-    color: var(--cli-fg);
-    font-family: inherit;
-    font-size: 0.8rem;
+    padding: 4px 6px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    color: var(--text-1);
+    font-family: var(--font-mono);
+    font-size: 11px;
 }
 
 .jsonpath-item input:focus {
     outline: none;
-    border-color: var(--cli-fg);
+    border-color: var(--accent);
 }
 
 .jsonpath-item input::placeholder {
-    color: var(--cli-fg-dim);
-    opacity: 0.5;
+    color: var(--text-3);
+    opacity: 1;
 }
 
 .jsonpath-item .jsonpath-btn {
-    padding: 0.3vw 0.6vw;
+    padding: 4px 8px;
     background: transparent;
-    border: 1px solid var(--cli-border);
-    color: var(--cli-fg-dim);
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    color: var(--text-2);
     cursor: pointer;
-    font-size: 0.8rem;
-    font-family: inherit;
+    font-size: 11px;
+    font-family: var(--font-ui);
 }
 
 .jsonpath-item .jsonpath-btn:hover {
-    border-color: var(--cli-fg);
-    color: var(--cli-fg);
+    border-color: var(--accent);
+    color: var(--accent);
+}
+
+/* 主题切换按钮在状态条里的紧凑形态（theme-tool.css 里是顶栏版本） */
+.ws-bar .tool-theme-toggle {
+    order: 0;
+    height: 20px;
+    padding: 0 6px;
+    margin-left: 0;
+    font-size: 11px;
+    line-height: 1;
 }
 
 @media (max-width: 768px) {
+    /* 窄屏改为上下分栏，中间用 1px 横线分隔 */
     .panels-container {
         flex-direction: column;
     }
-    
-    .action-btn {
-        width: 28px;
-        height: 28px;
+
+    #inputPanel {
+        border-right: none;
+        border-bottom: 1px solid var(--border);
     }
 }
 
+/* ========================================
+   7. 右键菜单
+   ======================================== */
 .context-menu {
     display: none;
     position: fixed;
-    background: var(--cli-bg);
-    border: 1px solid var(--cli-fg);
+    background: var(--bg-elevated);
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius);
     min-width: 140px;
     z-index: 1000;
-    padding: 4px 0;
+    padding: 2px 0;
 }
 
 .context-menu-item {
@@ -326,68 +488,76 @@ textarea[readonly] {
     cursor: pointer;
     gap: 8px;
     font-size: 13px;
+    color: var(--text-1);
+    transition: background-color var(--t-fast);
 }
 
 .context-menu-item:hover {
-    background: rgba(78, 201, 176, 0.15);
+    background: var(--bg-hover);
 }
 
 .context-menu-icon {
-    font-size: 14px;
+    font-size: 13px;
 }
 
+/* ========================================
+   8. 消息提示
+   ======================================== */
 .message {
     position: fixed;
     top: 20px;
     left: 50%;
     transform: translateX(-50%);
-    padding: 10px 20px;
-    background: var(--cli-bg);
-    color: var(--cli-fg);
-    border: 1px solid var(--cli-border);
+    padding: 8px 18px;
+    background: var(--bg-elevated);
+    color: var(--text-1);
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius);
     z-index: 1000;
-    font-size: 14px;
+    font-size: 13px;
     display: none;
 }
 
 .success-message {
-    border-color: #4EC9B0;
-    color: #4EC9B0;
+    border-color: var(--accent);
+    color: var(--accent);
 }
 
 .error-message {
-    border-color: #F44747;
-    color: #F44747;
+    border-color: var(--danger);
+    color: var(--danger);
 }
 
 .warning-message {
-    border-color: #DCDCAA;
-    color: #DCDCAA;
+    border-color: var(--border-strong);
+    color: var(--text-2);
 }
 
-/* 图谱懒加载指示器 */
+/* ========================================
+   9. 图谱懒加载指示器
+   ======================================== */
 .graph-loader {
     position: fixed;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    background: rgba(22, 27, 34, 0.95);
-    border: 1px solid var(--cli-border);
-    border-radius: 8px;
-    padding: 20px 32px;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius);
+    padding: 16px 24px;
     display: flex;
     align-items: center;
     gap: 12px;
     z-index: 9999;
-    font-size: 14px;
-    color: var(--cli-fg-dim);
+    font-size: 13px;
+    color: var(--text-2);
 }
 
 .loader-spinner {
-    width: 18px;
-    height: 18px;
-    border: 2px solid var(--cli-border);
-    border-top-color: var(--cli-fg);
+    width: 16px;
+    height: 16px;
+    border: 2px solid var(--border);
+    border-top-color: var(--accent);
     border-radius: 50%;
     animation: spin 0.8s linear infinite;
 }
@@ -396,14 +566,14 @@ textarea[readonly] {
     to { transform: rotate(360deg); }
 }
 
-/* 3D图谱加载遮罩 */
+/* ========================================
+   10. 3D图谱加载遮罩
+   ======================================== */
 .graph-loading-overlay {
     position: fixed;
     top: 0; left: 0; right: 0; bottom: 0;
     z-index: 10001;
-    background: rgba(0,0,0,0.6);
-    backdrop-filter: blur(4px);
-    -webkit-backdrop-filter: blur(4px);
+    background: var(--bg-page);
     display: none;
     align-items: center;
     justify-content: center;
@@ -412,10 +582,10 @@ textarea[readonly] {
 }
 .graph-loading-overlay.active { display: flex; }
 .graph-loading-spinner {
-    width: 40px;
-    height: 40px;
-    border: 3px solid var(--cli-border);
-    border-top-color: var(--cli-fg);
+    width: 36px;
+    height: 36px;
+    border: 3px solid var(--border);
+    border-top-color: var(--accent);
     border-radius: 50%;
     animation: graph-spin 0.8s linear infinite;
 }
@@ -423,6 +593,6 @@ textarea[readonly] {
     to { transform: rotate(360deg); }
 }
 .graph-loading-text {
-    color: var(--cli-fg-dim);
-    font-size: 14px;
+    color: var(--text-2);
+    font-size: 13px;
 }

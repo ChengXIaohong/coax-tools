@@ -350,7 +350,7 @@ async function compressImage() {
             downloadBtn.href = compressedUrl;
             downloadBtn.download = 'compressed-image' + bestFormat;
             downloadBtn.classList.add('visible');
-            compressBtn.textContent = '🔄 重新压缩';
+            compressBtn.textContent = '重新压缩';
             isCompressed = true;
         } else {
             showMessage('图片压缩失败: 无法生成压缩后的图片', 'error');
@@ -480,7 +480,7 @@ function resetAll() {
     downloadBtn.href = '#';
     progressContainer.classList.remove('active');
     loadingOverlay.classList.remove('active');
-    compressBtn.textContent = '🗜️ 压缩图片';
+    compressBtn.textContent = '压缩图片';
     isCompressed = false;
     controlsPanel.classList.add('collapsed');
     

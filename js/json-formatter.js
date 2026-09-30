@@ -99,14 +99,8 @@ const GraphButtonManager = {
 
     setLoading(loading) {
         this.isLoading = loading;
-        const icon = graphToggle.querySelector('.graph-icon') || graphToggle;
-        if (loading) {
-            icon.textContent = '⏳';
-            graphToggle.classList.add('loading');
-        } else {
-            icon.textContent = '🔗';
-            graphToggle.classList.remove('loading');
-        }
+        // 不覆盖按钮内容（按钮内是 24px 线性 SVG），只用状态类表达加载中
+        graphToggle.classList.toggle('loading', loading);
     },
 
     validateJsonData() {
@@ -538,15 +532,15 @@ const ContextMenuManager = {
         this.menu.className = 'context-menu';
         this.menu.innerHTML = `
             <div class="context-menu-item" data-action="copy">
-                <span class="context-menu-icon">📋</span>
+                <span class="context-menu-icon">[cp]</span>
                 <span>复制</span>
             </div>
             <div class="context-menu-item" data-action="copy-value">
-                <span class="context-menu-icon">📄</span>
+                <span class="context-menu-icon">[{}]</span>
                 <span>复制值</span>
             </div>
             <div class="context-menu-item" data-action="download">
-                <span class="context-menu-icon">💾</span>
+                <span class="context-menu-icon">[sv]</span>
                 <span>下载</span>
             </div>
         `;
@@ -757,7 +751,7 @@ function showMessage(text, type) {
 function createMessageDiv() {
     const div = document.createElement('div');
     div.id = 'message';
-    div.style.cssText = 'position:fixed;top:20px;left:50%;transform:translateX(-50%);padding:10px 20px;background:var(--cli-bg);color:var(--cli-fg);border:1px solid var(--cli-border);z-index:1000;';
+    div.style.cssText = 'position:fixed;top:20px;left:50%;transform:translateX(-50%);padding:6px 12px;background:var(--bg-elevated);color:var(--text-1);border:1px solid var(--border-strong);border-radius:var(--radius);font-family:var(--font-mono);font-size:11px;z-index:1000;';
     document.body.appendChild(div);
     return div;
 }
@@ -882,7 +876,7 @@ function showGraphValidationError(validation) {
     const error = errorMessages[validation.error] || { text: '未知错误', hint: '' };
 
     const modal = createErrorModal({
-        title: '⚠️ 无法打开图谱',
+        title: '无法打开图谱',
         type: validation.error,
         message: error.text,
         hint: error.hint,
@@ -924,7 +918,7 @@ function createErrorModal(options) {
     modal.innerHTML = `
         <div class="error-modal-content">
             <div class="error-modal-header">
-                <span class="error-icon">${options.title.includes('语法') ? '📝' : '⚠️'}</span>
+                <span class="error-icon">${options.title.includes('语法') ? '[!]' : '[!]'}</span>
                 <span class="error-title">${options.title}</span>
             </div>
             <div class="error-modal-body">

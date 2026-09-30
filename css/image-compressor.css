@@ -1,6 +1,7 @@
 /*
  * 图片压缩器样式
- * 适配 Liquid Glass 科幻主题
+ * 纸面质感 · 瑞士极简 + 莫兰迪护眼
+ * 层级靠 1px 描边 + 底色差表达，不使用阴影 / 渐变 / 毛玻璃
  */
 
 /* ========================================
@@ -19,20 +20,20 @@
 
 .tool-desc p {
     margin: 0;
-    color: var(--tool-fg-dim);
-    font-size: 0.9rem;
+    color: var(--text-2);
+    font-size: 13px;
+    line-height: 1.6;
 }
 
 .compressor-container {
     padding: 0;
     margin: 0;
     background: transparent;
-    box-shadow: none;
     border-radius: 0;
 }
 
 /* ========================================
-   上传区域 - Glass Effect
+   上传区
    ======================================== */
 
 .upload-section {
@@ -52,50 +53,30 @@
 }
 
 .upload-area {
-    border: 2px dashed var(--tool-border);
+    border: 1px dashed var(--border-strong);
     padding: 3rem 2rem;
     text-align: center;
-    transition: all var(--tool-duration-normal, 250ms);
-    background: var(--tool-surface);
-    border-radius: 16px;
+    background: var(--bg-page);
+    border-radius: var(--radius);
     position: relative;
     overflow: hidden;
+    transition: background-color var(--t-fast), border-color var(--t-fast);
 }
 
-.upload-area::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: radial-gradient(circle at center, var(--tool-accent-glow) 0%, transparent 70%);
-    opacity: 0;
-    transition: opacity var(--tool-duration-normal, 250ms);
+.upload-area:hover {
+    border-color: var(--accent);
+    background: var(--bg-card);
 }
 
-.upload-area:hover,
 .upload-area.dragover {
-    border-color: var(--tool-accent);
-    box-shadow: inset 0 0 40px var(--tool-accent-glow);
-}
-
-.upload-area:hover::before,
-.upload-area.dragover::before {
-    opacity: 1;
+    border-color: var(--accent);
+    background: var(--accent-soft);
 }
 
 .upload-area i {
     font-size: 3rem;
     display: block;
     margin-bottom: 1rem;
-    position: relative;
-    animation: float 3s ease-in-out infinite;
-}
-
-@keyframes float {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-8px); }
 }
 
 .upload-area .cloud-icon {
@@ -105,33 +86,34 @@
 
 .upload-area h3 {
     margin: 0 0 0.5rem;
-    color: var(--tool-fg);
-    font-size: 1.2rem;
+    color: var(--text-1);
+    font-size: 15px;
     font-weight: 600;
-    position: relative;
 }
 
 .upload-area p {
-    color: var(--tool-fg-dim);
+    color: var(--text-2);
     margin: 0 0 1rem;
-    font-size: 0.85rem;
-    position: relative;
+    font-size: 13px;
 }
 
 .upload-area .format-hint {
     display: inline-flex;
-    gap: 0.5rem;
+    flex-wrap: wrap;
+    gap: 0.4rem;
     margin-top: 0.5rem;
-    position: relative;
 }
 
 .upload-area .format-tag {
-    background: rgba(167, 139, 250, 0.15);
-    color: var(--tool-accent);
-    padding: 0.25rem 0.6rem;
-    border-radius: 20px;
-    font-size: 0.75rem;
+    background: var(--accent-soft);
+    color: var(--accent);
+    border: 1px solid var(--border);
+    padding: 0.15rem 0.4rem;
+    border-radius: 2px;
+    font-family: var(--font-mono);
+    font-size: 11px;
     font-weight: 500;
+    letter-spacing: 0.04em;
 }
 
 .file-input-wrapper {
@@ -150,38 +132,36 @@
 }
 
 .file-input-button {
-    padding: 0.8rem 2rem;
-    background: linear-gradient(135deg, var(--tool-accent) 0%, #8b5cf6 100%);
-    color: #fff;
-    border: none;
-    font-size: 0.95rem;
+    height: 32px;
+    padding: 0 1.1rem;
+    background: var(--accent);
+    /* 底色随主题翻转：浅色主题为近白，深色主题为近黑，保证对比度 */
+    color: var(--bg-page);
+    border: 1px solid var(--accent);
+    font-size: 13px;
     font-weight: 600;
     font-family: inherit;
     cursor: pointer;
-    transition: all var(--tool-duration-normal, 250ms);
-    border-radius: 30px;
-    box-shadow: 0 4px 20px var(--tool-accent-glow);
+    border-radius: var(--radius);
     position: relative;
+    transition: background-color var(--t-fast), border-color var(--t-fast);
 }
 
 .file-input-button:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 30px var(--tool-accent-glow);
-}
-
-.file-input-button:active {
-    transform: translateY(0);
+    background: var(--accent-hover);
+    border-color: var(--accent-hover);
 }
 
 #fileInfo {
     margin-top: 1rem;
-    color: var(--tool-fg-dim);
-    font-size: 0.8rem;
+    color: var(--text-2);
+    font-family: var(--font-mono);
+    font-size: 11px;
     position: relative;
 }
 
 /* ========================================
-   预览区域 - Glass Panels
+   预览区
    ======================================== */
 
 .preview-container {
@@ -206,26 +186,25 @@
 }
 
 .preview-panel {
-    background: var(--tool-glass-bg);
-    border: 1px solid var(--tool-glass-border);
-    backdrop-filter: blur(var(--tool-glass-blur));
-    -webkit-backdrop-filter: blur(var(--tool-glass-blur));
-    border-radius: 16px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
     padding: 1rem;
-    transition: all var(--tool-duration-normal, 250ms);
+    transition: border-color var(--t-fast);
 }
 
 .preview-panel:hover {
-    border-color: var(--tool-border-hover);
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    border-color: var(--border-strong);
 }
 
 .preview-panel h3 {
     margin: 0 0 0.75rem;
-    color: var(--tool-fg-dim);
-    font-size: 0.8rem;
+    color: var(--text-2);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 500;
     text-transform: uppercase;
-    letter-spacing: 0.1em;
+    letter-spacing: 0.12em;
     display: flex;
     align-items: center;
     gap: 0.5rem;
@@ -233,14 +212,14 @@
 
 .preview-panel h3::before {
     content: '>';
-    color: var(--tool-accent);
+    color: var(--accent);
 }
 
 .preview-wrapper {
     position: relative;
-    background: var(--tool-surface);
-    border: 1px solid var(--tool-border);
-    border-radius: 12px;
+    background: var(--bg-page);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
     min-height: 160px;
     display: flex;
     align-items: center;
@@ -252,7 +231,7 @@
     max-width: 100%;
     max-height: 30vh;
     display: none;
-    border-radius: 6px;
+    border-radius: 2px;
 }
 
 .image-preview.visible {
@@ -260,8 +239,8 @@
 }
 
 .preview-placeholder {
-    color: var(--tool-fg-dim);
-    font-size: 0.85rem;
+    color: var(--text-2);
+    font-size: 13px;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -269,7 +248,7 @@
 }
 
 .preview-placeholder .icon {
-    font-size: 2rem;
+    font-size: 1.75rem;
     opacity: 0.5;
 }
 
@@ -282,13 +261,14 @@
     bottom: 0;
     left: 0;
     right: 0;
-    background: rgba(0, 0, 0, 0.85);
-    backdrop-filter: blur(8px);
-    padding: 0.6rem 1rem;
-    font-size: 0.8rem;
-    color: var(--tool-fg);
+    background: var(--bg-elevated);
+    border-top: 1px solid var(--border);
+    padding: 0.45rem 0.75rem;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text-1);
     display: none;
-    border-radius: 0 0 12px 12px;
+    border-radius: 0 0 2px 2px;
 }
 
 .preview-tooltip.visible {
@@ -302,21 +282,19 @@
 }
 
 .preview-tooltip .highlight {
-    color: var(--tool-accent);
-    font-weight: bold;
+    color: var(--accent);
+    font-weight: 600;
 }
 
 /* ========================================
-   控制面板 - Glass Effect
+   控制面板
    ======================================== */
 
 .controls-panel {
     margin-bottom: 1rem;
-    background: var(--tool-glass-bg);
-    border: 1px solid var(--tool-glass-border);
-    backdrop-filter: blur(var(--tool-glass-blur));
-    -webkit-backdrop-filter: blur(var(--tool-glass-blur));
-    border-radius: 16px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
     overflow: hidden;
 }
 
@@ -332,31 +310,32 @@
     width: 100%;
     background: transparent;
     border: none;
-    color: var(--tool-fg);
-    padding: 1rem 1.25rem;
-    font-size: 0.9rem;
+    color: var(--text-1);
+    padding: 0.75rem 1rem;
+    font-size: 13px;
     font-family: inherit;
     cursor: pointer;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border-bottom: 1px solid var(--tool-border);
-    transition: background var(--tool-duration-fast, 150ms);
+    border-bottom: 1px solid var(--border);
+    transition: background-color var(--t-fast);
 }
 
 .controls-toggle:hover {
-    background: var(--tool-surface-hover);
+    background: var(--bg-hover);
 }
 
+/* 折叠箭头：功能状态指示，保留旋转但限制在 140ms ease-out 内 */
 .toggle-icon {
-    transition: transform 0.3s;
+    transition: transform var(--t-base);
     transform: rotate(90deg);
-    color: var(--tool-accent);
+    color: var(--accent);
 }
 
 .controls-body {
     padding: 1.25rem;
-    background: var(--tool-surface);
+    background: var(--bg-page);
 }
 
 .control-group {
@@ -372,46 +351,49 @@
     justify-content: space-between;
     align-items: center;
     margin-bottom: 0.6rem;
-    font-size: 0.85rem;
-    color: var(--tool-fg);
+    font-size: 13px;
+    color: var(--text-1);
 }
 
 .control-group label .hint {
-    color: var(--tool-fg-dim);
-    font-size: 0.75rem;
+    color: var(--text-2);
+    font-family: var(--font-mono);
+    font-size: 11px;
     font-weight: normal;
 }
 
 .control-group input[type="range"] {
     width: 100%;
-    height: 6px;
-    background: var(--tool-border);
+    height: 4px;
+    background: var(--border);
     appearance: none;
     cursor: pointer;
-    border-radius: 3px;
+    border-radius: 2px;
 }
 
 .control-group input[type="range"]::-webkit-slider-thumb {
     appearance: none;
-    width: 18px;
-    height: 18px;
-    background: linear-gradient(135deg, var(--tool-accent) 0%, #8b5cf6 100%);
+    width: 16px;
+    height: 16px;
+    background: var(--accent);
+    border: 1px solid var(--accent);
     cursor: pointer;
-    border-radius: 50%;
-    box-shadow: 0 2px 12px var(--tool-accent-glow);
-    transition: all var(--tool-duration-fast, 150ms);
+    border-radius: 2px;
+    transition: background-color var(--t-fast), border-color var(--t-fast);
 }
 
 .control-group input[type="range"]::-webkit-slider-thumb:hover {
-    transform: scale(1.15);
+    background: var(--accent-hover);
+    border-color: var(--accent-hover);
 }
 
 .slider-value {
-    color: var(--tool-accent);
-    font-weight: bold;
+    color: var(--accent);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 600;
     min-width: 4rem;
     text-align: right;
-    font-size: 0.9rem;
 }
 
 /* ========================================
@@ -426,14 +408,15 @@
 }
 
 .btn {
-    padding: 0.75rem 1.5rem;
-    font-size: 0.9rem;
+    height: 32px;
+    padding: 0 1rem;
+    font-size: 13px;
     font-weight: 600;
     font-family: inherit;
     cursor: pointer;
-    transition: all var(--tool-duration-normal, 250ms);
-    border: none;
-    border-radius: 10px;
+    transition: background-color var(--t-fast), border-color var(--t-fast), color var(--t-fast);
+    border: 1px solid transparent;
+    border-radius: var(--radius);
     text-decoration: none;
     display: inline-flex;
     align-items: center;
@@ -441,23 +424,16 @@
     gap: 0.5rem;
 }
 
-.btn:hover {
-    transform: translateY(-2px);
-}
-
-.btn:active {
-    transform: translateY(0);
-}
-
 .btn-primary {
-    background: linear-gradient(135deg, var(--tool-accent) 0%, #8b5cf6 100%);
-    color: #fff;
-    box-shadow: 0 4px 20px var(--tool-accent-glow);
+    background: var(--accent);
+    border-color: var(--accent);
+    color: var(--bg-page);
 }
 
 .btn-primary:hover {
-    box-shadow: 0 6px 30px var(--tool-accent-glow);
-    color: #fff;
+    background: var(--accent-hover);
+    border-color: var(--accent-hover);
+    color: var(--bg-page);
 }
 
 .btn-primary.hidden {
@@ -466,10 +442,9 @@
 
 .btn-download {
     display: none;
-    background: linear-gradient(135deg, var(--tool-accent) 0%, #8b5cf6 100%);
-    color: #fff;
-    box-shadow: 0 4px 20px var(--tool-accent-glow);
-    font-weight: bold;
+    background: var(--accent);
+    border-color: var(--accent);
+    color: var(--bg-page);
 }
 
 .btn-download.visible {
@@ -477,19 +452,20 @@
 }
 
 .btn-download:hover {
-    box-shadow: 0 6px 30px var(--tool-accent-glow);
-    color: #fff;
+    background: var(--accent-hover);
+    border-color: var(--accent-hover);
+    color: var(--bg-page);
 }
 
 .btn-secondary {
     background: transparent;
-    color: var(--tool-fg);
-    border: 2px solid var(--tool-border);
+    color: var(--text-1);
+    border: 1px solid var(--border);
 }
 
 .btn-secondary:hover {
-    border-color: var(--tool-accent);
-    box-shadow: 0 0 20px var(--tool-accent-glow);
+    background: var(--bg-hover);
+    border-color: var(--border-strong);
 }
 
 /* ========================================
@@ -498,26 +474,24 @@
 
 .message {
     text-align: center;
-    padding: 0.8rem 1.25rem;
+    padding: 0.6rem 1rem 0.6rem 2.5rem;
     margin-bottom: 1rem;
     display: none;
-    font-size: 0.85rem;
-    border-radius: 12px;
-    border: 1px solid var(--tool-glass-border);
+    font-size: 13px;
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
     position: relative;
-    padding-left: 2.5rem;
-    background: var(--tool-glass-bg);
-    backdrop-filter: blur(var(--tool-glass-blur));
+    background: var(--bg-card);
+    color: var(--text-1);
 }
 
 .message::before {
     content: '';
     position: absolute;
     left: 1rem;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 8px;
-    height: 8px;
+    top: calc(50% - 3px);
+    width: 6px;
+    height: 6px;
     border-radius: 50%;
 }
 
@@ -526,43 +500,44 @@
 }
 
 .message-error {
-    background: rgba(255, 82, 82, 0.1);
-    color: #ff5252;
-    border: 1px solid rgba(255, 82, 82, 0.3);
+    background: var(--danger-soft);
+    color: var(--danger);
+    border-color: var(--border);
 }
 
 .message-error::before {
-    background: #ff5252;
+    background: var(--danger);
 }
 
 .message-success {
-    background: rgba(167, 139, 250, 0.1);
-    color: var(--tool-accent);
-    border: 1px solid rgba(167, 139, 250, 0.3);
+    background: var(--accent-soft);
+    color: var(--accent);
+    border-color: var(--border);
 }
 
 .message-success::before {
-    background: var(--tool-accent);
+    background: var(--accent);
 }
 
+/* 警告 / 提示：不引入额外色相，用中性色区分 */
 .message-warning {
-    background: rgba(255, 193, 7, 0.1);
-    color: #ffc107;
-    border: 1px solid rgba(255, 193, 7, 0.3);
+    background: var(--bg-hover);
+    color: var(--text-2);
+    border-color: var(--border-strong);
 }
 
 .message-warning::before {
-    background: #ffc107;
+    background: var(--text-2);
 }
 
 .message-info {
-    background: rgba(33, 150, 243, 0.1);
-    color: #2196f3;
-    border: 1px solid rgba(33, 150, 243, 0.3);
+    background: var(--bg-card);
+    color: var(--text-2);
+    border-color: var(--border);
 }
 
 .message-info::before {
-    background: #2196f3;
+    background: var(--text-2);
 }
 
 /* ========================================
@@ -572,12 +547,10 @@
 .progress-container {
     display: none;
     margin: 1rem 0;
-    background: var(--tool-glass-bg);
-    border: 1px solid var(--tool-glass-border);
-    backdrop-filter: blur(var(--tool-glass-blur));
-    -webkit-backdrop-filter: blur(var(--tool-glass-blur));
-    border-radius: 16px;
-    padding: 1rem;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 0.75rem 1rem;
 }
 
 .progress-container.active {
@@ -588,9 +561,10 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 0.75rem;
-    font-size: 0.85rem;
-    color: var(--tool-fg);
+    margin-bottom: 0.6rem;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text-2);
 }
 
 .progress-status {
@@ -600,48 +574,37 @@
 }
 
 .progress-spinner {
-    width: 16px;
-    height: 16px;
-    border: 2px solid var(--tool-border);
-    border-top-color: var(--tool-accent);
+    width: 14px;
+    height: 14px;
+    border: 2px solid var(--border-strong);
+    border-top-color: var(--accent);
     border-radius: 50%;
-    animation: spin 0.8s linear infinite;
+    animation: spin 0.9s linear infinite;
 }
 
 .progress-bar {
-    height: 8px;
-    background: var(--tool-border);
+    height: 6px;
+    background: var(--border);
     overflow: hidden;
-    border-radius: 4px;
+    border-radius: 2px;
 }
 
 .progress-fill {
     height: 100%;
-    background: linear-gradient(90deg, var(--tool-accent) 0%, #8b5cf6 100%);
+    background: var(--accent);
     width: 0%;
-    transition: width 0.3s ease-out;
-    border-radius: 4px;
-    position: relative;
+    transition: width var(--t-base);
+    border-radius: 2px;
 }
 
-.progress-fill::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
-    animation: shimmer 1.5s infinite;
-}
-
-@keyframes shimmer {
-    0% { transform: translateX(-100%); }
-    100% { transform: translateX(100%); }
+/* 功能性加载指示（非装饰动画），本页原本缺少 keyframes 定义 */
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
 }
 
 /* ========================================
-   加载遮罩 - Glass Blur
+   加载遮罩
    ======================================== */
 
 .loading-overlay {
@@ -650,9 +613,8 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(0, 0, 0, 0.7);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
+    /* 固定遮罩色：深色纸面遮罩，与主题无关 */
+    background: rgba(23, 22, 19, 0.5);
     display: none;
     align-items: center;
     justify-content: center;
@@ -665,27 +627,32 @@
 
 .loading-content {
     text-align: center;
-    color: var(--tool-fg);
+    color: var(--text-1);
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.5rem 2rem;
 }
 
 .loading-spinner-large {
-    width: 50px;
-    height: 50px;
-    border: 3px solid var(--tool-border);
-    border-top-color: var(--tool-accent);
+    width: 44px;
+    height: 44px;
+    border: 3px solid var(--border-strong);
+    border-top-color: var(--accent);
     border-radius: 50%;
-    animation: spin 0.8s linear infinite;
+    animation: spin 0.9s linear infinite;
     margin: 0 auto 1rem;
 }
 
 .loading-text {
-    font-size: 0.95rem;
-    margin-bottom: 0.5rem;
+    font-size: 14px;
+    margin-bottom: 0.35rem;
 }
 
 .loading-detail {
-    font-size: 0.8rem;
-    color: var(--tool-fg-dim);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text-2);
 }
 
 /* ========================================

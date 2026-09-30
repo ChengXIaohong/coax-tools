@@ -10,40 +10,48 @@
     <!-- 主题初始化：防止 FOUC（Flash of Unstyled Content）闪烁 -->
     <script>
     (function() {
+        // 默认暖纸浅色；历史值 'sci-fi' 属于旧的深色主题，迁移为 'dark' 以保留用户偏好
         var saved = localStorage.getItem('coax-tools-mode');
-        if (saved === 'light') {
-            document.documentElement.setAttribute('data-mode', 'light');
-        }
+        var theme = (saved === 'dark' || saved === 'sci-fi') ? 'dark' : 'light';
+        document.documentElement.setAttribute('data-theme', theme);
     })();
     </script>
-    <link rel="stylesheet" href="../styles/theme-base.css">
-    <link rel="stylesheet" href="../styles/theme-tool.css">
+    <link rel="stylesheet" href="../styles/theme-base.css?v=20260930">
+    <link rel="stylesheet" href="../styles/theme-tool.css?v=20260930">
     <link rel="stylesheet" href="../css/json-formatter.css">
     <link rel="stylesheet" href="../css/json-graph.css">
     <link rel="stylesheet" href="../css/json-graph-3d.css">
 </head>
-<body data-theme="tool">
-    <div class="bg-orbs" aria-hidden="true"></div>
-    <div class="grid-pattern" aria-hidden="true"></div>
+<body>
     <div class="container">
         <main>
+            <!-- 全屏工作区：不使用 .tool-header-bar，整个视口就是编辑区 -->
             <div class="formatter-container">
                 <div class="panels-container">
                     <div class="panel" id="inputPanel">
+                        <div class="ws-bar">
+                            <span class="ws-bar__crumb">~/tools/json</span>
+                            <span class="ws-bar__spacer"></span>
+                            <a href="../index.html" class="ws-bar__link">返回</a>
+                        </div>
                         <textarea id="inputJson" placeholder="粘贴或输入 JSON..."></textarea>
                     </div>
 
                     <div class="panel" id="outputPanel">
-                        <div class="output-actions">
-                            <button class="action-btn" id="actionToggle" title="操作">☰</button>
-                            <button class="action-btn" id="graphToggle" title="图谱视图">🔗</button>
-                            <button class="action-btn" id="graph3dToggle" title="3D图谱视图">🧊</button>
-                            <div class="action-menu" id="actionMenu">
-                                <button class="action-item" id="yamlConvert">转YAML</button>
-                                <button class="action-item" id="toonConvert">转TOON</button>
-                                <button class="action-item" id="extractStructure">提取结构</button>
-                                <button class="action-item" id="compressJson">压缩JSON</button>
-                                <button class="action-item" id="importFile">📂 导入文件</button>
+                        <div class="ws-bar">
+                            <span class="ws-bar__label">输出</span>
+                            <span class="ws-bar__spacer"></span>
+                            <div class="output-actions">
+                                <button class="action-btn" id="actionToggle" title="操作" aria-label="操作"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
+                                <button class="action-btn" id="graphToggle" title="图谱视图" aria-label="图谱视图"><span class="graph-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="2.5"/><circle cx="18" cy="6" r="2.5"/><circle cx="12" cy="18" r="2.5"/><path d="M8.5 6h7M7.2 8.1l3.6 7.8M16.8 8.1l-3.6 7.8"/></svg></span></button>
+                                <button class="action-btn" id="graph3dToggle" title="3D图谱视图" aria-label="3D图谱视图"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 20 7.5v9L12 21 4 16.5v-9Z"/><path d="M12 12 20 7.5M12 12v9M12 12 4 7.5"/></svg></button>
+                                <div class="action-menu" id="actionMenu">
+                                    <button class="action-item" id="yamlConvert">转YAML</button>
+                                    <button class="action-item" id="toonConvert">转TOON</button>
+                                    <button class="action-item" id="extractStructure">提取结构</button>
+                                    <button class="action-item" id="compressJson">压缩JSON</button>
+                                    <button class="action-item" id="importFile">导入文件</button>
+                                </div>
                             </div>
                         </div>
                         <div id="outputJson" contenteditable="true" spellcheck="false"></div>
@@ -221,7 +229,7 @@
                 var modal = document.createElement('div');
                 modal.className = 'json-size-warning';
                 modal.innerHTML =
-                    '<h3>⚠️ 数据较大</h3>' +
+                    '<h3>数据较大</h3>' +
                     '<p>JSON 约 ' + sizeKB + 'KB，预估 ' + nodeCount + ' 个节点。<br>3D 图谱渲染可能较慢或卡顿。</p>' +
                     '<div class="warning-actions">' +
                     '<button class="danger" id="warn-cancel">取消</button>' +

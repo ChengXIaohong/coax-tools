@@ -193,14 +193,15 @@ function createToast(message) {
         position: fixed;
         top: 20px;
         right: 20px;
-        background: linear-gradient(135deg, rgba(0, 209, 255, 0.9), rgba(0, 153, 204, 0.9));
-        color: #000;
-        padding: 12px 20px;
-        border-radius: 6px;
+        background: var(--accent-soft);
+        color: var(--text-1);
+        border: 1px solid var(--border-strong);
+        border-radius: 3px;
+        padding: 6px 10px;
         z-index: 10000;
-        font-size: 14px;
-        font-weight: bold;
-        box-shadow: 0 0 15px rgba(0, 209, 255, 0.5);
+        font-family: var(--font-mono);
+        font-size: 11px;
+        letter-spacing: 0.02em;
         animation: fadeInOut 2s ease-in-out forwards;
     `;
     

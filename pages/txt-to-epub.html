@@ -9,18 +9,17 @@
     <title>TXT转EPUB - coax的小工具</title>
     <script>
     (function() {
+        // 默认暖纸浅色；历史值 'sci-fi' 属于旧的深色主题，迁移为 'dark' 以保留用户偏好
         var saved = localStorage.getItem('coax-tools-mode');
-        var theme = saved === 'light' ? 'light' : 'sci-fi';
+        var theme = (saved === 'dark' || saved === 'sci-fi') ? 'dark' : 'light';
         document.documentElement.setAttribute('data-theme', theme);
     })();
     </script>
-    <link rel="stylesheet" href="../styles/theme-base.css">
-    <link rel="stylesheet" href="../styles/theme-tool.css">
+    <link rel="stylesheet" href="../styles/theme-base.css?v=20260930">
+    <link rel="stylesheet" href="../styles/theme-tool.css?v=20260930">
     <link rel="stylesheet" href="../css/txt-to-epub.css">
 </head>
-<body data-theme="sci-fi">
-    <div class="bg-orbs"></div>
-    <div class="grid-pattern"></div>
+<body>
     <div class="container">
         <main class="docx-main">
             <header class="tool-header-bar">
@@ -31,7 +30,7 @@
                     返回首页
                 </a>
                 <div class="tool-title">
-                    <div class="tool-icon">📚</div>
+                    <div class="tool-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2Z"/><path d="M4 5v14"/><path d="M8 7h7"/><path d="M8 11h5"/></svg></div>
                     <span class="tool-name">Txt转Epub</span>
                 </div>
                 <span class="tool-desc">将 TXT 文本转换为 EPUB 电子书</span>
@@ -43,10 +42,10 @@
 
                     <!-- 文件上传区 -->
                     <div class="card">
-                        <h2>📄 文件选择</h2>
+                        <h2>文件选择</h2>
                         <div class="upload-area" id="uploadArea">
                             <div class="upload-hint">
-                                <span class="upload-icon">📁</span>
+                                <span class="upload-icon"></span>
                                 <p>拖拽 TXT 文件到此处或点击上传</p>
                                 <p class="upload-limit">最多10个文件，每个最大50MB</p>
                             </div>
@@ -60,7 +59,7 @@
 
                     <!-- 内容预览区 -->
                     <div class="card" id="previewCard" style="display: none;">
-                        <h2>👁 内容预览</h2>
+                        <h2>内容预览</h2>
                         <div class="preview-controls">
                             <select id="previewFileSelect"></select>
                         </div>
@@ -69,7 +68,7 @@
 
                     <!-- 章节解析区 -->
                     <div class="card" id="chapterCard" style="display: none;">
-                        <h2>📑 章节设置</h2>
+                        <h2>章节设置</h2>
                         <div class="chapter-options">
                             <div class="option-row">
                                 <label for="chapterPatternSelect">章节识别规则：</label>
@@ -87,7 +86,7 @@
 
                     <!-- 封面与元数据区 -->
                     <div class="card">
-                        <h2>🎨 封面与元数据</h2>
+                        <h2>封面与元数据</h2>
                         <div class="metadata-form">
                             <div class="form-row">
                                 <label for="bookTitle">书名 <span class="required">*</span>：</label>
@@ -110,7 +109,7 @@
                                 <label>封面图片：</label>
                                 <div class="cover-upload" id="coverUpload">
                                     <div class="cover-placeholder">
-                                        <span class="cover-icon">🖼️</span>
+                                        
                                         <span>点击上传封面</span>
                                     </div>
                                     <input type="file" id="coverInput" accept="image/jpeg,image/png,image/jpg">

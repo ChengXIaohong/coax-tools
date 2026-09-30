@@ -1,69 +1,232 @@
 /*
- * coax的小工具 - 一套实用的前端工具集合
- * 
+ * coax的小工具 - 基础设计系统
+ * ================================
+ * 纸感瑞士极简 + 莫兰迪护眼
+ *
+ * 规则（全站强制）：
+ *   1. 禁止渐变（gradient）
+ *   2. 禁止阴影（box-shadow / text-shadow / filter: drop-shadow）
+ *   3. 禁止毛玻璃（backdrop-filter）
+ *   4. 圆角上限 4px
+ *   5. 层级只用 1px 边框 + 背景色差表达
+ *
  * MIT License
- * 
  * Copyright (c) 2025 coax
- * 
- *  Permission is hereby granted, free of charge, to any person obtaining a copy
- *  of this software and associated documentation files (the "Software"), to deal
- *  in the Software without restriction, including without limitation the rights
- *  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- *  copies of the Software, and to permit persons to whom the Software is
- *  furnished to do so, subject to the following conditions:
- * 
- *  The above copyright notice and this permission notice shall be included in all
- *  copies or substantial portions of the Software.
- * 
- *  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- *  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- *  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- *  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- *  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- *  SOFTWARE.
- * 
- *  一套实用的前端工具集合，包括文本处理、数据转换、文件操作等多种实用工具。
- *  源码可得，快乐加倍！记得给个Star哦~ 🌟
  */
 
 /* ========================================
-   公共基础样式 - 所有主题的共同依赖
+   1. 设计令牌
    ======================================== */
 
-/* 基础重置 */
+:root {
+    /* 背景 */
+    --bg-page: #F7F6F1;
+    --bg-card: #FDFCF9;
+    --bg-elevated: #FFFFFF;
+    --bg-hover: #F1EFE8;
+
+    /* 边框 */
+    --border: #DAD5CB;
+    --border-strong: #C4BEB1;
+
+    /* 文字 */
+    --text-1: #23221F;
+    --text-2: #706C63;
+    --text-3: #9B968C;
+
+    /* 强调色（莫兰迪灰绿） */
+    --accent: #5C6E63;
+    --accent-hover: #4A5A50;
+    --accent-soft: #E6EAE4;
+    /* 强调色填充上的前景色：浅色下白字，深色下近黑字，保证可读 */
+    --on-accent: #FFFFFF;
+
+    /* 危险 */
+    --danger: #9B4B3F;
+    --danger-soft: #F2E7E4;
+
+    /* 排版 */
+    --font-ui: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+    --font-mono: "JetBrains Mono", "SF Mono", Menlo, Consolas, monospace;
+
+    /* 几何 */
+    --radius: 3px;
+    --radius-lg: 4px;
+    --border-w: 1px;
+
+    /* 间距 */
+    --sp-1: 4px;
+    --sp-2: 8px;
+    --sp-3: 12px;
+    --sp-4: 16px;
+    --sp-5: 20px;
+    --sp-6: 24px;
+
+    /* 动效 */
+    --t-fast: 100ms ease-out;
+    --t-base: 140ms ease-out;
+
+    /* 兼容别名：工具页仍在用的旧变量名，统一指向新令牌 */
+    --tool-bg: var(--bg-page);
+    --tool-bg-alt: var(--bg-card);
+    --tool-bg-elevated: var(--bg-elevated);
+    --tool-surface: var(--bg-card);
+    --tool-surface-hover: var(--bg-hover);
+    --tool-border: var(--border);
+    --tool-border-hover: var(--border-strong);
+    --tool-fg: var(--text-1);
+    --tool-fg-dim: var(--text-2);
+    --tool-fg-muted: var(--text-3);
+    --tool-accent: var(--accent);
+    --tool-accent-2: var(--accent);
+    --tool-accent-3: var(--accent);
+    --tool-accent-glow: transparent;
+    --tool-glass-bg: var(--bg-card);
+    --tool-glass-border: var(--border);
+    --tool-duration-fast: var(--t-fast);
+    --tool-duration-normal: var(--t-base);
+    --tool-duration-slow: var(--t-base);
+    --tool-ease-out: ease-out;
+    --tool-ease-spring: ease-out;
+}
+
+/* 深色模式：html 与 body 上都支持，保持与旧代码兼容 */
+[data-theme="dark"],
+[data-mode="dark"] {
+    --bg-page: #1B1A17;
+    --bg-card: #23221E;
+    --bg-elevated: #2A2925;
+    --bg-hover: #2E2C27;
+
+    --border: #38352F;
+    --border-strong: #4A463E;
+
+    --text-1: #E8E6E1;
+    --text-2: #A8A39A;
+    --text-3: #7A756C;
+
+    --accent: #8FA396;
+    --accent-hover: #A3B7A9;
+    --accent-soft: #2C352F;
+    --on-accent: #1B1A17;
+
+    --danger: #C97A6B;
+    --danger-soft: #342A27;
+
+    color-scheme: dark;
+}
+
+/* ========================================
+   2. 全局重置
+   ======================================== */
+
 * {
+    box-sizing: border-box;
+}
+
+html,
+body {
     margin: 0;
     padding: 0;
-    box-sizing: border-box;
 }
 
 html {
     scroll-behavior: smooth;
 }
 
-/* 工具提示 */
-[data-tooltip] {
-    position: relative;
-    cursor: help;
+body {
+    background: var(--bg-page);
+    color: var(--text-1);
+    font-family: var(--font-ui);
+    font-size: 14px;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    min-height: 100vh;
 }
 
-[data-tooltip]:hover::after {
-    content: attr(data-tooltip);
-    position: absolute;
-    bottom: 100%;
-    left: 50%;
-    transform: translateX(-50%);
-    padding: 4px 8px;
-    background: rgba(0, 0, 0, 0.8);
-    color: white;
-    font-size: 12px;
-    white-space: nowrap;
-    border-radius: 4px;
-    z-index: 1000;
+/* 旧主题遗留的背景装饰层：一律隐藏，不再参与渲染 */
+.bg-orbs,
+.grid-pattern {
+    display: none !important;
 }
 
-/* 禁用状态 */
+/* 标题层级：最高 600 字重，行高 1.3 */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    margin: 0;
+    font-weight: 600;
+    line-height: 1.3;
+    color: var(--text-1);
+}
+
+p {
+    margin: 0;
+}
+
+a {
+    color: var(--accent);
+    text-decoration: none;
+}
+
+a:hover {
+    color: var(--accent-hover);
+    text-decoration: underline;
+}
+
+:focus {
+    outline: none;
+}
+
+:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 1px;
+}
+
+::selection {
+    background: var(--accent-soft);
+    color: var(--text-1);
+}
+
+/* 滚动条：细，克制 */
+::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--border);
+    border-radius: 2px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--border-strong);
+}
+
+/* ========================================
+   3. 工具类
+   ======================================== */
+
+/* 元信息专用：等宽小字 */
+.mono,
+.mono-text {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.02em;
+}
+
+.hidden {
+    display: none !important;
+}
+
 .disabled,
 [disabled] {
     opacity: 0.5;
@@ -71,12 +234,6 @@ html {
     pointer-events: none;
 }
 
-/* 隐藏元素 */
-.hidden {
-    display: none !important;
-}
-
-/* 可见性隐藏 */
 .sr-only {
     position: absolute;
     width: 1px;
@@ -88,114 +245,95 @@ html {
     border: 0;
 }
 
-/* 加载动画 */
-@keyframes spin {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
-}
-
-.loading {
-    display: inline-block;
-    width: 20px;
-    height: 20px;
-    border: 2px solid currentColor;
-    border-right-color: transparent;
-    border-radius: 50%;
-    animation: spin 0.75s linear infinite;
-}
-
-/* 渐入动画 */
-@keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
-}
-
-.fade-in {
-    animation: fadeIn 0.3s ease-in;
-}
-
-/* 滑入动画 */
-@keyframes slideIn {
-    from { transform: translateY(-10px); opacity: 0; }
-    to { transform: translateY(0); opacity: 1; }
-}
-
-.slide-in {
-    animation: slideIn 0.3s ease-out;
-}
-
 /* ========================================
-   公共组件样式
+   4. 按钮
    ======================================== */
 
-/* 消息提示 - 通用 */
-.message {
-    padding: 12px 16px;
-    border-radius: 6px;
-    margin: 10px 0;
-    animation: slideIn 0.3s ease-out;
-}
-
-.message-success {
-    background: #d4edda;
-    color: #155724;
-    border: 1px solid #c3e6cb;
-}
-
-.message-error {
-    background: #f8d7da;
-    color: #721c24;
-    border: 1px solid #f5c6cb;
-}
-
-.message-info {
-    background: #d1ecf1;
-    color: #0c5460;
-    border: 1px solid #bee5eb;
-}
-
-/* 按钮基础 - 通用 */
 .btn {
-    display: inline-block;
-    padding: 8px 16px;
-    font-size: 14px;
-    font-weight: 500;
-    text-align: center;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    height: 32px;
+    padding: 0 14px;
+    font-family: var(--font-ui);
+    font-size: 13px;
+    line-height: 1;
     text-decoration: none;
-    border: none;
-    border-radius: 6px;
+    border: 1px solid transparent;
+    border-radius: var(--radius);
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: background-color var(--t-fast), border-color var(--t-fast), color var(--t-fast);
 }
 
 .btn:hover {
-    transform: translateY(-1px);
+    text-decoration: none;
 }
 
-.btn:active {
-    transform: translateY(0);
-}
-
+.btn--primary,
 .btn-primary {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
+    background: var(--accent);
+    border-color: var(--accent);
+    color: var(--on-accent);
 }
 
+.btn--primary:hover,
 .btn-primary:hover {
-    opacity: 0.9;
-    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    background: var(--accent-hover);
+    border-color: var(--accent-hover);
+    color: var(--on-accent);
 }
 
+.btn--secondary,
 .btn-secondary {
-    background: #6c757d;
-    color: white;
+    background: transparent;
+    border-color: var(--border);
+    color: var(--text-1);
 }
 
+.btn--secondary:hover,
 .btn-secondary:hover {
-    background: #5a6268;
+    background: var(--bg-hover);
+    border-color: var(--border-strong);
 }
 
-/* 输入框基础 - 通用 */
+.btn--ghost,
+.btn-ghost {
+    background: transparent;
+    border-color: transparent;
+    color: var(--text-2);
+}
+
+.btn--ghost:hover,
+.btn-ghost:hover {
+    background: var(--bg-hover);
+    color: var(--text-1);
+}
+
+.btn--danger {
+    background: transparent;
+    border-color: var(--danger);
+    color: var(--danger);
+}
+
+.btn--danger:hover {
+    background: var(--danger-soft);
+}
+
+.btn[disabled] {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+
+/* 无 class 的裸按钮：给一个克制的默认外观 */
+button {
+    font-family: var(--font-ui);
+}
+
+/* ========================================
+   5. 表单元素
+   ======================================== */
+
 input[type="text"],
 input[type="number"],
 input[type="password"],
@@ -204,120 +342,180 @@ input[type="url"],
 input[type="search"],
 input[type="date"],
 input[type="datetime-local"],
+input[type="file"],
 textarea,
-select {
-    padding: 10px 12px;
-    font-size: 14px;
-    border: 1px solid #ddd;
-    border-radius: 6px;
-    background: white;
-    transition: border-color 0.2s, box-shadow 0.2s;
+select,
+.field {
+    width: 100%;
+    padding: 7px 10px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    color: var(--text-1);
+    font-family: var(--font-ui);
+    font-size: 13px;
+    line-height: 1.5;
+    transition: border-color var(--t-fast);
 }
 
 input:focus,
 textarea:focus,
-select:focus {
+select:focus,
+.field:focus {
+    border-color: var(--accent);
     outline: none;
-    border-color: #667eea;
-    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
 }
 
-/* 标签页 */
-.tabs {
-    display: flex;
-    gap: 0.3vw;
-    margin-bottom: 1.5vw;
-    border-bottom: 1px solid #ddd;
+input::placeholder,
+textarea::placeholder {
+    color: var(--text-3);
+}
+
+select {
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='none' viewBox='0 0 24 24' stroke='%239B968C' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    padding-right: 28px;
+}
+
+select option {
+    background: var(--bg-elevated);
+    color: var(--text-1);
+}
+
+textarea {
+    resize: vertical;
+}
+
+input[type="range"] {
+    width: 100%;
+    accent-color: var(--accent);
+    background: transparent;
+    border: none;
+    padding: 0;
+    height: 20px;
+}
+
+input[type="checkbox"],
+input[type="radio"] {
+    accent-color: var(--accent);
+}
+
+label {
+    color: var(--text-2);
+    font-size: 12px;
 }
 
 /* ========================================
-   分类区块样式（通用）
+   6. 状态文字
    ======================================== */
 
-.tool-category {
-    margin-bottom: 2.5vw;
+.status {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.02em;
+    color: var(--text-2);
 }
 
-.tool-category:last-child {
-    margin-bottom: 0;
+.status--ok {
+    color: var(--accent);
 }
 
-/* 分类小标题 */
-.category-header {
-    display: flex;
-    align-items: center;
-    gap: 0.5vw;
-    padding: 0.6vw 0;
-    margin-bottom: 1vw;
-    font-size: 0.9rem;
+.status--error {
+    color: var(--danger);
 }
 
-.category-icon {
-    opacity: 0.7;
-}
+/* ========================================
+   7. 消息条（内联，非 toast）
+   ======================================== */
 
-.category-name {
-    font-weight: 500;
-}
-
-.category-count {
-    opacity: 0.5;
-    font-size: 0.8rem;
-}
-
-/* 分类内工具网格 */
-.category-tools-grid {
-    display: grid;
-    gap: 1vw;
-}
-
-/* 工具卡片加载动画 - 打字机风格 */
-.tool-card {
-    opacity: 0;
-}
-
-.tool-card.animate {
-    animation: fadeIn 0.08s ease forwards;
-}
-
-.tool-card.animate h3 {
-    overflow: hidden;
-    white-space: nowrap;
-}
-
-.tool-card.animate p {
-    animation: fadeSlideIn 0.08s ease forwards;
-    animation-delay: 0.08s;
-    opacity: 0;
-}
-
-@keyframes fadeSlideIn {
-    from {
-        opacity: 0;
-        transform: translateY(-5px);
-    }
-    to {
-        opacity: 0.8;
-        transform: translateY(0);
-    }
-}
-
-/* 共享光标 */
-.type-cursor {
-    position: fixed;
-    width: 2px;
-    height: 1.2em;
-    background: #333;
-    animation: cursorBlink 0.3s steps(1) infinite;
-    pointer-events: none;
-    z-index: 1000;
+.message {
     display: none;
+    padding: 8px 12px;
+    margin: 0 0 12px;
+    font-size: 13px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--bg-card);
+    color: var(--text-1);
 }
 
-.type-cursor.active {
+.message.show,
+.message:not(:empty) {
     display: block;
 }
 
-@keyframes cursorBlink {
-    50% { opacity: 0; }
+.message-success {
+    background: var(--accent-soft);
+    border-color: var(--accent);
+    color: var(--accent-hover);
+}
+
+.message-error {
+    background: var(--danger-soft);
+    border-color: var(--danger);
+    color: var(--danger);
+}
+
+.message-info {
+    background: var(--bg-card);
+    border-color: var(--border-strong);
+    color: var(--text-2);
+}
+
+/* ========================================
+   8. 卡片
+   ======================================== */
+
+.card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px;
+}
+
+/* ========================================
+   9. 页脚
+   ======================================== */
+
+footer {
+    border-top: 1px solid var(--border);
+    padding: 20px 0;
+    margin-top: 32px;
+    color: var(--text-3);
+    font-size: 12px;
+}
+
+.footer-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 0 24px;
+}
+
+.footer-content p {
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.02em;
+}
+
+/* ========================================
+   10. 减少动画
+   ======================================== */
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
 }

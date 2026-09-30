@@ -1,6 +1,8 @@
 /*
  * 身份证生成器样式
- * 适配 Liquid Glass 科幻主题
+ * 纸感瑞士极简 + 莫兰迪护眼
+ *
+ * 规则：零渐变、零阴影、零毛玻璃、圆角 2-4px
  */
 
 /* ========================================
@@ -11,21 +13,23 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 1rem 0;
-    margin-bottom: 2rem;
-    border-bottom: 1px solid var(--tool-border);
+    padding: 12px 0;
+    margin-bottom: 16px;
+    border-bottom: 1px solid var(--border);
 }
 
 .nav-breadcrumb {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
-    color: var(--tool-fg-dim);
-    font-size: 0.9rem;
+    gap: 6px;
+    color: var(--text-2);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.02em;
 }
 
 .nav-breadcrumb .material-icons {
-    font-size: 1.2rem;
+    font-size: 14px;
 }
 
 .nav-separator {
@@ -33,12 +37,12 @@
 }
 
 .nav-item-current {
-    color: var(--tool-fg);
+    color: var(--text-1);
 }
 
 .nav-title-icon {
-    font-size: 1rem !important;
-    color: var(--tool-fg-dim);
+    font-size: 12px !important;
+    color: var(--text-2);
 }
 
 /* ========================================
@@ -48,51 +52,48 @@
 .content-zone {
     display: flex;
     flex-direction: column;
-    gap: 2rem;
+    gap: 16px;
 }
 
 .tool-desc {
-    margin-bottom: 0.5rem;
+    margin-bottom: 4px;
 }
 
 .tool-desc p {
     margin: 0;
-    color: var(--tool-fg-dim);
-    font-size: 0.9rem;
+    color: var(--text-2);
+    font-size: 13px;
 }
 
 .id-generator-container {
     padding: 0;
     margin: 0;
     background: transparent;
-    box-shadow: none;
     border-radius: 0;
 }
 
 /* ========================================
-   选项区 - Glass Panel
+   选项区
    ======================================== */
 
 .options {
-    background: var(--tool-glass-bg);
-    border: 1px solid var(--tool-glass-border);
-    backdrop-filter: blur(var(--tool-glass-blur));
-    -webkit-backdrop-filter: blur(var(--tool-glass-blur));
-    padding: 1.5rem;
-    margin-bottom: 1.5rem;
-    border-radius: 16px;
-    transition: all 0.3s ease;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    padding: 16px;
+    margin-bottom: 16px;
+    border-radius: var(--radius);
+    transition: border-color var(--t-fast);
 }
 
 .options:hover {
-    border-color: var(--tool-border-hover);
+    border-color: var(--border-strong);
 }
 
 .option-group {
     display: flex;
     flex-wrap: wrap;
-    gap: 1rem;
-    margin-bottom: 1rem;
+    gap: 12px;
+    margin-bottom: 12px;
     align-items: center;
 }
 
@@ -101,22 +102,25 @@
 }
 
 .option-label {
-    font-weight: normal;
+    font-weight: 400;
     min-width: 5rem;
-    color: var(--tool-fg-dim);
-    font-size: 0.9rem;
+    color: var(--text-2);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.02em;
 }
 
 .option-group select,
 .option-group input {
-    padding: 0.6rem 0.8rem;
-    border: 1px solid var(--tool-border);
-    background: var(--tool-surface);
-    color: var(--tool-fg);
-    font-family: inherit;
-    font-size: 0.9rem;
-    border-radius: 8px;
-    transition: all var(--tool-duration-fast) var(--tool-ease-out);
+    height: 32px;
+    padding: 0 10px;
+    border: 1px solid var(--border);
+    background: var(--bg-card);
+    color: var(--text-1);
+    font-family: var(--font-ui);
+    font-size: 13px;
+    border-radius: var(--radius);
+    transition: border-color var(--t-fast);
 }
 
 .option-group input[type="number"] {
@@ -127,13 +131,12 @@
 .option-group select:focus,
 .option-group input:focus {
     outline: none;
-    border-color: var(--tool-accent);
-    box-shadow: 0 0 0 3px var(--tool-accent-glow);
+    border-color: var(--accent);
 }
 
 .option-group select:hover,
 .option-group input:hover {
-    border-color: var(--tool-accent);
+    border-color: var(--accent);
 }
 
 /* ========================================
@@ -143,105 +146,95 @@
 .controls {
     display: flex;
     justify-content: flex-start;
-    gap: 1rem;
-    margin-bottom: 1.5rem;
+    gap: 8px;
+    margin-bottom: 16px;
     flex-wrap: wrap;
 }
 
 .btn {
-    padding: 0.75rem 1.5rem;
-    font-size: 0.9rem;
+    height: 32px;
+    padding: 0 14px;
+    font-size: 13px;
     font-weight: 600;
-    font-family: inherit;
+    font-family: var(--font-ui);
+    line-height: 1;
     cursor: pointer;
-    transition: all var(--tool-duration-normal) var(--tool-ease-out);
-    border: none;
-    border-radius: 10px;
+    transition: background-color var(--t-fast), border-color var(--t-fast), color var(--t-fast);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
     text-decoration: none;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 0.5rem;
+    gap: 6px;
 }
 
 .btn .material-icons {
-    font-size: 1.1rem;
-}
-
-.btn:hover {
-    transform: translateY(-2px);
-}
-
-.btn:active {
-    transform: translateY(0);
+    font-size: 16px;
 }
 
 .btn-primary {
-    background: linear-gradient(135deg, var(--tool-accent) 0%, #8b5cf6 100%);
-    color: #fff;
-    box-shadow: 0 4px 20px var(--tool-accent-glow);
+    background: var(--accent);
+    color: #FFFFFF;
+    border-color: var(--accent);
 }
 
 .btn-primary:hover {
-    box-shadow: 0 6px 30px var(--tool-accent-glow);
-    color: #fff;
+    background: var(--accent-hover);
+    border-color: var(--accent-hover);
+    color: #FFFFFF;
 }
 
 .btn-secondary {
-    background: var(--tool-surface);
-    color: var(--tool-fg);
-    border: 1px solid var(--tool-border);
+    background: var(--bg-card);
+    color: var(--text-1);
+    border: 1px solid var(--border);
 }
 
 .btn-secondary:hover {
-    border-color: var(--tool-accent);
-    box-shadow: 0 0 20px var(--tool-accent-glow);
+    background: var(--bg-hover);
+    border-color: var(--border-strong);
 }
 
+/* 生成 / 复制：主操作实心，次操作描边 */
 .generate-btn,
 .copy-json-btn {
-    padding: 0.75rem 1.5rem;
-    font-size: 0.9rem;
-    font-family: inherit;
+    height: 32px;
+    padding: 0 14px;
+    font-size: 13px;
+    font-weight: 600;
+    font-family: var(--font-ui);
+    line-height: 1;
     cursor: pointer;
-    transition: all var(--tool-duration-normal) var(--tool-ease-out);
-    background: linear-gradient(135deg, var(--tool-accent) 0%, #8b5cf6 100%);
-    border: none;
-    color: #fff;
-    border-radius: 10px;
-    position: relative;
-    overflow: hidden;
-    box-shadow: 0 4px 20px var(--tool-accent-glow);
+    transition: background-color var(--t-fast), border-color var(--t-fast), color var(--t-fast);
+    border-radius: var(--radius);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
 }
 
-.generate-btn::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-    transition: left 0.5s ease;
-}
-
-.generate-btn:hover::before {
-    left: 100%;
+.generate-btn {
+    background: var(--accent);
+    border: 1px solid var(--accent);
+    color: #FFFFFF;
 }
 
 .generate-btn:hover {
-    box-shadow: 0 6px 30px var(--tool-accent-glow);
-    transform: translateY(-2px);
+    background: var(--accent-hover);
+    border-color: var(--accent-hover);
 }
 
 .copy-json-btn {
-    background: linear-gradient(135deg, var(--tool-accent-2) 0%, #06b6d4 100%);
-    box-shadow: 0 4px 20px var(--tool-accent-2-glow);
+    background: var(--bg-card);
+    border: 1px solid var(--accent);
+    color: var(--accent);
 }
 
 .copy-json-btn:hover {
-    box-shadow: 0 6px 30px var(--tool-accent-2-glow);
-    transform: translateY(-2px);
+    background: var(--accent-soft);
+    border-color: var(--accent-hover);
+    color: var(--accent-hover);
 }
 
 .copy-json-btn {
@@ -249,37 +242,33 @@
 }
 
 /* ========================================
-   ID 信息显示区 - Glass Panel
+   ID 信息显示区
    ======================================== */
 
 .id-info {
-    background: var(--tool-glass-bg);
-    border: 1px solid var(--tool-glass-border);
-    backdrop-filter: blur(var(--tool-glass-blur));
-    -webkit-backdrop-filter: blur(var(--tool-glass-blur));
-    padding: 1.5rem;
-    margin-bottom: 1.5rem;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    padding: 16px;
+    margin-bottom: 16px;
     display: none;
-    border-radius: 16px;
-    animation: slideIn 0.3s ease;
+    border-radius: var(--radius);
+    animation: idFadeIn 140ms ease-out;
 }
 
-@keyframes slideIn {
+@keyframes idFadeIn {
     from {
         opacity: 0;
-        transform: translateY(-10px);
     }
     to {
         opacity: 1;
-        transform: translateY(0);
     }
 }
 
 .id-field {
     display: flex;
-    margin-bottom: 1rem;
-    padding: 0.5rem 0;
-    border-bottom: 1px solid var(--tool-border);
+    margin-bottom: 12px;
+    padding: 6px 0;
+    border-bottom: 1px solid var(--border);
 }
 
 .id-field:last-child {
@@ -288,51 +277,53 @@
 }
 
 .id-label {
-    font-weight: normal;
+    font-weight: 400;
     min-width: 8rem;
-    color: var(--tool-fg-dim);
+    color: var(--text-2);
     display: flex;
     align-items: center;
-    gap: 0.5rem;
-    font-size: 0.9rem;
+    gap: 6px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.02em;
 }
 
 .id-label::before {
     content: '›';
-    color: var(--tool-accent);
-    font-weight: bold;
+    color: var(--accent);
+    font-weight: 600;
 }
 
 .id-value {
     flex: 1;
-    color: var(--tool-fg);
-    font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+    color: var(--text-1);
+    font-family: var(--font-mono);
+    font-size: 13px;
+    letter-spacing: 0.02em;
     word-break: break-all;
     display: flex;
     align-items: center;
-    gap: 1rem;
-    font-size: 0.95rem;
+    gap: 16px;
 }
 
 .copy-btn {
     background: transparent;
-    color: var(--tool-fg-dim);
-    border: 1px solid var(--tool-border);
-    padding: 0.3rem 0.6rem;
+    color: var(--text-2);
+    border: 1px solid var(--border);
+    padding: 2px 8px;
     cursor: pointer;
-    margin-left: 0.5rem;
-    font-family: inherit;
-    font-size: 0.8rem;
-    transition: all 0.15s;
-    border-radius: 6px;
-    opacity: 0.7;
+    margin-left: 8px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    line-height: 16px;
+    transition: background-color var(--t-fast), border-color var(--t-fast), color var(--t-fast);
+    border-radius: 2px;
 }
 
 .copy-btn:hover {
-    border-color: var(--tool-accent);
-    color: var(--tool-accent);
-    opacity: 1;
-    box-shadow: 0 0 8px var(--tool-accent-glow);
+    border-color: var(--accent);
+    color: var(--accent);
+    background: var(--bg-hover);
 }
 
 .disclaimer {
@@ -347,33 +338,39 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 1rem;
-    color: var(--tool-fg-dim);
-    font-size: 0.9rem;
+    margin-bottom: 12px;
+    color: var(--text-2);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.02em;
 }
 
 .toggle-btn {
     background: transparent;
-    border: 1px solid var(--tool-border);
-    color: var(--tool-fg);
+    border: 1px solid var(--border);
+    color: var(--text-1);
     cursor: pointer;
-    padding: 0.3rem 0.6rem;
-    font-size: 0.8rem;
-    transition: all 0.2s ease;
-    border-radius: 6px;
+    padding: 2px 8px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    line-height: 16px;
+    transition: background-color var(--t-fast), border-color var(--t-fast), color var(--t-fast);
+    border-radius: 2px;
 }
 
 .toggle-btn:hover {
-    border-color: var(--tool-accent);
-    color: var(--tool-accent);
+    border-color: var(--accent);
+    color: var(--accent);
+    background: var(--bg-hover);
 }
 
+/* 折叠状态指示：这是状态标记，不是 hover 位移效果，保留 */
 .toggle-btn.collapsed {
     transform: rotate(-90deg);
 }
 
 /* ========================================
-   Disclaimer Modal - Glass Blur
+   Disclaimer Modal
    ======================================== */
 
 .disclaimer-modal {
@@ -383,13 +380,12 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.7);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
+    background: var(--bg-page);
+    background: color-mix(in srgb, var(--bg-page) 88%, transparent);
     z-index: 10000;
     justify-content: center;
     align-items: center;
-    animation: fadeIn 0.3s ease;
+    animation: idFadeIn 140ms ease-out;
 }
 
 .disclaimer-modal.show {
@@ -397,83 +393,86 @@
 }
 
 .disclaimer-modal-content {
-    background: var(--tool-bg-elevated);
-    border: 1px solid var(--tool-warning, #f59e0b);
+    background: var(--bg-elevated);
+    border: 1px solid var(--danger);
     max-width: 500px;
     width: 90%;
     max-height: 80vh;
     overflow-y: auto;
-    border-radius: 16px;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+    border-radius: var(--radius-lg);
 }
 
 .disclaimer-modal-header {
-    padding: 1.5rem;
-    border-bottom: 1px solid var(--tool-border);
+    padding: 16px;
+    border-bottom: 1px solid var(--border);
 }
 
 .disclaimer-modal-header h3 {
     margin: 0;
-    color: var(--tool-warning, #f59e0b);
-    font-size: 1rem;
+    color: var(--danger);
+    font-size: 15px;
+    font-weight: 600;
 }
 
 .disclaimer-modal-body {
-    padding: 1.5rem;
-    color: var(--tool-fg-dim);
-    font-size: 0.85rem;
+    padding: 16px;
+    color: var(--text-2);
+    font-size: 13px;
     line-height: 1.6;
 }
 
 .disclaimer-modal-body ul {
-    padding-left: 1.5rem;
+    padding-left: 20px;
     margin: 0;
 }
 
 .disclaimer-modal-body li {
-    margin-bottom: 0.5rem;
+    margin-bottom: 6px;
 }
 
 .disclaimer-modal-footer {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 1.5rem;
-    border-top: 1px solid var(--tool-border);
+    padding: 16px;
+    border-top: 1px solid var(--border);
 }
 
 .disclaimer-modal-footer label {
-    color: var(--tool-fg-dim);
-    font-size: 0.85rem;
+    color: var(--text-2);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.02em;
     cursor: pointer;
     display: flex;
     align-items: center;
-    gap: 0.5rem;
+    gap: 6px;
 }
 
 .disclaimer-modal-footer input[type="checkbox"] {
-    width: 1rem;
-    height: 1rem;
-    accent-color: var(--tool-accent);
+    width: 14px;
+    height: 14px;
+    accent-color: var(--accent);
 }
 
 .disclaimer-modal-confirm {
-    background: linear-gradient(135deg, var(--tool-warning, #f59e0b) 0%, #d97706 100%);
-    border: none;
-    color: #000;
-    padding: 0.6rem 1.5rem;
+    height: 32px;
+    background: var(--danger);
+    border: 1px solid var(--danger);
+    color: #FFFFFF;
+    padding: 0 16px;
     cursor: pointer;
-    font-family: inherit;
-    font-size: 0.9rem;
-    transition: all 0.2s ease;
-    border-radius: 8px;
-    font-weight: bold;
-    box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3);
+    font-family: var(--font-ui);
+    font-size: 13px;
+    line-height: 1;
+    transition: background-color var(--t-fast), border-color var(--t-fast);
+    border-radius: var(--radius);
+    font-weight: 600;
 }
 
 .disclaimer-modal-confirm:hover {
-    box-shadow: 0 6px 25px rgba(245, 158, 11, 0.4);
-    transform: translateY(-2px);
+    background: var(--danger);
+    border-color: var(--text-1);
 }
 
 /* ========================================
@@ -482,18 +481,24 @@
 
 .loading-spinner {
     display: none;
-    width: 16px;
-    height: 16px;
-    border: 2px solid var(--tool-border);
-    border-top-color: var(--tool-accent);
+    width: 14px;
+    height: 14px;
+    border: 2px solid var(--border-strong);
+    border-top-color: var(--accent);
     border-radius: 50%;
-    animation: spin 1s linear infinite;
-    margin-right: 0.5rem;
+    animation: idSpin 0.8s linear infinite;
+    margin-right: 6px;
     vertical-align: middle;
 }
 
 .generate-btn.loading .loading-spinner {
     display: inline-block;
+}
+
+@keyframes idSpin {
+    to {
+        transform: rotate(360deg);
+    }
 }
 
 @media (max-width: 768px) {
@@ -507,7 +512,7 @@
 
     .id-field {
         flex-direction: column;
-        gap: 0.5rem;
+        gap: 6px;
     }
 
     .id-label {
@@ -534,7 +539,7 @@
 
     .disclaimer-modal-footer {
         flex-direction: column;
-        gap: 1rem;
+        gap: 12px;
     }
 
     .disclaimer-modal-confirm {

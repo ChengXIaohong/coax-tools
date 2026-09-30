@@ -152,8 +152,8 @@ document.addEventListener('DOMContentLoaded', function() {
         const text = asciiOutput.textContent;
         try {
             await navigator.clipboard.writeText(text);
-            copyBtn.textContent = '✅ 已复制';
-            setTimeout(() => copyBtn.textContent = '📋 复制纯文本', 1500);
+            copyBtn.textContent = '[已复制]';
+            setTimeout(() => copyBtn.textContent = '复制纯文本', 1500);
         } catch (err) {
             // fallback
             const textarea = document.createElement('textarea');
@@ -162,8 +162,8 @@ document.addEventListener('DOMContentLoaded', function() {
             textarea.select();
             document.execCommand('copy');
             document.body.removeChild(textarea);
-            copyBtn.textContent = '✅ 已复制';
-            setTimeout(() => copyBtn.textContent = '📋 复制纯文本', 1500);
+            copyBtn.textContent = '[已复制]';
+            setTimeout(() => copyBtn.textContent = '复制纯文本', 1500);
         }
     });
 

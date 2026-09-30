@@ -797,14 +797,14 @@ const JsonGraph3D = (function() {
                 <div class="modal-header">
                     <div class="modal-tabs"></div>
                     <div class="modal-toolbar">
-                        <button class="toolbar-btn" data-action="reset-camera" title="重置视角">🔄</button>
+                        <button class="toolbar-btn" data-action="reset-camera" title="重置视角">⟲</button>
                         <button class="toolbar-btn" data-action="view-top" title="俯视">↑</button>
                         <button class="toolbar-btn" data-action="view-bottom" title="仰视">↓</button>
                         <button class="toolbar-btn" data-action="view-side" title="侧视">→</button>
                         <button class="toolbar-btn" data-action="view-isometric" title="等距视图">◇</button>
-                        <button class="toolbar-btn" data-action="toggle-theme" title="切换主题">🌓</button>
-                        <button class="toolbar-btn" data-action="toggle-family-compact" title="族压缩模式">🔲</button>
-                        <button class="toolbar-btn" data-action="fullscreen" title="全屏">⛶</button>
+                        <button class="toolbar-btn" data-action="toggle-theme" title="切换主题">◐</button>
+                        <button class="toolbar-btn" data-action="toggle-family-compact" title="族压缩模式">▦</button>
+                        <button class="toolbar-btn" data-action="fullscreen" title="全屏">⤢</button>
                         <button class="toolbar-btn" data-action="close" title="关闭">✕</button>
                         <span class="toolbar-divider"></span>
                         <button class="toolbar-btn" id="toolbar-toggle-outline" title="切换大纲">☰</button>
@@ -847,9 +847,9 @@ const JsonGraph3D = (function() {
                                     <span class="stat-value" id="selected-children">0</span>
                                 </div>
                                 <div class="outline-selected-actions" id="outline-selected-actions">
-                                    <button class="outline-action-btn" id="outline-copy-path" title="复制路径">📋</button>
-                                    <button class="outline-action-btn" id="outline-extract-json" title="提取JSON">📦</button>
-                                    <button class="outline-action-btn" id="outline-toggle-mark" title="标记">⭐</button>
+                                    <button class="outline-action-btn" id="outline-copy-path" title="复制路径">[cp]</button>
+                                    <button class="outline-action-btn" id="outline-extract-json" title="提取JSON">[{}]</button>
+                                    <button class="outline-action-btn" id="outline-toggle-mark" title="标记">*</button>
                                     <button class="outline-action-btn" id="outline-drill-down" title="查看子图">→</button>
                                 </div>
                             </div>
@@ -863,7 +863,7 @@ const JsonGraph3D = (function() {
                         <button class="zoom-btn" data-action="zoom-in">➕</button>
                     </div>
                     <div class="breadcrumb-nav" id="breadcrumb-nav">
-                        <button class="breadcrumb-btn" data-action="breadcrumb-root" title="返回根节点">🏠</button>
+                        <button class="breadcrumb-btn" data-action="breadcrumb-root" title="返回根节点">[root]</button>
                         <button class="breadcrumb-btn" data-action="breadcrumb-back" title="返回上级">←</button>
                         <span class="breadcrumb-trail" id="breadcrumb-trail">$</span>
                     </div>
@@ -1485,18 +1485,18 @@ const JsonGraph3D = (function() {
         }
 
         contextMenu.innerHTML = `
-            <div class="menu-item" data-action="copy-path">📍 复制节点路径</div>
-            <div class="menu-item" data-action="copy-json">📄 提取JSON片段</div>
-            <div class="menu-item" data-action="mark-important">⭐ 标记重点关注</div>
+            <div class="menu-item" data-action="copy-path">复制节点路径</div>
+            <div class="menu-item" data-action="copy-json">提取JSON片段</div>
+            <div class="menu-item" data-action="mark-important">[ ] 标记重点关注</div>
             <div class="menu-divider"></div>
             ${node.childCountActual && node.childCountActual > node.childCount ? '<div class="menu-item" data-action="expand-node">➕ 展开全部子节点 (' + node.childCount + '/' + node.childCountActual + ')</div>' : ''}
             <div class="menu-divider"></div>
-            <div class="menu-item" data-action="open-subgraph">🔍 查看下级图谱</div>
+            <div class="menu-item" data-action="open-subgraph">[?] 查看下级图谱</div>
         `;
 
         const markItem = contextMenu.querySelector('[data-action="mark-important"]');
         if (markedNodes.has(node.id)) {
-            markItem.textContent = '⭐ 取消重点关注';
+            markItem.textContent = '[x] 取消重点关注';
         }
 
         contextMenu.style.display = 'block';
@@ -1869,7 +1869,7 @@ const JsonGraph3D = (function() {
 
         if (count > CONFIG.OUTLINE_EXPAND_THRESHOLD) {
             if (hint) {
-                hint.innerHTML = `<span style="color:#dcdcaa;font-size:11px;">⚠ ${count.toLocaleString()} 节点</span>`;
+                hint.innerHTML = `<span class="status">// ${count.toLocaleString()} 节点</span>`;
             }
         } else {
             if (hint) {
@@ -1928,7 +1928,7 @@ const JsonGraph3D = (function() {
             const toggleBtn = document.createElement('button');
             toggleBtn.className = 'outline-toggle-btn';
             toggleBtn.textContent = node.hasChildren ? (isExpanded ? '⊟' : '⊞') : '';
-            toggleBtn.style.cssText = 'background:none;border:none;cursor:pointer;color:#8b949e;padding:0 2px;font-size:10px;';
+            toggleBtn.style.cssText = 'background:none;border:none;cursor:pointer;color:var(--text-2);padding:0 2px;font-size:10px;';
             if (node.hasChildren) {
                 toggleBtn.addEventListener('click', e => {
                     e.stopPropagation();
@@ -1964,21 +1964,21 @@ const JsonGraph3D = (function() {
             const copyBtn = document.createElement('button');
             copyBtn.className = 'outline-action-btn';
             copyBtn.title = '复制路径';
-            copyBtn.textContent = '📋';
+            copyBtn.textContent = '[cp]';
             copyBtn.addEventListener('click', e => { e.stopPropagation(); copyNodePath(node); });
             actions.appendChild(copyBtn);
 
             const extractBtn = document.createElement('button');
             extractBtn.className = 'outline-action-btn';
             extractBtn.title = '提取JSON';
-            extractBtn.textContent = '📦';
+            extractBtn.textContent = '[{}]';
             extractBtn.addEventListener('click', e => { e.stopPropagation(); extractNodeJson(node); });
             actions.appendChild(extractBtn);
 
             const markBtn = document.createElement('button');
             markBtn.className = 'outline-action-btn outline-mark-btn';
             markBtn.title = '标记节点';
-            markBtn.textContent = '⭐';
+            markBtn.textContent = '*';
             markBtn.addEventListener('click', e => { e.stopPropagation(); toggleNodeMark(node, markBtn); });
             actions.appendChild(markBtn);
 
@@ -2032,10 +2032,11 @@ const JsonGraph3D = (function() {
         const fgDimHex = '#' + colors.fgDim.toString(16).padStart(6, '0');
 
         styleEl.textContent = `
-            .graph-modal .modal-window { background: #${colors.bg.toString(16).padStart(6, '0')}; color: ${fgHex}; }
+            .graph-modal .modal-window { border-radius: 3px; overflow: hidden;
+                background: #${colors.bg.toString(16).padStart(6, '0')}; color: ${fgHex}; }
             .graph-modal .modal-header { background: #${(colors.bg === 0x0d1117 ? 0x161b22 : 0xf6f8fa).toString(16).padStart(6, '0')}; border-bottom: 1px solid #${colors.border.toString(16).padStart(6, '0')}; }
             .graph-modal .toolbar-btn { background: transparent; border: 1px solid #${colors.border.toString(16).padStart(6, '0')}; color: ${fgHex}; }
-            .graph-modal .toolbar-btn:hover { background: rgba(78,201,176,0.15); border-color: #58a6ff; }
+            .graph-modal .toolbar-btn:hover { background: #${colors.border.toString(16).padStart(6, '0')}; }
             .graph-modal .toolbar-btn.active { background: #${colors.selected.toString(16).padStart(6, '0')}; color: #${(colors.bg === 0x0d1117 ? '0d1117' : 'ffffff')}; }
             .graph-modal .toolbar-divider { width: 1px; height: 20px; background: #${colors.border.toString(16).padStart(6, '0')}; margin: 0 4px; }
             .graph-modal .modal-sidebar { background: #${(colors.bg === 0x0d1117 ? 0x161b22 : 0xf6f8fa).toString(16).padStart(6, '0')}; border-left: 1px solid #${colors.border.toString(16).padStart(6, '0')}; }
@@ -2043,25 +2044,25 @@ const JsonGraph3D = (function() {
             .graph-modal .stat-value { color: ${fgHex}; }
             .graph-modal .outline-hint { font-size: 11px; font-weight: normal; margin-left: 8px; }
             .graph-modal .zoom-btn, .graph-modal .zoom-display { background: transparent; border: 1px solid #${colors.border.toString(16).padStart(6, '0')}; color: ${fgHex}; }
-            .graph3d-node-label { color: ${fgHex}; font-size: 11px; font-family: monospace; pointer-events: none; text-shadow: 0 1px 3px rgba(0,0,0,0.8); }
+            .graph3d-node-label { color: ${fgHex}; font-size: 11px; font-family: monospace; pointer-events: none;  }
             .graph-modal .outline-nav-section { flex: 1; min-height: 0; display: flex; flex-direction: column; }
             .graph-modal .outline-search-box { padding: 8px 0; }
-            .graph-modal .outline-search-box input { width: 100%; padding: 4px 8px; background: #0d1117; border: 1px solid #30363d; border-radius: 4px; color: #c9d1d9; font-size: 12px; box-sizing: border-box; }
-            .graph-modal .outline-search-box input:focus { outline: none; border-color: #58a6ff; }
+            .graph-modal .outline-search-box input { width: 100%; padding: 4px 8px; background: #${colors.bg.toString(16).padStart(6, '0')}; border: 1px solid #${colors.border.toString(16).padStart(6, '0')}; border-radius: 3px; color: ${fgHex}; font-size: 12px; box-sizing: border-box; }
+            .graph-modal .outline-search-box input:focus { outline: none; border-color: ${fgDimHex}; }
             .graph-modal .outline-tree { flex: 1; overflow-y: auto; font-size: 12px; }
             .graph-modal .outline-item { display: flex; align-items: center; padding: 2px 4px; cursor: pointer; border-radius: 3px; white-space: nowrap; }
-            .graph-modal .outline-toggle-btn { background: none; border: none; cursor: pointer; color: #8b949e; padding: 0 2px; font-size: 10px; min-width: 16px; }
-            .graph-modal .outline-item:hover { background: rgba(88,166,255,0.1); }
-            .graph-modal .outline-item.selected { background: rgba(88,166,255,0.2); }
+            .graph-modal .outline-toggle-btn { background: none; border: none; cursor: pointer; color: ${fgDimHex}; padding: 0 2px; font-size: 10px; min-width: 16px; }
+            .graph-modal .outline-item:hover { background: #${colors.border.toString(16).padStart(6, '0')}; }
+            .graph-modal .outline-item.selected { background: #${colors.highlight.toString(16).padStart(6, '0')}; }
             .graph-modal .outline-item.filtered-hidden { display: none; }
-            .graph-modal .outline-key { color: #79c0ff; margin-right: 4px; }
-            .graph-modal .outline-value { color: #a5d6ff; opacity: 0.7; overflow: hidden; text-overflow: ellipsis; max-width: 120px; }
+            .graph-modal .outline-key { color: ${fgHex}; margin-right: 4px; }
+            .graph-modal .outline-value { color: ${fgDimHex}; opacity: 0.7; overflow: hidden; text-overflow: ellipsis; max-width: 120px; }
             .graph-modal .outline-tree::-webkit-scrollbar { width: 6px; }
             .graph-modal .outline-tree::-webkit-scrollbar-track { background: transparent; }
-            .graph-modal .outline-tree::-webkit-scrollbar-thumb { background: #30363d; border-radius: 3px; }
+            .graph-modal .outline-tree::-webkit-scrollbar-thumb { background: #${colors.border.toString(16).padStart(6, '0')}; border-radius: 3px; }
             .graph-modal .outline-action-btn { background: none; border: none; cursor: pointer; font-size: 11px; padding: 4px 6px; opacity: 0; visibility: hidden; border-radius: 3px; transition: opacity 0.15s, visibility 0.15s; min-width: 24px; min-height: 24px; box-sizing: border-box; }
             .graph-modal .outline-item:hover .outline-action-btn { opacity: 0.8; visibility: visible; }
-            .graph-modal .outline-action-btn:hover { opacity: 1; background: rgba(88,166,255,0.15); }
+            .graph-modal .outline-action-btn:hover { opacity: 1; background: #${colors.border.toString(16).padStart(6, '0')}; }
             .graph-modal .outline-mark-btn.marked { color: #dcdcaa; opacity: 1; visibility: visible; }
             .graph-modal .outline-selected-actions { display: flex; gap: 4px; margin-top: 8px; visibility: hidden; }
             .graph-modal .outline-selected-actions.visible { visibility: visible; }

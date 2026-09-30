@@ -1,109 +1,71 @@
 /*
- * coax的小工具 - 一套实用的前端工具集合
- * 
+ * coax的小工具 - 主题切换（工具页）
+ *
+ * 在工具页顶栏注入一个纯文字的明暗切换按钮，无图标。
+ * 与首页 (js/main.js) 共用同一个 localStorage 键和 data-theme 属性。
+ *
  * MIT License
- * 
  * Copyright (c) 2025 coax
  */
 
 const ThemeSwitcher = (function() {
     const MODE_KEY = 'coax-tools-mode';
-    const DEFAULT_MODE = 'dark';
 
-    let currentMode = DEFAULT_MODE;
+    function getTheme() {
+        return document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'light';
+    }
+
+    // 按钮上显示的是「切换后会变成的模式」
+    function labelFor(theme) {
+        return theme === 'dark' ? '浅色' : '深色';
+    }
+
+    function applyTheme(theme) {
+        document.documentElement.setAttribute('data-theme', theme);
+        try {
+            localStorage.setItem(MODE_KEY, theme);
+        } catch (e) {
+            /* 隐私模式下 localStorage 可能不可用，忽略 */
+        }
+        const btn = document.querySelector('.tool-theme-toggle');
+        if (btn) {
+            btn.textContent = labelFor(theme);
+            btn.setAttribute('aria-label', theme === 'dark' ? '切换到浅色主题' : '切换到深色主题');
+        }
+    }
+
+    function createSwitcher() {
+        // 优先放进工具页顶栏；json-formatter 这类全屏工作区改用 .ws-bar
+        const host = document.querySelector('.tool-header-bar') || document.querySelector('.ws-bar');
+        // 没有承载容器的页面不注入
+        if (!host || host.querySelector('.tool-theme-toggle')) return;
+
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'tool-theme-toggle';
+        btn.textContent = labelFor(getTheme());
+        btn.setAttribute('aria-label', '切换明暗主题');
+        btn.addEventListener('click', function() {
+            applyTheme(getTheme() === 'dark' ? 'light' : 'dark');
+        });
+        host.appendChild(btn);
+    }
 
     function init() {
-        // TODO: 主题切换功能暂时禁用，默认暗色系
-        // loadSavedMode();
-        // createThemeSwitcher();
-        // applyMode(currentMode);
-        // listenForThemeChanges();
-    }
+        createSwitcher();
 
-    function loadSavedMode() {
-        const saved = localStorage.getItem(MODE_KEY);
-        if (saved === 'light') {
-            currentMode = 'light';
-        } else if (saved === 'sci-fi') {
-            currentMode = 'dark';
-        }
-        // 其他值（包括 null）保持默认 dark
-    }
-
-    function saveMode(mode) {
-        localStorage.setItem(MODE_KEY, mode);
-    }
-
-    function createThemeSwitcher() {
-        const existing = document.querySelector('.theme-switcher');
-        if (existing) existing.remove();
-
-        // 仅首页显示切换按钮
-        if (!isHomePage()) return;
-
-        const switcher = document.createElement('button');
-        switcher.className = 'theme-switcher';
-        switcher.setAttribute('aria-label', '切换明暗主题');
-
-        switcher.addEventListener('click', () => {
-            switchMode(currentMode === 'dark' ? 'light' : 'dark');
-        });
-
-        document.body.appendChild(switcher);
-    }
-
-    function isHomePage() {
-        return window.location.pathname.endsWith('index.html') ||
-               window.location.pathname.endsWith('/') ||
-               window.location.pathname === '';
-    }
-
-    function listenForThemeChanges() {
-        // 监听其他页面广播的主题变化事件
-        window.addEventListener('coax-theme-change', (e) => {
-            applyMode(e.detail.theme);
-        });
-
-        // 跨标签页同步（storage 事件）
-        window.addEventListener('storage', (e) => {
-            if (e.key === MODE_KEY) {
-                loadSavedMode();
-                applyMode(currentMode);
+        // 跨标签页同步
+        window.addEventListener('storage', function(e) {
+            if (e.key === MODE_KEY && (e.newValue === 'light' || e.newValue === 'dark')) {
+                applyTheme(e.newValue);
             }
         });
-    }
-
-    function applyMode(mode) {
-        currentMode = mode;
-        const themeValue = mode === 'light' ? 'light' : 'sci-fi';
-
-        document.body.setAttribute('data-theme', themeValue);
-        saveMode(themeValue);
-
-        const switcher = document.querySelector('.theme-switcher');
-        if (switcher) {
-            if (mode === 'dark') {
-                switcher.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="#a1a1aa" stroke-width="1.5"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>';
-                switcher.setAttribute('aria-label', '切换到浅色模式');
-            } else {
-                switcher.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="#a1a1aa" stroke-width="1.5"><path d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707"></path><circle cx="12" cy="12" r="4" fill="currentColor" stroke="none"/></svg>';
-                switcher.setAttribute('aria-label', '切换到深色模式');
-            }
-        }
-    }
-
-    function switchMode(mode) {
-        applyMode(mode);
-    }
-
-    function getCurrentMode() {
-        return currentMode;
     }
 
     document.addEventListener('DOMContentLoaded', init);
 
     return {
-        switchMode,
-        getCurrentMode
+        switchMode: applyTheme,
+        getCurrentMode: getTheme
     };
 })();

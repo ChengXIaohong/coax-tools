@@ -1,0 +1,341 @@
+/*
+ * 首页主题 - 纸感瑞士极简
+ * ================================
+ * 顶部栏 / 分类 Tab / 工具卡片网格
+ *
+ * 规则：零渐变、零阴影、零毛玻璃、圆角 2-4px
+ */
+
+/* ========================================
+   布局容器
+   ======================================== */
+
+body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+main {
+    flex: 1;
+    width: 100%;
+    max-width: 1280px;
+    margin: 0 auto;
+}
+
+body footer {
+    margin-top: auto;
+}
+
+/* ========================================
+   顶部栏
+   ======================================== */
+
+.topbar {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 0 24px;
+    background: var(--bg-page);
+    border-bottom: 1px solid var(--border);
+}
+
+.topbar__logo {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-1);
+    white-space: nowrap;
+}
+
+.topbar__spacer {
+    flex: 1;
+}
+
+.topbar__theme {
+    height: 28px;
+    padding: 0 10px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.02em;
+    color: var(--text-2);
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background-color var(--t-fast), color var(--t-fast), border-color var(--t-fast);
+}
+
+.topbar__theme:hover {
+    background: var(--bg-hover);
+    border-color: var(--border-strong);
+    color: var(--text-1);
+}
+
+/* ========================================
+   搜索框
+   ======================================== */
+
+.search {
+    flex: 1;
+    max-width: 520px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0 10px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    transition: border-color var(--t-fast);
+}
+
+.search:focus-within {
+    border-color: var(--accent);
+}
+
+.search__icon {
+    width: 14px;
+    height: 14px;
+    flex-shrink: 0;
+    stroke: var(--text-3);
+    fill: none;
+    stroke-width: 1.5;
+}
+
+.search__input {
+    flex: 1;
+    min-width: 0;
+    border: none;
+    background: transparent;
+    color: var(--text-1);
+    font-family: var(--font-ui);
+    font-size: 13px;
+    padding: 0;
+    height: 100%;
+}
+
+.search__input::placeholder {
+    color: var(--text-3);
+}
+
+.search__kbd {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text-3);
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    padding: 0 4px;
+    line-height: 16px;
+    flex-shrink: 0;
+}
+
+/* ========================================
+   分类 Tab
+   ======================================== */
+
+.catbar {
+    display: flex;
+    gap: 4px;
+    padding: 12px 24px;
+    max-width: 1280px;
+    margin: 0 auto;
+    overflow-x: auto;
+    border-bottom: 1px solid var(--border);
+    scrollbar-width: none;
+}
+
+.catbar::-webkit-scrollbar {
+    display: none;
+}
+
+.catbar__item {
+    height: 26px;
+    padding: 0 10px;
+    font-family: var(--font-ui);
+    font-size: 13px;
+    color: var(--text-2);
+    background: transparent;
+    border: none;
+    border-radius: var(--radius);
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background-color var(--t-fast), color var(--t-fast);
+}
+
+.catbar__item:hover {
+    background: var(--bg-hover);
+    color: var(--text-1);
+}
+
+.catbar__item.is-active {
+    background: var(--accent);
+    color: var(--on-accent);
+}
+
+.catbar__item.is-active:hover {
+    background: var(--accent-hover);
+    color: var(--on-accent);
+}
+
+.catbar__count {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    opacity: 0.7;
+    margin-left: 4px;
+}
+
+/* ========================================
+   工具卡片网格
+   ======================================== */
+
+.tool-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 12px;
+    padding: 20px 24px;
+    max-width: 1280px;
+    margin: 0 auto;
+    /* 分类切换只做极短的透明度过渡，不做缩放或位移 */
+    transition: opacity 120ms ease-out;
+}
+
+.tool-grid.is-switching {
+    opacity: 0.35;
+}
+
+.tool-card {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-height: 150px;
+    padding: 16px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    cursor: pointer;
+    text-align: left;
+    font-family: inherit;
+    color: inherit;
+    transition: background-color var(--t-fast), border-color var(--t-fast);
+}
+
+.tool-card:hover {
+    background: var(--bg-hover);
+    border-color: var(--border-strong);
+}
+
+.tool-card__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.tool-card__icon {
+    display: block;
+    width: 24px;
+    height: 24px;
+    color: var(--text-1);
+}
+
+.tool-card__icon svg {
+    width: 24px;
+    height: 24px;
+    stroke: var(--text-1);
+    fill: none;
+    stroke-width: 1.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    display: block;
+}
+
+.tool-card__tag {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.02em;
+    color: var(--text-2);
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    padding: 1px 5px;
+    line-height: 1.2;
+}
+
+.tool-card__title {
+    margin: 4px 0 0;
+    font-size: 15px;
+    font-weight: 600;
+    line-height: 1.3;
+    color: var(--text-1);
+}
+
+.tool-card__desc {
+    margin: 0;
+    font-size: 13px;
+    line-height: 1.55;
+    color: var(--text-2);
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.tool-card__meta {
+    margin-top: auto;
+    padding-top: 10px;
+    border-top: 1px solid var(--border);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.02em;
+    color: var(--text-3);
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+/* ========================================
+   无结果
+   ======================================== */
+
+.no-results {
+    padding: 60px 24px;
+    text-align: center;
+}
+
+.no-results__text {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.02em;
+    color: var(--text-3);
+}
+
+/* ========================================
+   响应式
+   ======================================== */
+
+@media (max-width: 640px) {
+    .topbar {
+        gap: 10px;
+        padding: 0 12px;
+    }
+
+    .search__kbd {
+        display: none;
+    }
+
+    .catbar {
+        padding: 10px 12px;
+    }
+
+    .tool-grid {
+        grid-template-columns: 1fr;
+        padding: 16px 12px;
+    }
+
+    .footer-content {
+        padding: 0 12px;
+    }
+}

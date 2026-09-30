@@ -7,18 +7,17 @@
     <!-- 主题初始化：防止 FOUC -->
     <script>
     (function() {
+        // 默认暖纸浅色；历史值 'sci-fi' 属于旧的深色主题，迁移为 'dark' 以保留用户偏好
         var saved = localStorage.getItem('coax-tools-mode');
-        var theme = saved === 'light' ? 'light' : 'sci-fi';
+        var theme = (saved === 'dark' || saved === 'sci-fi') ? 'dark' : 'light';
         document.documentElement.setAttribute('data-theme', theme);
     })();
     </script>
-    <link rel="stylesheet" href="../styles/theme-base.css">
-    <link rel="stylesheet" href="../styles/theme-tool.css">
+    <link rel="stylesheet" href="../styles/theme-base.css?v=20260930">
+    <link rel="stylesheet" href="../styles/theme-tool.css?v=20260930">
     <link rel="stylesheet" href="../css/image-to-ascii.css">
 </head>
-<body data-theme="sci-fi">
-    <div class="bg-orbs"></div>
-    <div class="grid-pattern"></div>
+<body>
     <div class="container">
         <!-- 顶栏 -->
         <header class="tool-header-bar">
@@ -29,7 +28,7 @@
                 返回首页
             </a>
             <div class="tool-title">
-                <div class="tool-icon">💻</div>
+                <div class="tool-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="4" width="20" height="13" rx="2"/><path d="M8 21h8"/><path d="M12 17v4"/><path d="M6 12.5 8.5 10l2 1.8 2.5-3 3 3.7"/></svg></div>
                 <span class="tool-name">图片转字符</span>
             </div>
             <span class="tool-desc">将图片转换为 ASCII 字符画</span>
@@ -40,7 +39,7 @@
             <div class="input-section" id="inputSection">
                 <div class="upload-area" id="uploadArea">
                     <div class="upload-hint">
-                        <span class="upload-icon">☁️</span>
+                        <span class="upload-icon"></span>
                         <h3>拖拽图片到此处或点击上传</h3>
                         <p>支持 JPG / PNG / WEBP / GIF</p>
                     </div>
@@ -58,7 +57,7 @@
                 </div>
 
                 <div class="action-row">
-                    <button class="btn btn-primary btn-convert" id="convertBtn" disabled>🔄 转换为 ASCII</button>
+                    <button class="btn btn-primary btn-convert" id="convertBtn" disabled>转换为 ASCII</button>
                 </div>
             </div>
 
@@ -92,9 +91,9 @@
                     <pre id="asciiOutput"></pre>
                 </div>
                 <div class="action-row">
-                    <button class="btn btn-primary" id="copyBtn">📋 复制纯文本</button>
-                    <button class="btn btn-secondary" id="downloadBtn">⬇️ 下载图片</button>
-                    <button class="btn btn-ghost" id="resetBtn">🔄 重新选择</button>
+                    <button class="btn btn-primary" id="copyBtn">复制纯文本</button>
+                    <button class="btn btn-secondary" id="downloadBtn">下载图片</button>
+                    <button class="btn btn-ghost" id="resetBtn">重新选择</button>
                 </div>
             </div>
         </main>

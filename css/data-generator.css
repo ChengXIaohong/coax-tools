@@ -1,6 +1,8 @@
 /*
  * 数据生成器样式
- * 适配 Liquid Glass 科幻主题
+ * 纸感瑞士极简 + 莫兰迪护眼
+ *
+ * 规则：零渐变、零阴影、零毛玻璃、圆角 2-4px
  */
 
 /* ========================================
@@ -10,139 +12,157 @@
 .content-zone {
     display: flex;
     flex-direction: column;
-    gap: 2rem;
+    gap: 16px;
 }
 
 .tool-desc {
-    margin-bottom: 0.5rem;
+    margin-bottom: 4px;
 }
 
 .tool-desc p {
     margin: 0;
-    color: var(--tool-fg-dim);
-    font-size: 0.9rem;
+    color: var(--text-2);
+    font-size: 13px;
 }
 
 /* ========================================
-   选项容器 - Glass Panel
+   选项容器
    ======================================== */
 
 .options-container {
-    background: var(--tool-glass-bg);
-    border: 1px solid var(--tool-glass-border);
-    backdrop-filter: blur(var(--tool-glass-blur));
-    -webkit-backdrop-filter: blur(var(--tool-glass-blur));
-    padding: 2rem;
-    border-radius: 16px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    padding: 16px;
+    border-radius: var(--radius);
+    transition: border-color var(--t-fast);
+}
+
+.options-container:hover {
+    border-color: var(--border-strong);
 }
 
 .options-container h3 {
-    color: var(--tool-fg);
-    margin: 0 0 1.5rem 0;
-    font-size: 1rem;
-    font-weight: 500;
+    color: var(--text-1);
+    margin: 0 0 16px 0;
+    font-size: 15px;
+    font-weight: 600;
 }
 
 .row-count-input {
-    margin-bottom: 1.5rem;
+    margin-bottom: 16px;
 }
 
 .row-count-input label {
-    color: var(--tool-fg-dim);
-    margin-right: 1rem;
-    font-size: 0.9rem;
+    color: var(--text-2);
+    margin-right: 12px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.02em;
 }
 
 .row-count-input input {
-    padding: 0.6rem 1rem;
-    border: 1px solid var(--tool-border);
-    background: var(--tool-surface);
-    color: var(--tool-fg);
-    font-family: inherit;
-    font-size: 0.9rem;
+    height: 32px;
+    padding: 0 10px;
+    border: 1px solid var(--border);
+    background: var(--bg-card);
+    color: var(--text-1);
+    font-family: var(--font-ui);
+    font-size: 13px;
     width: 10rem;
     min-width: 80px;
-    border-radius: 10px;
-    transition: all var(--tool-duration-fast, 150ms);
+    border-radius: var(--radius);
+    transition: border-color var(--t-fast);
 }
 
 .row-count-input input:focus {
     outline: none;
-    border-color: var(--tool-accent);
-    box-shadow: 0 0 0 3px var(--tool-accent-glow);
+    border-color: var(--accent);
+}
+
+.row-count-input input:hover {
+    border-color: var(--accent);
 }
 
 .options-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
-    gap: 1rem;
-    margin-top: 1.5rem;
+    gap: 12px;
+    margin-top: 16px;
 }
 
 .option-item {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
-    color: var(--tool-fg);
+    gap: 8px;
+    color: var(--text-1);
     cursor: pointer;
 }
 
 .option-item input {
     appearance: none;
-    width: 1rem;
-    height: 1rem;
-    min-width: 16px;
-    min-height: 16px;
-    border: 1px solid var(--tool-border);
-    background: var(--tool-surface);
+    -webkit-appearance: none;
+    width: 14px;
+    height: 14px;
+    min-width: 14px;
+    min-height: 14px;
+    margin: 0;
+    border: 1px solid var(--border-strong);
+    background: var(--bg-card);
     cursor: pointer;
-    border-radius: 4px;
-    transition: all 0.15s;
+    border-radius: 2px;
+    transition: background-color var(--t-fast), border-color var(--t-fast);
+}
+
+/* 单选按钮保持圆形，与复选框区分 */
+.option-item input[type="radio"] {
+    border-radius: 50%;
+}
+
+.option-item input:hover {
+    border-color: var(--accent);
 }
 
 .option-item input:checked {
-    border-color: var(--tool-accent);
-    background: var(--tool-accent);
-}
-
-.option-item input:checked::after {
-    content: '✓';
-    display: block;
-    color: white;
-    font-size: 0.7rem;
-    text-align: center;
-    line-height: 1rem;
+    border-color: var(--accent);
+    background: var(--accent);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23FFFFFF' stroke-width='3.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 6 9 17l-5-5'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: center;
 }
 
 .name-options {
-    margin-top: 1.5rem;
-    padding-top: 1.5rem;
-    border-top: 1px solid var(--tool-border);
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
 }
 
 .name-options h4 {
-    margin: 0 0 1rem 0;
-    color: var(--tool-fg);
-    font-size: 0.95rem;
-    font-weight: 500;
+    margin: 0 0 12px 0;
+    color: var(--text-1);
+    font-size: 14px;
+    font-weight: 600;
 }
 
 .name-options select {
-    padding: 0.6rem 1rem;
-    border: 1px solid var(--tool-border);
-    background: var(--tool-surface);
-    color: var(--tool-fg);
-    font-family: inherit;
-    font-size: 0.9rem;
-    border-radius: 10px;
+    height: 32px;
+    padding: 0 10px;
+    border: 1px solid var(--border);
+    background: var(--bg-card);
+    color: var(--text-1);
+    font-family: var(--font-ui);
+    font-size: 13px;
+    border-radius: var(--radius);
     cursor: pointer;
-    transition: all var(--tool-duration-fast, 150ms);
+    transition: border-color var(--t-fast);
 }
 
 .name-options select:focus {
     outline: none;
-    border-color: var(--tool-accent);
-    box-shadow: 0 0 0 3px var(--tool-accent-glow);
+    border-color: var(--accent);
+}
+
+.name-options select:hover {
+    border-color: var(--accent);
 }
 
 /* ========================================
@@ -152,150 +172,164 @@
 .controls {
     display: flex;
     justify-content: flex-start;
-    gap: 1rem;
-    padding: 2rem 0;
+    gap: 8px;
+    padding: 16px 0;
     flex-wrap: wrap;
 }
 
 button {
-    padding: 0.75rem 1.5rem;
-    border: 1px solid var(--tool-border);
-    background: var(--tool-surface);
-    color: var(--tool-fg);
+    height: 32px;
+    padding: 0 14px;
+    border: 1px solid var(--border);
+    background: var(--bg-card);
+    color: var(--text-1);
     cursor: pointer;
-    font-family: inherit;
-    font-size: 0.9rem;
-    transition: all var(--tool-duration-normal, 250ms);
-    border-radius: 10px;
+    font-family: var(--font-ui);
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 1;
+    transition: background-color var(--t-fast), border-color var(--t-fast), color var(--t-fast);
+    border-radius: var(--radius);
 }
 
 button:hover:not(.disabled) {
-    border-color: var(--tool-accent);
-    box-shadow: 0 0 15px var(--tool-accent-glow);
+    background: var(--bg-hover);
+    border-color: var(--border-strong);
+}
+
+button:focus:not(.disabled) {
+    outline: none;
+    border-color: var(--accent);
 }
 
 .start-btn {
-    background: linear-gradient(135deg, var(--tool-accent) 0%, #8b5cf6 100%);
-    color: #fff;
-    border: none;
-    box-shadow: 0 4px 20px var(--tool-accent-glow);
+    background: var(--accent);
+    color: #FFFFFF;
+    border-color: var(--accent);
 }
 
 .start-btn:hover:not(.disabled) {
-    box-shadow: 0 6px 30px var(--tool-accent-glow);
-    transform: translateY(-2px);
-    color: #fff;
+    background: var(--accent-hover);
+    border-color: var(--accent-hover);
+    color: #FFFFFF;
 }
 
 .preview-btn {
-    border-color: var(--tool-border);
-    color: var(--tool-fg-dim);
+    border-color: var(--border);
+    color: var(--text-2);
 }
 
 .preview-btn:hover:not(.disabled) {
-    border-color: var(--tool-accent-2);
-    color: var(--tool-fg);
-    box-shadow: 0 0 15px var(--tool-accent-2-glow);
+    border-color: var(--accent);
+    color: var(--accent);
 }
 
 .disabled {
-    border-color: var(--tool-border);
-    color: var(--tool-fg-muted);
+    border-color: var(--border);
+    color: var(--text-3);
     cursor: not-allowed;
-    opacity: 0.6;
+    opacity: 0.5;
 }
 
 /* ========================================
-   进度容器 - Glass Panel
+   进度容器
    ======================================== */
 
 .progress-container {
     display: none;
-    background: var(--tool-glass-bg);
-    border: 1px solid var(--tool-glass-border);
-    backdrop-filter: blur(var(--tool-glass-blur));
-    -webkit-backdrop-filter: blur(var(--tool-glass-blur));
-    padding: 2rem;
-    border-radius: 16px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    padding: 16px;
+    border-radius: var(--radius);
 }
 
 .progress-container h3 {
-    margin: 0 0 1.5rem 0;
-    color: var(--tool-fg);
-    font-size: 0.95rem;
+    margin: 0 0 16px 0;
+    color: var(--text-1);
+    font-size: 14px;
+    font-weight: 600;
 }
 
 .progress-bar {
     width: 100%;
-    height: 1.5rem;
-    min-height: 16px;
-    background: var(--tool-border);
+    height: 12px;
+    min-height: 12px;
+    background: var(--bg-hover);
+    border: 1px solid var(--border);
     overflow: hidden;
-    border-radius: 8px;
+    border-radius: 2px;
 }
 
 .progress-fill {
     height: 100%;
-    background: linear-gradient(90deg, var(--tool-accent), #8b5cf6);
+    background: var(--accent);
     width: 0%;
-    transition: width 0.3s;
-    border-radius: 8px;
-    box-shadow: 0 0 10px var(--tool-accent-glow);
+    transition: width 140ms ease-out;
+    border-radius: 2px;
 }
 
 /* ========================================
-   预览容器 - Glass Panel
+   预览容器
    ======================================== */
 
 .preview-container {
-    background: var(--tool-glass-bg);
-    border: 1px solid var(--tool-glass-border);
-    backdrop-filter: blur(var(--tool-glass-blur));
-    -webkit-backdrop-filter: blur(var(--tool-glass-blur));
-    padding: 2rem;
-    border-radius: 16px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    padding: 16px;
+    border-radius: var(--radius);
     overflow-x: auto;
 }
 
 .preview-container h3 {
-    margin: 0 0 1.5rem 0;
-    color: var(--tool-fg);
-    font-size: 1rem;
+    margin: 0 0 16px 0;
+    color: var(--text-1);
+    font-size: 15px;
+    font-weight: 600;
 }
 
 table {
     width: 100%;
     border-collapse: collapse;
-    margin-top: 1.5rem;
+    margin-top: 16px;
 }
 
 th {
-    background: var(--tool-surface);
-    color: var(--tool-fg);
+    background: var(--bg-hover);
+    color: var(--text-1);
     text-align: left;
-    padding: 1rem;
-    border-bottom: 2px solid var(--tool-border);
-    font-weight: 500;
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--border-strong);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    white-space: nowrap;
 }
 
 td {
-    padding: 0.8rem 1rem;
-    border-bottom: 1px solid var(--tool-border);
-    color: var(--tool-fg-dim);
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text-2);
+    font-family: var(--font-mono);
+    font-size: 12px;
+    white-space: nowrap;
 }
 
 tr:hover {
-    background: var(--tool-surface);
+    background: var(--bg-hover);
 }
 
 .empty-preview {
     text-align: center;
-    padding: 4rem;
-    color: var(--tool-fg-dim);
+    padding: 40px;
+    color: var(--text-3);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.02em;
 }
 
 /* ========================================
-   Modal - Glass Blur
+   Modal
    ======================================== */
 
 .modal {
@@ -306,62 +340,62 @@ tr:hover {
     top: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.7);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
+    background: var(--bg-page);
+    background: color-mix(in srgb, var(--bg-page) 88%, transparent);
+    overflow-y: auto;
 }
 
 .modal-content {
-    background: var(--tool-bg-elevated);
-    border: 1px solid var(--tool-border);
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
     margin: 5% auto;
-    padding: 2rem;
+    padding: 20px;
     width: 90%;
     max-width: 800px;
     max-height: 80vh;
     overflow-y: auto;
-    border-radius: 16px;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+    border-radius: var(--radius-lg);
 }
 
 .modal-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 2rem;
-    padding-bottom: 1rem;
-    border-bottom: 1px solid var(--tool-border);
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border);
 }
 
 .modal-header h2 {
     margin: 0;
-    color: var(--tool-fg);
-    font-size: 1rem;
-    font-weight: 500;
+    color: var(--text-1);
+    font-size: 15px;
+    font-weight: 600;
 }
 
 .close {
-    color: var(--tool-fg-dim);
-    font-size: 1.5rem;
+    color: var(--text-2);
+    font-size: 20px;
+    line-height: 1;
     cursor: pointer;
-    font-family: inherit;
-    transition: color 0.15s;
+    font-family: var(--font-ui);
+    transition: color var(--t-fast);
 }
 
 .close:hover {
-    color: var(--tool-accent);
+    color: var(--danger);
 }
 
 .modal-body {
-    margin-bottom: 2rem;
+    margin-bottom: 16px;
 }
 
 .modal-footer {
     display: flex;
     justify-content: flex-end;
-    gap: 1rem;
-    padding-top: 2rem;
-    border-top: 1px solid var(--tool-border);
+    gap: 8px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
 }
 
 .modal-table {
@@ -371,14 +405,26 @@ tr:hover {
 
 .modal-table th,
 .modal-table td {
-    padding: 0.8rem;
+    padding: 8px 10px;
     text-align: left;
-    border-bottom: 1px solid var(--tool-border);
+    border-bottom: 1px solid var(--border);
 }
 
 .modal-table th {
-    background: var(--tool-surface);
-    color: var(--tool-fg);
+    background: var(--bg-hover);
+    color: var(--text-1);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    white-space: nowrap;
+}
+
+.modal-table td {
+    color: var(--text-2);
+    font-family: var(--font-mono);
+    font-size: 12px;
+    white-space: nowrap;
 }
 
 /* ========================================
@@ -403,4 +449,30 @@ tr:hover {
         width: 95%;
         margin: 10% auto;
     }
+}
+
+/* ========================================
+   提示块（免责声明等）
+   ======================================== */
+
+.notice {
+    margin-top: 20px;
+    padding: 12px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-left: 2px solid var(--danger);
+    border-radius: var(--radius);
+    font-size: 13px;
+}
+
+.notice h4 {
+    margin: 0 0 6px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--danger);
+}
+
+.notice p {
+    margin: 4px 0;
+    color: var(--text-2);
 }

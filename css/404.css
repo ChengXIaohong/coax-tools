@@ -1,133 +1,78 @@
-.not-found-container {
-    text-align: center;
-    padding: 50px 20px;
-    max-width: 800px;
+/*
+ * 404 页面 - 纸感瑞士极简
+ * 零渐变、零阴影、零毛玻璃、圆角 2-4px
+ */
+
+body {
+    background: var(--bg-page);
+    color: var(--text-1);
+}
+
+.container {
+    max-width: 1280px;
     margin: 0 auto;
+    padding: 24px;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+}
+
+.not-found-container {
+    width: 100%;
+    padding: 20px 0;
+    border-top: 1px solid var(--border);
 }
 
 .error-code {
-    font-size: 120px;
-    font-weight: bold;
-    color: #667eea;
-    margin-bottom: 20px;
-    text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.1);
-    animation: pulse 2s infinite;
-}
-
-@keyframes pulse {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.05); }
-    100% { transform: scale(1); }
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.02em;
+    color: var(--text-3);
+    margin-bottom: 8px;
 }
 
 .error-message {
-    font-size: 32px;
-    font-weight: bold;
-    color: #333;
-    margin-bottom: 20px;
+    font-size: 24px;
+    font-weight: 600;
+    line-height: 1.3;
+    color: var(--text-1);
+    margin-bottom: 4px;
 }
 
 .error-description {
-    font-size: 18px;
-    color: #666;
-    margin-bottom: 40px;
-    line-height: 1.6;
+    font-size: 13px;
+    color: var(--text-2);
+    margin-bottom: 20px;
 }
 
 .error-description p {
-    margin: 10px 0;
-}
-
-.astronaut-animation {
-    margin: 40px 0;
-    position: relative;
-    height: 100px;
-}
-
-.astronaut {
-    font-size: 60px;
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
-    animation: float 3s ease-in-out infinite;
-}
-
-@keyframes float {
-    0% { 
-        transform: translateX(-50%) translateY(0px);
-    }
-    50% { 
-        transform: translateX(-50%) translateY(-20px);
-    }
-    100% { 
-        transform: translateX(-50%) translateY(0px);
-    }
+    margin: 0;
 }
 
 .error-actions {
-    margin: 40px 0;
-}
-
-.btn {
-    display: inline-block;
-    padding: 12px 30px;
-    margin: 0 10px;
-    border-radius: 30px;
-    text-decoration: none;
-    font-weight: bold;
-    transition: all 0.3s ease;
-    border: none;
-    cursor: pointer;
-    font-size: 16px;
-}
-
-.home-btn {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-}
-
-.back-btn {
-    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-    color: white;
-}
-
-.btn:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
 }
 
 .fun-fact {
-    margin-top: 40px;
-    padding: 20px;
-    background: #f8f9fa;
-    border-radius: 10px;
-    border-left: 4px solid #667eea;
+    margin-top: 24px;
+    padding-top: 10px;
+    border-top: 1px solid var(--border);
 }
 
 .fun-fact p {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.02em;
+    color: var(--text-3);
     margin: 0;
-    color: #666;
-    font-style: italic;
 }
 
-/* 响应式设计 */
-@media (max-width: 768px) {
-    .error-code {
-        font-size: 80px;
-    }
-    
-    .error-message {
-        font-size: 24px;
-    }
-    
-    .error-description {
-        font-size: 16px;
-    }
-    
-    .btn {
-        display: block;
-        margin: 10px auto;
-        width: 80%;
-        max-width: 200px;
+@media (max-width: 640px) {
+    .container {
+        padding: 12px;
     }
 }

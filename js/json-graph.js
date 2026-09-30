@@ -128,12 +128,12 @@ const JsonGraph = (function() {
                 <div class="modal-header">
                     <div class="modal-tabs"></div>
                     <div class="modal-toolbar">
-                        <button class="toolbar-btn" data-action="reset-layout" title="重置布局">🔄</button>
-                        <button class="toolbar-btn" data-action="toggle-theme" title="切换主题">🌓</button>
-                        <button class="toolbar-btn" data-action="toggle-family-compact" title="族压缩模式">🔲</button>
-                        <button class="toolbar-btn" data-action="export-png" title="导出PNG">📷</button>
-                        <button class="toolbar-btn" data-action="export-svg" title="导出SVG">📐</button>
-                        <button class="toolbar-btn" data-action="fullscreen" title="全屏">⛶</button>
+                        <button class="toolbar-btn" data-action="reset-layout" title="重置布局">⟲</button>
+                        <button class="toolbar-btn" data-action="toggle-theme" title="切换主题">◐</button>
+                        <button class="toolbar-btn" data-action="toggle-family-compact" title="族压缩模式">▦</button>
+                        <button class="toolbar-btn" data-action="export-png" title="导出PNG">⇩</button>
+                        <button class="toolbar-btn" data-action="export-svg" title="导出SVG">⇱</button>
+                        <button class="toolbar-btn" data-action="fullscreen" title="全屏">⤢</button>
                         <button class="toolbar-btn" data-action="close" title="关闭">✕</button>
                     </div>
                 </div>
@@ -190,7 +190,7 @@ const JsonGraph = (function() {
                                 </div>
                             </div>
                             <div class="sidebar-section">
-                                <button class="sidebar-btn" id="run-diagnosis">🔍 结构诊断</button>
+                                <button class="sidebar-btn" id="run-diagnosis">[?] 结构诊断</button>
                                 <div class="diagnosis-results" id="diagnosis-results"></div>
                             </div>
                         </div>
@@ -256,15 +256,15 @@ const JsonGraph = (function() {
                 </div>
                 <div class="modal-body">
                     <div class="empty-state-modal">
-                        <div class="empty-state-icon">📊</div>
+                        <div class="empty-state-icon">[ ]</div>
                         <div class="empty-state-title">暂无可视化数据</div>
                         <div class="empty-state-hint">JSON数据为空或无有效结构，无法生成关系图谱</div>
                         <div class="empty-state-actions">
                             <button class="empty-state-btn primary" id="load-sample-data">
-                                📥 导入示例数据
+                                导入示例数据
                             </button>
                             <button class="empty-state-btn secondary" id="import-file">
-                                📁 从文件导入
+                                从文件导入
                             </button>
                         </div>
                     </div>
@@ -330,26 +330,26 @@ const JsonGraph = (function() {
                 </div>
                 <div class="modal-body">
                     <div class="empty-state-modal cors-warning">
-                        <div class="empty-state-icon">🔒</div>
+                        <div class="empty-state-icon">[ ]</div>
                         <div class="empty-state-title">CORS 权限受限</div>
                         <div class="empty-state-hint">无法直接加载跨域JSON数据，请使用以下方案：</div>
                         <div class="cors-options">
                             <div class="cors-option">
-                                <span class="cors-icon">📋</span>
+                                <span class="cors-icon">[i]</span>
                                 <span>复制数据后粘贴到本页面</span>
                             </div>
                             <div class="cors-option">
-                                <span class="cors-icon">📁</span>
+                                <span class="cors-icon">[dir]</span>
                                 <span>下载JSON文件后本地导入</span>
                             </div>
                             <div class="cors-option">
-                                <span class="cors-icon">🌐</span>
+                                <span class="cors-icon">[url]</span>
                                 <span>确保目标服务器允许跨域访问</span>
                             </div>
                         </div>
                         <div class="empty-state-actions">
                             <button class="empty-state-btn secondary" id="import-local-file">
-                                📁 导入本地文件
+                                导入本地文件
                             </button>
                         </div>
                     </div>
@@ -684,8 +684,6 @@ const JsonGraph = (function() {
     function applyTheme() {
         const colors = CONFIG.THEME_COLORS[currentTheme];
         const modalWindow = modal.querySelector('.modal-window');
-        modalWindow.style.background = colors.bg;
-        modalWindow.style.color = colors.fg;
 
         const styleId = 'graph-modal-styles';
         let styleEl = document.getElementById(styleId);
@@ -695,24 +693,30 @@ const JsonGraph = (function() {
             document.head.appendChild(styleEl);
         }
 
+        // 弹窗外壳一律跟随站点设计令牌，不再使用图谱自带的深色调色板，
+        // 避免与 css/json-graph.css 的令牌互相覆盖。节点/连线颜色仍由 NODE_COLORS 表达。
         styleEl.textContent = `
-            .graph-modal .modal-window { background: ${colors.bg}; color: ${colors.fg}; }
-            .graph-modal .modal-header { background: ${colors.bg}; border-bottom: 1px solid ${colors.border}; }
-            .graph-modal .modal-tab { background: ${colors.bg}; border: 1px solid ${colors.border}; color: ${colors.fgDim}; }
-            .graph-modal .modal-tab.active { background: ${colors.border}; color: ${colors.fg}; }
-            .graph-modal .toolbar-btn { background: transparent; border: 1px solid ${colors.border}; color: ${colors.fg}; }
-            .graph-modal .toolbar-btn:hover { background: ${colors.highlight}; }
-            .graph-modal .toolbar-btn.active { background: ${colors.selected}; color: ${colors.bg}; }
-            .graph-modal .modal-sidebar { background: ${colors.bg}; border-left: 1px solid ${colors.border}; }
-            .graph-modal .modal-sidebar.collapsed .sidebar-toggle { background: ${colors.border}; color: ${colors.fg}; }
-            .graph-modal .stat-label, .graph-modal .section-title { color: ${colors.fgDim}; }
-            .graph-modal .stat-value { color: ${colors.fg}; }
-            .graph-modal .progress-bar { background: ${colors.border}; }
-            .graph-modal .zoom-btn, .graph-modal .zoom-display { background: ${colors.bg}; border: 1px solid ${colors.border}; color: ${colors.fg}; }
-            .graph-modal .sidebar-btn { background: transparent; border: 1px solid ${colors.border}; color: ${colors.fg}; }
-            .graph-modal .node-label { fill: ${colors.fg}; }
-            .graph-modal .link { stroke: ${colors.border}; }
-            .graph-modal .context-menu { background: ${colors.bg}; border: 1px solid ${colors.border}; color: ${colors.fg}; }
+            .graph-modal .modal-window { background: var(--bg-card); color: var(--text-1); border: 1px solid var(--border); border-radius: 3px; overflow: hidden; }
+            .graph-modal .modal-header { background: var(--bg-elevated); border-bottom: 1px solid var(--border); }
+            .graph-modal .modal-tab { background: var(--bg-card); border: 1px solid var(--border); color: var(--text-2); border-radius: var(--radius); }
+            .graph-modal .modal-tab.active { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+            .graph-modal .tab-close { color: var(--text-3); }
+            .graph-modal .tab-close:hover { color: var(--text-1); background: var(--bg-hover); }
+            .graph-modal .toolbar-btn { background: transparent; border: 1px solid var(--border); color: var(--text-2); border-radius: var(--radius); }
+            .graph-modal .toolbar-btn:hover { background: var(--bg-hover); border-color: var(--border-strong); color: var(--text-1); }
+            .graph-modal .toolbar-btn.active { background: var(--accent-soft); border-color: var(--accent); color: var(--text-1); }
+            .graph-modal .modal-sidebar { background: var(--bg-card); border-left: 1px solid var(--border); }
+            .graph-modal .modal-sidebar.collapsed .sidebar-toggle { background: var(--bg-hover); color: var(--text-1); }
+            .graph-modal .stat-label, .graph-modal .section-title { color: var(--text-2); font-family: var(--font-mono); font-size: 11px; }
+            .graph-modal .stat-value { color: var(--text-1); }
+            .graph-modal .progress-bar { background: var(--border); }
+            .graph-modal .zoom-btn, .graph-modal .zoom-display { background: var(--bg-card); border: 1px solid var(--border); color: var(--text-1); border-radius: var(--radius); font-family: var(--font-mono); }
+            .graph-modal .sidebar-btn { background: transparent; border: 1px solid var(--border); color: var(--text-1); border-radius: var(--radius); }
+            .graph-modal .sidebar-btn:hover { background: var(--bg-hover); }
+            .graph-modal .node-label { fill: var(--graph-fg, var(--text-1)); }
+            .graph-modal .link { stroke: var(--graph-link, var(--border)); }
+            .graph-modal .context-menu { background: var(--bg-elevated); border: 1px solid var(--border-strong); color: var(--text-1); border-radius: var(--radius); }
+            .graph-modal .context-menu .menu-item:hover { background: var(--bg-hover); }
         `;
     }
 
@@ -763,9 +767,6 @@ const JsonGraph = (function() {
         defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
         svg.appendChild(defs);
 
-        createGradients();
-        createFilters();
-
         mainGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
         svg.appendChild(mainGroup);
 
@@ -773,71 +774,6 @@ const JsonGraph = (function() {
 
         setupSVGEvents();
         createContextMenu();
-    }
-
-    function createGradients() {
-        Object.entries(CONFIG.NODE_COLORS).forEach(([type, colors]) => {
-            const gradient = document.createElementNS('http://www.w3.org/2000/svg', 'radialGradient');
-            gradient.setAttribute('id', `gradient-${type}`);
-            gradient.setAttribute('cx', '30%');
-            gradient.setAttribute('cy', '30%');
-
-            const stop1 = document.createElementNS('http://www.w3.org/2000/svg', 'stop');
-            stop1.setAttribute('offset', '0%');
-            stop1.setAttribute('stop-color', colors.light);
-
-            const stop2 = document.createElementNS('http://www.w3.org/2000/svg', 'stop');
-            stop2.setAttribute('offset', '100%');
-            stop2.setAttribute('stop-color', colors.dark);
-
-            gradient.appendChild(stop1);
-            gradient.appendChild(stop2);
-            defs.appendChild(gradient);
-        });
-
-        const haloGradient = document.createElementNS('http://www.w3.org/2000/svg', 'radialGradient');
-        haloGradient.setAttribute('id', 'halo-gradient');
-        haloGradient.setAttribute('cx', '50%');
-        haloGradient.setAttribute('cy', '50%');
-
-        const hStop1 = document.createElementNS('http://www.w3.org/2000/svg', 'stop');
-        hStop1.setAttribute('offset', '0%');
-        hStop1.setAttribute('stop-color', '#FF6B6B');
-        hStop1.setAttribute('stop-opacity', '0.6');
-
-        const hStop2 = document.createElementNS('http://www.w3.org/2000/svg', 'stop');
-        hStop2.setAttribute('offset', '100%');
-        hStop2.setAttribute('stop-color', '#FF6B6B');
-        hStop2.setAttribute('stop-opacity', '0');
-
-        haloGradient.appendChild(hStop1);
-        haloGradient.appendChild(hStop2);
-        defs.appendChild(haloGradient);
-    }
-
-    function createFilters() {
-        const glowFilter = document.createElementNS('http://www.w3.org/2000/svg', 'filter');
-        glowFilter.setAttribute('id', 'glow');
-        glowFilter.setAttribute('x', '-50%');
-        glowFilter.setAttribute('y', '-50%');
-        glowFilter.setAttribute('width', '200%');
-        glowFilter.setAttribute('height', '200%');
-
-        const feGaussianBlur = document.createElementNS('http://www.w3.org/2000/svg', 'feGaussianBlur');
-        feGaussianBlur.setAttribute('stdDeviation', '2');
-        feGaussianBlur.setAttribute('result', 'coloredBlur');
-
-        const feMerge = document.createElementNS('http://www.w3.org/2000/svg', 'feMerge');
-        const feMergeNode1 = document.createElementNS('http://www.w3.org/2000/svg', 'feMergeNode');
-        feMergeNode1.setAttribute('in', 'coloredBlur');
-        const feMergeNode2 = document.createElementNS('http://www.w3.org/2000/svg', 'feMergeNode');
-        feMergeNode2.setAttribute('in', 'SourceGraphic');
-        feMerge.appendChild(feMergeNode1);
-        feMerge.appendChild(feMergeNode2);
-
-        glowFilter.appendChild(feGaussianBlur);
-        glowFilter.appendChild(feMerge);
-        defs.appendChild(glowFilter);
     }
 
     function setupSVGEvents() {
@@ -978,9 +914,9 @@ const JsonGraph = (function() {
         contextMenu = document.createElement('div');
         contextMenu.className = 'context-menu';
         contextMenu.innerHTML = `
-            <div class="menu-item" data-action="copy-path">📍 复制节点路径</div>
-            <div class="menu-item" data-action="copy-json">📄 提取JSON片段</div>
-            <div class="menu-item" data-action="mark-important">⭐ 标记重点关注</div>
+            <div class="menu-item" data-action="copy-path">复制节点路径</div>
+            <div class="menu-item" data-action="copy-json">提取JSON片段</div>
+            <div class="menu-item" data-action="mark-important">[ ] 标记重点关注</div>
             <div class="menu-divider"></div>
             <div class="menu-item" data-action="collapse-children">➖ 折叠子节点</div>
             <div class="menu-item" data-action="expand-children">➕ 展开子节点</div>
@@ -1010,7 +946,7 @@ const JsonGraph = (function() {
                     updateSelectedNodeStats(node);
                     
                     const markItem = contextMenu.querySelector('[data-action="mark-important"]');
-                    markItem.textContent = markedNodes.has(nodeId) ? '⭐ 取消重点关注' : '⭐ 标记重点关注';
+                    markItem.textContent = markedNodes.has(nodeId) ? '[x] 取消重点关注' : '[ ] 标记重点关注';
                     
                     const rect = modal.querySelector('.modal-graph-area').getBoundingClientRect();
                     contextMenu.style.left = Math.min(e.clientX - rect.left, rect.width - 180) + 'px';
@@ -1433,9 +1369,11 @@ const JsonGraph = (function() {
 
             if (node.isRoot) {
                 const halo = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-                halo.setAttribute('r', size * 1.2);
-                halo.setAttribute('fill', 'url(#halo-gradient)');
-                halo.innerHTML = `<animate attributeName="r" values="${size * 1.5};${size * 2.2};${size * 1.5}" dur="2s" repeatCount="indefinite"/>`;
+                halo.setAttribute('r', size * 1.25);
+                halo.setAttribute('fill', 'none');
+                halo.setAttribute('stroke', CONFIG.NODE_COLORS.root.base);
+                halo.setAttribute('stroke-width', 1);
+                halo.setAttribute('stroke-dasharray', '3,3');
                 group.appendChild(halo);
             }
 
@@ -1444,14 +1382,14 @@ const JsonGraph = (function() {
                 star.setAttribute('x', size + 4);
                 star.setAttribute('y', -size);
                 star.setAttribute('font-size', '10');
-                star.textContent = '⭐';
+                star.setAttribute('fill', CONFIG.NODE_COLORS.string.base);
+                star.textContent = '*';
                 group.appendChild(star);
             }
 
             const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
             circle.setAttribute('r', size);
-            circle.setAttribute('fill', `url(#gradient-${node.type})`);
-            circle.setAttribute('filter', node.isRoot ? 'url(#glow)' : 'none');
+            circle.setAttribute('fill', (CONFIG.NODE_COLORS[node.type] || CONFIG.NODE_COLORS.null).base);
             
             if (node.type === 'null') {
                 circle.setAttribute('stroke', 'var(--graph-fg-dim, #8b949e)');
@@ -1778,7 +1716,7 @@ const JsonGraph = (function() {
         const resultsDiv = document.getElementById('diagnosis-results');
         resultsDiv.innerHTML = results.map(r => `
             <div class="diagnosis-item diagnosis-${r.level}">
-                <span>${r.level === 'success' ? '✅' : r.level === 'warning' ? '⚠️' : 'ℹ️'}</span>
+                <span>${r.level === 'success' ? '[ok]' : r.level === 'warning' ? '[!]' : '[i]'}</span>
                 <span>${r.message}</span>
             </div>
         `).join('');
