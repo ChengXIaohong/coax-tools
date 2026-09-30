@@ -19,12 +19,6 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.tools.coax.uno/pages/docx-converter.html</loc>
-    <lastmod>2025-11-20</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
     <loc>https://www.tools.coax.uno/pages/id-generator.html</loc>
     <lastmod>2025-11-20</lastmod>
     <changefreq>monthly</changefreq>
@@ -43,25 +37,7 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.tools.coax.uno/pages/password-generator.html</loc>
-    <lastmod>2025-11-20</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
     <loc>https://www.tools.coax.uno/pages/color-converter.html</loc>
-    <lastmod>2025-11-20</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://www.tools.coax.uno/pages/text-reader.html</loc>
-    <lastmod>2025-11-20</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://www.tools.coax.uno/pages/text-slicer.html</loc>
     <lastmod>2025-11-20</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>

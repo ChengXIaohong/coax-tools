@@ -55,15 +55,6 @@ const jsonFormatterTestData = {
     indent: 4
 };
 
-// 密码生成器测试数据
-const passwordGeneratorTestData = {
-    length: 12,
-    includeUppercase: true,
-    includeLowercase: true,
-    includeNumbers: true,
-    includeSymbols: true
-};
-
 // 文本转换工具测试数据
 const textConverterTestData = {
     input: 'hello world',
@@ -87,13 +78,9 @@ const timestampConverterTestData = {
 const allTestData = {
     converter: converterTestData,
     'data-generator': dataGeneratorTestData,
-    'docx-converter': {}, // 该工具需要实际文件上传，无法简单模拟
     'id-generator': idGeneratorTestData,
     'image-compressor': imageCompressorTestData,
     'json-formatter': jsonFormatterTestData,
-    'password-generator': passwordGeneratorTestData,
     'text-converter': textConverterTestData,
-    'text-reader': {}, // 该工具需要实际文件上传，无法简单模拟
-    'text-slicer': {}, // 该工具需要实际文件上传，无法简单模拟
     'timestamp-converter': timestampConverterTestData
 };

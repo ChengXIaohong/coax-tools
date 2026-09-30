@@ -17,14 +17,6 @@ const tools = [
         category: "common"
     },
     {
-        id: 2,
-        title: "随机密码",
-        description: "生成高强度安全密码，可自定义长度和字符类型。",
-        link: "pages/password-generator.html",
-        icon: "🔐",
-        category: "security"
-    },
-    {
         id: 4,
         title: "JSON",
         description: "验证并格式化JSON数据，使其更易读和调试。",
@@ -41,14 +33,6 @@ const tools = [
         category: "dev"
     },
     {
-        id: 6,
-        title: "Docx",
-        description: "将Word文档(.docx)转换为纯文本格式，方便内容提取和处理。",
-        link: "pages/docx-converter.html",
-        icon: "📝",
-        category: "doc"
-    },
-    {
         id: 7,
         title: "模拟数据",
         description: "生成模拟数据，支持多种数据类型，可自定义生成数量。",
@@ -57,52 +41,12 @@ const tools = [
         category: "data"
     },
     {
-        id: 8,
-        title: "切片",
-        description: "将大文本文件按行数或文件大小进行分割，支持多种分割方式。",
-        link: "pages/text-slicer.html",
-        icon: "✂️",
-        category: "text"
-    },
-    {
-        id: 9,
-        title: "阅读",
-        description: "支持超大文件的分块加载和虚拟滚动显示，实现流畅的阅读体验。",
-        link: "pages/text-reader.html",
-        icon: "📖",
-        category: "text"
-    },
-    {
-        id: 10,
-        title: "合并",
-        description: "将多个纯文本文件合并成一个大文件并提供下载功能。",
-        link: "pages/text-file-merger.html",
-        icon: "📋",
-        category: "text"
-    },
-    {
-        id: 11,
-        title: "Markdown",
-        description: "实时预览 Markdown 内容，支持语法高亮和常用编辑功能。",
-        link: "pages/markdown-editor.html",
-        icon: "📝",
-        category: "text"
-    },
-    {
         id: 12,
         title: "字符画",
         description: "将文字转换为炫酷的 ASCII Art 效果，支持多种字体风格，可导出为图片。",
         link: "pages/ascii-art.html",
         icon: "🎨",
         category: "text"
-    },
-    {
-        id: 13,
-        title: "小霸王游戏机",
-        description: "上传 NES/FC 格式 ROM 文件，重温经典红白机游戏，支持键盘和手柄操作。",
-        link: "pages/nes-emulator.html",
-        icon: "🎮",
-        category: "common"
     },
     {
         id: 14,
@@ -121,14 +65,6 @@ const tools = [
         category: "common"
     },
     {
-        id: 16,
-        title: "显卡测试",
-        description: "GPU基准测试工具，支持粒子爆炸、矩阵雨、几何变形三种渲染场景的帧率测试。",
-        link: "pages/gpu-benchmark.html",
-        icon: "🎮",
-        category: "dev"
-    },
-    {
         id: 17,
         title: "Txt转Epub",
         description: "将 TXT 文本文件转换为 EPUB 电子书，支持自动章节解析和封面设置。",
@@ -144,7 +80,6 @@ const categoryConfig = {
     text: { name: "文本处理", order: 2 },
     data: { name: "数据工具", order: 3 },
     dev: { name: "开发相关", order: 4 },
-    security: { name: "安全相关", order: 5 },
     doc: { name: "文档处理", order: 6 },
 };
 
@@ -255,7 +190,6 @@ function renderTools(toolsList) {
             text: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>',
             data: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>',
             dev: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>',
-            security: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>',
             doc: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>'
         };
 

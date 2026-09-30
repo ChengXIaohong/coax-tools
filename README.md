@@ -10,15 +10,11 @@
 
 - [单位换算器](pages/converter.html) - 支持多种单位之间的换算
 - [JSON 格式化工具](pages/json-formatter.html) - JSON 数据格式化和美化
-- [密码生成器](pages/password-generator.html) - 安全密码生成工具
-- [文本切割器](pages/text-slicer.html) - 大文本分割工具
 - [时间戳转换器](pages/timestamp-converter.html) - 时间戳与日期相互转换
 - [身份证生成器](pages/id-generator.html) - 身份证号码生成和校验
 - [数据生成器](pages/data-generator.html) - 各种测试数据生成工具
-- [DOCX 转换器](pages/docx-converter.html) - DOCX 文档处理工具
 - [图像压缩器](pages/image-compressor.html) - 图片压缩工具
 - [文本转换器](pages/text-converter.html) - 文本格式转换工具
-- [文本阅读器](pages/text-reader.html) - 文本文件阅读器
 
 ## ✨ 功能特点
 
