@@ -53,6 +53,10 @@ CLAUDE.md
 harness-progress.txt
 harness-tasks.json
 
+# 内部文档与运维记录（设计稿、整改方案、服务器配置片段）
+# 非站点内容：deploy.sh 已排除，nginx 亦拦截 /docs/
+docs/
+
 # 本地部署测试工作区
 # 内含 fake-www/.env —— 是真实 API Key 的副本，切勿提交到公开仓库
 .deploy-test/
