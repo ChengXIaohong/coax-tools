@@ -45,12 +45,14 @@ Thumbs.db
 coverage/
 test-results/
 
+# AI 助手与内部开发文件（绝不提交、绝不发布到公网）
+.claude
+.harness
+AGENTS.md
+CLAUDE.md
+harness-progress.txt
+harness-tasks.json
+
 # Vite related files
 .vite/
- vite.config.*.timestamp-*
- .claude
- AGENTS.md
- CLAUDE.md
- harness-progress.txt
- harness-tasks.json
- .harness
+vite.config.*.timestamp-*
