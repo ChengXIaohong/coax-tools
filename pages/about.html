@@ -1,0 +1,114 @@
+<!--
+  关于本站 - 站点合规说明
+-->
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="root@coax 关于本站、隐私说明与免责声明。本站为纯前端在线工具集合，所有数据在浏览器本地处理，不上传服务器。">
+    <meta name="keywords" content="关于本站, 隐私说明, 免责声明, 在线工具">
+    <meta name="author" content="coax">
+    <title>关于本站 · 免责声明 · 隐私说明 - coax的小工具</title>
+    <!-- 微信/社交平台分享卡片：缺失会导致分享卡片无描述、无缩略图，命中低质链接判定 -->
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="root@coax">
+    <meta property="og:title" content="关于本站 · root@coax">
+    <meta property="og:description" content="纯前端在线工具集合，所有数据在浏览器本地处理，不上传服务器。">
+    <meta property="og:url" content="https://www.tools.coax.uno/pages/about.html">
+    <meta property="og:image" content="https://www.tools.coax.uno/images/og-cover.png">
+    <meta name="twitter:card" content="summary_large_image">
+    <!-- 主题初始化：防止 FOUC 闪烁。必须在样式表之前执行。 -->
+    <script>
+    (function() {
+        // 默认暖纸浅色；历史值 'sci-fi' 属于旧的深色主题，迁移为 'dark' 以保留用户偏好
+        var saved = localStorage.getItem('coax-tools-mode');
+        var theme = (saved === 'dark' || saved === 'sci-fi') ? 'dark' : 'light';
+        document.documentElement.setAttribute('data-theme', theme);
+    })();
+    </script>
+    <link rel="stylesheet" href="../styles/theme-base.css?v=20260930">
+    <link rel="stylesheet" href="../styles/theme-tool.css?v=20260930">
+    <link rel="stylesheet" href="../css/about.css">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpolygon points='50,5 90,27.5 90,72.5 50,95 10,72.5 10,27.5' fill='none' stroke='%235C6E63' stroke-width='6'/%3E%3C/svg%3E">
+</head>
+<body>
+    <div class="container">
+        <main class="about-main">
+            <header class="tool-header-bar">
+                <a href="../index.html" class="back-btn">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M19 12H5M12 19l-7-7 7-7"/>
+                    </svg>
+                    返回首页
+                </a>
+                <div class="tool-title">
+                    <div class="tool-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 16v-4M12 8h.01"/></svg></div>
+                    <span class="tool-name">关于本站</span>
+                </div>
+                <span class="tool-desc">站点性质 · 隐私说明 · 免责声明</span>
+            </header>
+
+            <p class="about-lede">
+                本站是一套纯前端实现的在线工具集合，无后端服务、无第三方广告、无用户行为统计。
+            </p>
+
+            <section class="about-section">
+                <h2>运营主体与备案</h2>
+                <ul>
+                    <li>站点名称：root@coax（coax 的小工具）</li>
+                    <li>主办单位：<strong>程小洪</strong>（个人开发者，非经营性个人网站）</li>
+                    <li>备案号：<a href="https://beian.miit.gov.cn" target="_blank" rel="noopener nofollow">渝ICP备2025071398号</a></li>
+                    <li>联系方式：<a href="mailto:only3bit@gmail.com">only3bit@gmail.com</a></li>
+                    <li>源代码：<a href="https://github.com/ChengXIaohong/coax-tools" target="_blank" rel="noopener nofollow">GitHub</a>，采用 MIT 许可证开源</li>
+                </ul>
+            </section>
+
+            <section class="about-section">
+                <h2>隐私说明</h2>
+                <ul>
+                    <li>本站全部工具均为<strong>纯前端实现</strong>，所有计算在用户浏览器本地完成。</li>
+                    <li>本站<strong>没有后端服务器</strong>，不收集、不存储、不上传任何用户数据。</li>
+                    <li>用户上传的图片、文本等仅在本地浏览器内存中处理，关闭页面即释放，不产生任何网络传输。</li>
+                    <li>本站不使用第三方统计脚本、广告代码或用户追踪 Cookie。</li>
+                    <li>部分工具会读取本地偏好设置（如主题选择）用于改善体验，这些信息仅存于用户本地，不上传。</li>
+                </ul>
+            </section>
+
+            <section class="about-section">
+                <h2>工具清单</h2>
+                <ul class="about-tools">
+                    <li>压图<span>JPG / PNG / WEBP 在线压缩</span></li>
+                    <li>JSON 格式化<span>验证、格式化与图谱可视化</span></li>
+                    <li>测试身份数据<span>保险 / 金融系统接口联调</span></li>
+                    <li>字符画<span>文字转 ASCII Art</span></li>
+                    <li>文字云<span>文本或 CSV 生成词云</span></li>
+                    <li>图转字<span>图片转 ASCII 字符画</span></li>
+                    <li>Txt转Epub<span>文本转 EPUB 电子书</span></li>
+                </ul>
+            </section>
+
+            <section class="about-section">
+                <h2>合规使用与免责声明</h2>
+                <ul>
+                    <li>本站工具仅供学习、开发和业务系统<strong>测试环境</strong>使用。</li>
+                    <li><strong>测试身份数据</strong>工具用于保险、金融等业务系统的接口联调测试。其输出数据由算法随机生成，姓名带「测试」前缀、地址为虚构地址，<strong>不对应任何真实自然人，不具备任何真实身份效力</strong>。</li>
+                    <li>生成的数据<strong>严禁用于实名注册、真实投保、开户、身份核验或任何生产环境</strong>。</li>
+                    <li>用户应确保自身使用行为符合所在国家或地区的法律法规，以及所接入系统的管理要求。</li>
+                    <li>因不当使用本站工具而产生的任何后果，由使用者自行承担，本站不承担相应责任。</li>
+                    <li>如发现本站数据被用于上述禁止场景，站点保留追究责任的权利。</li>
+                </ul>
+            </section>
+        </main>
+
+        <footer>
+            <div class="footer-content">
+                <p>&copy; <span id="currentYear"></span> root@coax. 保留所有权利。</p>
+                <p><a href="about.html">关于本站 · 免责声明 · 隐私说明</a> · <a href="https://beian.miit.gov.cn" target="_blank" rel="noopener nofollow">渝ICP备2025071398号</a></p>
+            </div>
+        </footer>
+    </div>
+
+    <script src="../js/theme-switcher.js"></script>
+</body>
+</html>

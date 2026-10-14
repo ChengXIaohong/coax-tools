@@ -160,6 +160,22 @@
     gap: 6px;
 }
 
+/*
+   Material Icons → 内联 SVG 适配
+   外部 fonts.googleapis.com 在国内不可用，改为 1em 尺寸的内联线性图标，
+   沿用各按钮已有的 font-size 上下文（16px / 14px）
+*/
+.material-icons {
+    width: 1em;
+    height: 1em;
+    vertical-align: -0.15em;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
 .btn .material-icons {
     font-size: 16px;
 }

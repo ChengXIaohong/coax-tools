@@ -26,19 +26,11 @@ const tools = [
     },
     {
         id: 5,
-        title: "身份证",
-        description: "生成模拟身份证信息用于测试开发，请勿用于非法用途。",
+        title: "测试身份数据",
+        description: "生成用于保险、金融系统接口联调的测试身份数据，纯本地计算。",
         link: "pages/id-generator.html",
         icon: "id-card",
         category: "dev"
-    },
-    {
-        id: 7,
-        title: "模拟数据",
-        description: "生成模拟数据，支持多种数据类型，可自定义生成数量。",
-        link: "pages/data-generator.html",
-        icon: "database",
-        category: "data"
     },
     {
         id: 12,

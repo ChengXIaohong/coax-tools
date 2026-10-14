@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <!--
+    root@coax 分享卡片封面 · 1200x630
+    设计约束（AGENTS.md）：无渐变、无阴影、圆角 ≤4px、层级只用 1px 边框 + 背景色差
+    重新生成：rsvg-convert -w 1200 -h 630 images/og-cover.svg -o images/og-cover.png
+  -->
+  <rect width="1200" height="630" fill="#F7F6F1"/>
+
+  <!-- 外框：1px 边框表达层级 -->
+  <rect x="40" y="40" width="1120" height="550" fill="none" stroke="#DAD5CB" stroke-width="1"/>
+
+  <!-- 品牌标识：六边形 + 内圆（与站点 favicon 同源） -->
+  <g transform="translate(96,104)">
+    <polygon points="0,-22 19,-11 19,11 0,22 -19,11 -19,-11" fill="none" stroke="#5C6E63" stroke-width="4"/>
+    <circle cx="0" cy="0" r="7" fill="none" stroke="#5C6E63" stroke-width="4"/>
+  </g>
+  <text x="150" y="114" font-family="PingFang SC, Hiragino Sans GB, Helvetica Neue, sans-serif"
+        font-size="30" font-weight="500" fill="#23221F" letter-spacing="1">root@coax</text>
+
+  <!-- 主标题 -->
+  <text x="96" y="300" font-family="PingFang SC, Hiragino Sans GB, Helvetica Neue, sans-serif"
+        font-size="76" font-weight="600" fill="#23221F" letter-spacing="2">开源在线小工具集合</text>
+
+  <!-- 副标题：工具清单 -->
+  <text x="96" y="372" font-family="PingFang SC, Hiragino Sans GB, Helvetica Neue, sans-serif"
+        font-size="30" font-weight="400" fill="#706C63" letter-spacing="1">JSON 格式化 · 图片压缩 · 测试数据构造 · 字符画 · 文字云 · TXT转EPUB</text>
+
+  <!-- 强调色块：仅用背景色差表达层级 -->
+  <rect x="96" y="424" width="180" height="3" fill="#5C6E63"/>
+
+  <!-- 底部合规声明 -->
+  <line x1="96" y1="500" x2="1104" y2="500" stroke="#DAD5CB" stroke-width="1"/>
+  <text x="96" y="542" font-family="PingFang SC, Hiragino Sans GB, Helvetica Neue, sans-serif"
+        font-size="24" font-weight="400" fill="#9B968C" letter-spacing="1">纯前端实现 · 所有数据在浏览器本地处理 · 不上传服务器 · 渝ICP备2025071398号</text>
+</svg>

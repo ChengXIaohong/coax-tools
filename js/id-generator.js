@@ -138,20 +138,26 @@ function getBirthDateFromID(idNumber) {
 }
 
 // 生成随机姓名
+// 强制加「测试」前缀：使合成数据在字面上自我标识为测试数据。
+// 身份证号码中不编码姓名，姓名是独立字段，校验位只覆盖前 17 位数字，
+// 因此该前缀不影响接口联调所需的字段格式与校验逻辑。
+// 此处刻意不提供关闭开关——保留开关等同于保留「生成可冒用身份」的能力。
+const TEST_NAME_PREFIX = "测试";
+
 function generateName() {
     const surname = IdData.surnames[Math.floor(Math.random() * IdData.surnames.length)];
     // 随机决定是单字名还是双字名
     const isDoubleName = Math.random() > 0.5;
-    
+
     if (isDoubleName) {
         // 双字名
         const givenName1 = IdData.givenNames[Math.floor(Math.random() * IdData.givenNames.length)];
         const givenName2 = IdData.givenNames[Math.floor(Math.random() * IdData.givenNames.length)];
-        return surname + givenName1 + givenName2;
+        return TEST_NAME_PREFIX + surname + givenName1 + givenName2;
     } else {
         // 单字名
         const givenName = IdData.givenNames[Math.floor(Math.random() * IdData.givenNames.length)];
-        return surname + givenName;
+        return TEST_NAME_PREFIX + surname + givenName;
     }
 }
 

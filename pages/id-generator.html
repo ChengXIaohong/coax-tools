@@ -3,10 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="身份证信息生成器可生成用于测试开发的模拟身份证信息，包括身份证号、姓名、性别、出生日期、地址等，仅供开发测试使用。">
-    <meta name="keywords" content="身份证生成, 身份证信息, 模拟数据, 测试数据, 开发工具">
+    <meta name="description" content="测试身份数据工具，用于保险、金融等业务系统的接口联调测试，输出结构化身份测试数据。所有计算在浏览器本地完成，不上传服务器。">
+    <meta name="keywords" content="测试数据, 接口测试, 联调测试, 测试数据构造, 开发工具, 保险系统测试">
     <meta name="author" content="coax">
-    <title>身份证信息生成器 - coax的小工具</title>
+    <title>测试身份数据 - coax的小工具</title>
+    <!-- 微信/社交平台分享卡片：缺失会导致分享卡片无描述、无缩略图，命中低质链接判定 -->
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="root@coax">
+    <meta property="og:title" content="测试身份数据 - coax的小工具">
+    <meta property="og:description" content="用于保险、金融等业务系统接口联调的测试数据构造工具，纯前端本地计算。">
+    <meta property="og:url" content="https://www.tools.coax.uno/pages/id-generator.html">
+    <meta property="og:image" content="https://www.tools.coax.uno/images/og-cover.png">
+    <meta name="twitter:card" content="summary_large_image">
     <!-- 主题初始化：防止 FOUC（Flash of Unstyled Content）闪烁 -->
     <script>
     (function() {
@@ -19,7 +27,6 @@
     <link rel="stylesheet" href="../styles/theme-base.css?v=20260930">
     <link rel="stylesheet" href="../styles/theme-tool.css?v=20260930">
     <link rel="stylesheet" href="../css/id-generator.css">
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <!-- 添加favicon图标 -->
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔧</text></svg>">
     <script src="../js/id-data.js"></script>
@@ -37,9 +44,9 @@
                 </a>
                 <div class="tool-title">
                     <div class="tool-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="5" width="20" height="14" rx="2"/><circle cx="8" cy="11" r="2"/><path d="M4.5 16c.6-1.4 1.9-2 3.5-2s2.9.6 3.5 2"/><path d="M15 10h4"/><path d="M15 14h3"/></svg></div>
-                    <span class="tool-name">身份证生成器</span>
+                    <span class="tool-name">测试身份数据</span>
                 </div>
-                <span class="tool-desc">生成模拟身份证信息</span>
+                <span class="tool-desc">保险/金融系统接口联调用</span>
             </header>
 
             <!-- 内容区 -->
@@ -103,7 +110,7 @@
                     </div>
 
                     <div class="controls">
-                        <button id="generateBtn" class="generate-btn"><span class="loading-spinner"></span>生成身份证信息</button>
+                        <button id="generateBtn" class="generate-btn"><span class="loading-spinner"></span>生成测试数据</button>
                         <button id="copyJsonBtn" class="copy-json-btn">复制JSON</button>
                     </div>
 
@@ -155,12 +162,11 @@
                     <div class="disclaimer">
                         <h3>免责声明与风险提示</h3>
                         <ul>
-                            <li>本工具仅供开发测试使用，生成的所有信息均为虚构的模拟数据</li>
-                            <li>严禁将生成的身份证信息用于任何非法用途</li>
-                            <li>请勿将生成的信息用于真实身份验证、注册账户等场景</li>
-                            <li>使用本工具生成的数据所造成的任何法律后果由使用者自行承担</li>
-                            <li>本工具不保证生成数据的真实性、准确性和合法性</li>
-                            <li>建议在测试完成后及时删除相关模拟数据</li>
+                            <li>本工具为开发者测试数据构造工具，主要用于保险、金融等业务系统的接口联调测试</li>
+                            <li>输出数据由算法随机生成，<strong>姓名带「测试」前缀、地址为虚构地址</strong>，不对应任何真实自然人，不具备任何真实身份效力</li>
+                            <li>生成的数据仅可用于测试环境，<strong>严禁用于实名注册、真实投保、开户、身份核验或任何生产环境</strong></li>
+                            <li>本工具全部计算在浏览器本地完成，不收集、不上传任何用户数据</li>
+                            <li>如发现本工具数据被用于上述禁止场景，站点保留追究责任的权利</li>
                         </ul>
                     </div>
                 </div>
@@ -170,7 +176,7 @@
         <footer>
             <div class="footer-content">
                 <p>&copy; <span id="currentYear"></span> root@coax. 保留所有权利。</p>
-                <p>渝ICP备2025071398号</p>
+                <p><a href="about.html">关于本站 · 免责声明 · 隐私说明</a> · <a href="https://beian.miit.gov.cn" target="_blank" rel="noopener nofollow">渝ICP备2025071398号</a></p>
             </div>
         </footer>
     </div>
@@ -182,12 +188,11 @@
             </div>
             <div class="disclaimer-modal-body">
                 <ul>
-                    <li>本工具仅供开发测试使用，生成的所有信息均为虚构的模拟数据</li>
-                    <li>严禁将生成的身份证信息用于任何非法用途</li>
-                    <li>请勿将生成的信息用于真实身份验证、注册账户等场景</li>
-                    <li>使用本工具生成的数据所造成的任何法律后果由使用者自行承担</li>
-                    <li>本工具不保证生成数据的真实性、准确性和合法性</li>
-                    <li>建议在测试完成后及时删除相关模拟数据</li>
+                    <li>本工具为开发者测试数据构造工具，主要用于保险、金融等业务系统的接口联调测试</li>
+                    <li>输出数据由算法随机生成，<strong>姓名带「测试」前缀、地址为虚构地址</strong>，不对应任何真实自然人，不具备任何真实身份效力</li>
+                    <li>生成的数据仅可用于测试环境，<strong>严禁用于实名注册、真实投保、开户、身份核验或任何生产环境</strong></li>
+                    <li>本工具全部计算在浏览器本地完成，不收集、不上传任何用户数据</li>
+                    <li>如发现本工具数据被用于上述禁止场景，站点保留追究责任的权利</li>
                 </ul>
             </div>
             <div class="disclaimer-modal-footer">

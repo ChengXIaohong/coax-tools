@@ -51,8 +51,16 @@ const ThemeSwitcher = (function() {
         host.appendChild(btn);
     }
 
+    function fillCopyrightYear() {
+        const span = document.getElementById('currentYear');
+        if (span) {
+            span.textContent = new Date().getFullYear();
+        }
+    }
+
     function init() {
         createSwitcher();
+        fillCopyrightYear();
 
         // 跨标签页同步
         window.addEventListener('storage', function(e) {
