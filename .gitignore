@@ -53,6 +53,10 @@ CLAUDE.md
 harness-progress.txt
 harness-tasks.json
 
+# 本地部署测试工作区
+# 内含 fake-www/.env —— 是真实 API Key 的副本，切勿提交到公开仓库
+.deploy-test/
+
 # Vite related files
 .vite/
 vite.config.*.timestamp-*

@@ -1,6 +1,7 @@
 User-agent: *
-# 测试目录不对外开放（对搜索引擎有效；微信爬虫不遵守 robots.txt，
-# 需同时在 nginx 层拦截，见 docs/wechat-link-risk-remediation.md）
+# 测试与内部文档目录不对外开放。
+# 注意：robots.txt 仅对搜索引擎爬虫有效，微信爬虫不遵守，
+# 因此 nginx 层另有 location 拦截作为真正生效的防护。
 Disallow: /test/
 Disallow: /docs/
 Disallow: /data/
